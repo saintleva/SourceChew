@@ -9,6 +9,20 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+object Versions {
+    const val koin = "4.0.0"
+}
+
+object Deps {
+
+    object Koin {
+        const val core = "io.insert-koin:koin-core:${Versions.koin}"
+        const val android = "io.insert-koin:koin-android:${Versions.koin}"
+        const val compose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
+        const val viewmodel = "io.insert-koin:koin-androidx-viewmodel:${Versions.koin}"
+    }
+}
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -18,7 +32,7 @@ kotlin {
     }
     
     jvm("desktop")
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -46,6 +60,11 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            implementation(Deps.Koin.core)
+            implementation(Deps.Koin.android)
+            implementation(Deps.Koin.compose)
+            implementation(Deps.Koin.viewmodel)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
