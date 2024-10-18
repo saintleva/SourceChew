@@ -20,13 +20,16 @@ package com.github.saintleva.sourcechew.ui.search
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.skia.FilterMode
+import org.koin.compose.viewmodel.koinViewModel
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
 

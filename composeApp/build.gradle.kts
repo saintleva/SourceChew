@@ -17,9 +17,8 @@ object Deps {
 
     object Koin {
         const val core = "io.insert-koin:koin-core:${Versions.koin}"
-        const val android = "io.insert-koin:koin-android:${Versions.koin}"
-        const val compose = "io.insert-koin:koin-androidx-compose:${Versions.koin}"
-        const val viewmodel = "io.insert-koin:koin-androidx-viewmodel:${Versions.koin}"
+        const val compose = "io.insert-koin:koin-compose:${Versions.koin}"
+        const val viewmodel = "io.insert-koin:koin-compose-viewmodel:${Versions.koin}"
     }
 }
 
@@ -62,7 +61,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
 
             implementation(Deps.Koin.core)
-            implementation(Deps.Koin.android)
             implementation(Deps.Koin.compose)
             implementation(Deps.Koin.viewmodel)
         }

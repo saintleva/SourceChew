@@ -45,7 +45,7 @@ typealias HostingOptions = Map<Hosting, Boolean>
 //    val groud: Boolean = false
 //)
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel() : ViewModel() {
 
     val selectedHostings = mutableStateMapOf() HostingOptions()
 //    val selectedTypes = TypeOptions()

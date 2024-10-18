@@ -17,6 +17,5 @@
 
 package com.github.saintleva.sourcechew.di
 
-
 class AppModule {
 }
