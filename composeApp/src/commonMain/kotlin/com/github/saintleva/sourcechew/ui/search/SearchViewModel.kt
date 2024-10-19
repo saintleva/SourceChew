@@ -17,38 +17,53 @@
 
 package com.github.saintleva.sourcechew.ui.search
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.github.saintleva.sourcechew.domain.models.Forge
+import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 
-sealed class Hosting(val name: String) {
-    object Github : Hosting("GitHub")
-    object Gitlab : Hosting("GitLab")
-    object Bitbucket : Hosting("Bitbucket")
+class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
 
-    companion object {
-        val list = listOf(Github, Gitlab, Bitbucket)
+    private val _selectedForges: MutableMap<Forge, MutableState<Boolean>>
+    val selectedForges: Map<Forge, State<Boolean>>
+
+    private val _repositoryOption = mutableStateOf(configRepository.previousOptions.typeOptions.repository)
+    val repositoryOption: State<Boolean> = _repositoryOption
+
+    private val _userOption = mutableStateOf(configRepository.previousOptions.typeOptions.user)
+    val userOption: State<Boolean> = _userOption
+
+    private val _groupOption = mutableStateOf(configRepository.previousOptions.typeOptions.group)
+    val groupOption: State<Boolean> = _groupOption
+
+    init {
+        _selectedForges = mutableMapOf()
+        selectedForges = mutableMapOf()
+        for (forge in Forge.list) {
+            _selectedForges[forge] = mutableStateOf(configRepository.previousOptions.forgeOptions[forge]!!)
+            selectedForges[forge] = _selectedForges[forge]!!
+        }
     }
-}
 
-typealias HostingOptions = Map<Hosting, Boolean>
+    fun maySearch(): Boolean {
+        for (forgeState : selectedForges.values) {
 
-//class HostingOptions(
-//    val github: Boolean = true,
-//    val gitlab: Boolean = true,
-//    val bitbucket: Boolean = true
-//)
+        }
+    }
 
-//class TypeOptions(
-//    val repository: Boolean = true,
-//    val user: Boolean = false,
-//    val groud: Boolean = false
-//)
+    fun onRepositoryOptionChange(value: Boolean) {
+        _repositoryOption.value = value
+    }
 
-class SearchViewModel() : ViewModel() {
+    fun onUserOptionChange(value: Boolean) {
+        _userOption.value = value
+    }
 
-    val selectedHostings = mutableStateMapOf() HostingOptions()
-//    val selectedTypes = TypeOptions()
-
-
+    fun onGroupOptionChange(value: Boolean) {
+        _groupOption.value = value
+    }
 }

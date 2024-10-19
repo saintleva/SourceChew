@@ -15,13 +15,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.di
-
-import com.github.saintleva.sourcechew.ui.search.SearchViewModel
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.module
+package com.github.saintleva.sourcechew.domain.models
 
 
-val appModule = module {
-    viewModelOf(::SearchViewModel)
+sealed class Forge(val name: String) {
+    object Github : Forge("GitHub")
+    object Gitlab : Forge("GitLab")
+    object Bitbucket : Forge("Bitbucket")
+
+    companion object {
+        val list = listOf(Github, Gitlab, Bitbucket)
+    }
 }

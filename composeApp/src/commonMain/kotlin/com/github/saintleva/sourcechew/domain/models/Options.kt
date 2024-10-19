@@ -15,13 +15,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.di
-
-import com.github.saintleva.sourcechew.ui.search.SearchViewModel
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.module
+package com.github.saintleva.sourcechew.domain.models
 
 
-val appModule = module {
-    viewModelOf(::SearchViewModel)
+typealias ForgeOptions = Map<Forge, Boolean>
+
+private fun genDefaultForgeOptions(): ForgeOptions {
+    val result = mutableMapOf<Forge, Boolean>()
+    for (forge in Forge.list) {
+        result[forge] = true
+    }
+    return result
 }
+
+val defaultForgeOptions = genDefaultForgeOptions()
+    //mapOf(Forge.Github to true, Forge.Gitlab to true, Forge.Bitbucket to true)
+
+
+class TypeOptions(
+    val repository: Boolean,
+    val user: Boolean,
+    val group: Boolean
+)
+
+class AllOptions(
+    val forgeOptions: ForgeOptions,
+    val typeOptions: TypeOptions
+)

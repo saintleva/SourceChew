@@ -15,13 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.di
+package com.github.saintleva.sourcechew.domain.repository
 
-import com.github.saintleva.sourcechew.ui.search.SearchViewModel
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.module
+import com.github.saintleva.sourcechew.domain.models.AllOptions
 
 
-val appModule = module {
-    viewModelOf(::SearchViewModel)
+interface ConfigRepository {
+
+    var previousOptions: AllOptions
 }

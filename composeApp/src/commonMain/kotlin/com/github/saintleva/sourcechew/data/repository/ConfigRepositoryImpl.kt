@@ -15,13 +15,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.di
+package com.github.saintleva.sourcechew.data.repository
 
-import com.github.saintleva.sourcechew.ui.search.SearchViewModel
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.module
+import com.github.saintleva.sourcechew.domain.models.AllOptions
+import com.github.saintleva.sourcechew.domain.models.TypeOptions
+import com.github.saintleva.sourcechew.domain.models.defaultForgeOptions
+import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 
-val appModule = module {
-    viewModelOf(::SearchViewModel)
+object ConfigRepositoryImpl : ConfigRepository {
+
+    override var previousOptions: AllOptions = AllOptions(
+        defaultForgeOptions,
+        TypeOptions(repository = true, user = false, group = false)
+    )
 }
