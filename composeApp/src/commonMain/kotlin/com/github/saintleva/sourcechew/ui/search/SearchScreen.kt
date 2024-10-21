@@ -22,9 +22,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.saintleva.sourcechew.domain.models.Forge
 import org.jetbrains.skia.FilterMode
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -34,10 +36,35 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
 
     Column(modifier = Modifier.padding(16.dp)) {
-        for (hosting in Hosting.list) {
+        Row(modifier = Modifier.padding(10.dp)) {
+            Forge.list.forEach { forge ->
+                FilterChip(
+                    selected = viewModel.selectedForges[forge]!!,
+                    onClick = { viewModel.toggleForge(forge) },
+                ) {
+                    Text(text = forge.name)
+                }
+            }
+        }
+        Row(modifier = Modifier.padding(10.dp)) {
             FilterChip(
-                selected = viewModel.selectedHostings[hosting].
-            )
+                selected = viewModel.repositoryOption.value,
+                onClick = { viewModel.toggleRepository() },
+            ) {
+                Text("Repositories")
+            }
+            FilterChip(
+                selected = viewModel.userOption.value,
+                onClick = { viewModel.toggleUser() },
+            ) {
+                Text("Users")
+            }
+            FilterChip(
+                selected = viewModel.groupOption.value,
+                onClick = { viewModel.toggleGroup() },
+            ) {
+                Text("Groups")
+            }
         }
     }
 }

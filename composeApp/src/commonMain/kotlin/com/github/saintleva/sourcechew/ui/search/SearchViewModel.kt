@@ -28,8 +28,10 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
 
-    private val _selectedForges: MutableMap<Forge, MutableState<Boolean>>
-    val selectedForges: Map<Forge, State<Boolean>>
+    val selectedForges = mutableStateMapOf<Forge, Boolean>()
+
+//    private val _selectedForges: Map<Forge, MutableState<Boolean>>
+//    val selectedForges: Map<Forge, State<Boolean>>
 
     private val _repositoryOption = mutableStateOf(configRepository.previousOptions.typeOptions.repository)
     val repositoryOption: State<Boolean> = _repositoryOption
@@ -41,29 +43,34 @@ class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
     val groupOption: State<Boolean> = _groupOption
 
     init {
-        _selectedForges = mutableMapOf()
-        selectedForges = mutableMapOf()
         for (forge in Forge.list) {
-            _selectedForges[forge] = mutableStateOf(configRepository.previousOptions.forgeOptions[forge]!!)
-            selectedForges[forge] = _selectedForges[forge]!!
+            selectedForges[forge] = configRepository.previousOptions.forgeOptions[forge]!!
         }
+//        _selectedForges = mutableMapOf()
+//        selectedForges = mutableMapOf()
+//        for (forge in Forge.list) {
+//            _selectedForges[forge] = mutableStateOf(configRepository.previousOptions.forgeOptions[forge]!!)
+//            selectedForges[forge] = _selectedForges[forge]!!
+//        }
     }
 
-    fun maySearch(): Boolean {
-        for (forgeState : selectedForges.values) {
+    fun maySearch() =
+        selectedForges.values.any { it }
+                && (_repositoryOption.value || _userOption.value || _groupOption.value)
 
-        }
+    fun toggleForge(forge: Forge) {
+        selectedForges[forge] = !selectedForges[forge]!!
     }
 
-    fun onRepositoryOptionChange(value: Boolean) {
-        _repositoryOption.value = value
+    fun toggleRepository() {
+        _repositoryOption.value = !_repositoryOption.value
     }
 
-    fun onUserOptionChange(value: Boolean) {
-        _userOption.value = value
+    fun toggleUser() {
+        _userOption.value = !_userOption.value
     }
 
-    fun onGroupOptionChange(value: Boolean) {
-        _groupOption.value = value
+    fun toggleGroup() {
+        _groupOption.value = !_groupOption.value
     }
 }
