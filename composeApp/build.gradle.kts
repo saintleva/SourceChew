@@ -13,14 +13,14 @@ object Versions {
     const val koin = "4.0.0"
 }
 
-object Deps {
-
-    object Koin {
-        const val core = "io.insert-koin:koin-core:${Versions.koin}"
-        const val compose = "io.insert-koin:koin-compose:${Versions.koin}"
-        const val viewmodel = "io.insert-koin:koin-compose-viewmodel:${Versions.koin}"
-    }
-}
+//object Deps {
+//
+//    object Koin {
+//        const val core = "io.insert-koin:koin-core:${Versions.koin}"
+//        const val compose = "io.insert-koin:koin-compose:${Versions.koin}"
+//        const val viewmodel = "io.insert-koin:koin-compose-viewmodel:${Versions.koin}"
+//    }
+//}
 
 kotlin {
     androidTarget {
@@ -49,6 +49,9 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -60,9 +63,13 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
 
-            implementation(Deps.Koin.core)
-            implementation(Deps.Koin.compose)
-            implementation(Deps.Koin.viewmodel)
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+
+//            implementation(Deps.Koin.core)
+//            implementation(Deps.Koin.compose)
+//            implementation(Deps.Koin.viewmodel)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

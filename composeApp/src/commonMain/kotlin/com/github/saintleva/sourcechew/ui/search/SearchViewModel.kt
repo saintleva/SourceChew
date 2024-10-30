@@ -17,7 +17,6 @@
 
 package com.github.saintleva.sourcechew.ui.search
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +40,8 @@ class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
 
     private val _groupOption = mutableStateOf(configRepository.previousOptions.typeOptions.group)
     val groupOption: State<Boolean> = _groupOption
+
+    private val text = mutableStateOf()
 
     init {
         for (forge in Forge.list) {

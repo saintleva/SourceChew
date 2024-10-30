@@ -19,15 +19,18 @@ package com.github.saintleva.sourcechew.ui.search
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FilterChip
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.saintleva.sourcechew.domain.models.Forge
-import org.jetbrains.skia.FilterMode
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -35,7 +38,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column {
         Row(modifier = Modifier.padding(10.dp)) {
             Forge.list.forEach { forge ->
                 FilterChip(
@@ -66,5 +69,13 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
                 Text("Groups")
             }
         }
+        OutlinedTextField(
+            value = viewModel.text.value,
+            onValueChange = { viewModel.onTextChange(it) },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(fontSize = 16.sp),
+            label = { Text(stringResource(R.string.enter_search_text)) },
+            isError = viewModel.text.value.isEmpty()
+        )
     }
 }
