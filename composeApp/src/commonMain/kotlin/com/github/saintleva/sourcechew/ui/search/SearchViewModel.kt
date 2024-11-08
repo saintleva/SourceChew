@@ -32,20 +32,21 @@ class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
 //    private val _selectedForges: Map<Forge, MutableState<Boolean>>
 //    val selectedForges: Map<Forge, State<Boolean>>
 
-    private val _repositoryOption = mutableStateOf(configRepository.previousOptions.typeOptions.repository)
+    private val _repositoryOption = mutableStateOf(configRepository.previousConditions.typeOptions.repository)
     val repositoryOption: State<Boolean> = _repositoryOption
 
-    private val _userOption = mutableStateOf(configRepository.previousOptions.typeOptions.user)
+    private val _userOption = mutableStateOf(configRepository.previousConditions.typeOptions.user)
     val userOption: State<Boolean> = _userOption
 
-    private val _groupOption = mutableStateOf(configRepository.previousOptions.typeOptions.group)
+    private val _groupOption = mutableStateOf(configRepository.previousConditions.typeOptions.group)
     val groupOption: State<Boolean> = _groupOption
 
-    private val text = mutableStateOf()
+    private val _text = mutableStateOf(configRepository.previousConditions.text)
+    val text: State<String> = _text
 
     init {
         for (forge in Forge.list) {
-            selectedForges[forge] = configRepository.previousOptions.forgeOptions[forge]!!
+            selectedForges[forge] = configRepository.previousConditions.forgeOptions[forge]!!
         }
 //        _selectedForges = mutableMapOf()
 //        selectedForges = mutableMapOf()
@@ -58,6 +59,7 @@ class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
     fun maySearch() =
         selectedForges.values.any { it }
                 && (_repositoryOption.value || _userOption.value || _groupOption.value)
+                && text.value.isNotEmpty()
 
     fun toggleForge(forge: Forge) {
         selectedForges[forge] = !selectedForges[forge]!!
@@ -73,5 +75,9 @@ class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
 
     fun toggleGroup() {
         _groupOption.value = !_groupOption.value
+    }
+
+    fun onTextChange(newText: String) {
+        _text.value = newText
     }
 }

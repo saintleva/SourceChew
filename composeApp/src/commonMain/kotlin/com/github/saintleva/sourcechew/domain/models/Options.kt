@@ -42,7 +42,8 @@ class TypeOptions(
     fun isAny() = repository || user || group
 }
 
-class AllOptions(
+class SearchConditions(
     val forgeOptions: ForgeOptions,
-    val typeOptions: TypeOptions
+    val typeOptions: TypeOptions,
+    val text: String
 )

@@ -17,7 +17,7 @@
 
 package com.github.saintleva.sourcechew.data.repository
 
-import com.github.saintleva.sourcechew.domain.models.AllOptions
+import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.models.defaultForgeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
@@ -25,8 +25,9 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 object ConfigRepositoryImpl : ConfigRepository {
 
-    override var previousOptions: AllOptions = AllOptions(
+    override var previousConditions: SearchConditions = SearchConditions(
         defaultForgeOptions,
-        TypeOptions(repository = true, user = false, group = false)
+        TypeOptions(repository = true, user = false, group = false),
+        ""
     )
 }

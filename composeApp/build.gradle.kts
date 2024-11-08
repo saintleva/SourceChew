@@ -9,9 +9,9 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-object Versions {
-    const val koin = "4.0.0"
-}
+//object Versions {
+//    const val koin = "4.0.0"
+//}
 
 //object Deps {
 //
@@ -56,7 +56,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)

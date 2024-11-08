@@ -17,10 +17,10 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
-import com.github.saintleva.sourcechew.domain.models.AllOptions
+import com.github.saintleva.sourcechew.domain.models.SearchConditions
 
 
 interface ConfigRepository {
 
-    var previousOptions: AllOptions
+    var previousConditions: SearchConditions
 }

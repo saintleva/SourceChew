@@ -21,10 +21,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FilterChip
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -34,7 +34,6 @@ import com.github.saintleva.sourcechew.domain.models.Forge
 import org.koin.compose.viewmodel.koinViewModel
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
 
@@ -44,38 +43,42 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
                 FilterChip(
                     selected = viewModel.selectedForges[forge]!!,
                     onClick = { viewModel.toggleForge(forge) },
-                ) {
-                    Text(text = forge.name)
-                }
+                    label = { Text(text = forge.name) }
+                )
             }
         }
         Row(modifier = Modifier.padding(10.dp)) {
             FilterChip(
                 selected = viewModel.repositoryOption.value,
                 onClick = { viewModel.toggleRepository() },
-            ) {
-                Text("Repositories")
-            }
+                label = { Text("Repositories") }
+            )
             FilterChip(
                 selected = viewModel.userOption.value,
                 onClick = { viewModel.toggleUser() },
-            ) {
-                Text("Users")
-            }
+                label = { Text("Users") }
+            )
             FilterChip(
                 selected = viewModel.groupOption.value,
                 onClick = { viewModel.toggleGroup() },
-            ) {
-                Text("Groups")
-            }
+                label = { Text("Groups") }
+            )
         }
         OutlinedTextField(
             value = viewModel.text.value,
             onValueChange = { viewModel.onTextChange(it) },
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(fontSize = 16.sp),
-            label = { Text(stringResource(R.string.enter_search_text)) },
+            label = { Text("Enter search text") },
+//            label = { Text(stringResource(R.string.enter_search_text)) },
             isError = viewModel.text.value.isEmpty()
         )
+        Button(
+            onClick = {},
+            modifier = Modifier.fillMaxWidth(),
+            enabled = viewModel.maySearch()
+        ) {
+            Text("Search")
+        }
     }
 }
