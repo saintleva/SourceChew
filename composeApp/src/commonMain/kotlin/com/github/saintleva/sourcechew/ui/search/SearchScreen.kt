@@ -17,8 +17,10 @@
 
 package com.github.saintleva.sourcechew.ui.search
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -34,11 +36,16 @@ import com.github.saintleva.sourcechew.domain.models.Forge
 import org.koin.compose.viewmodel.koinViewModel
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
 
     Column {
-        Row(modifier = Modifier.padding(10.dp)) {
+        FlowRow(
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.Top
+        ) {
             Forge.list.forEach { forge ->
                 FilterChip(
                     selected = viewModel.selectedForges[forge]!!,
@@ -47,7 +54,11 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
                 )
             }
         }
-        Row(modifier = Modifier.padding(10.dp)) {
+        FlowRow(
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.Top
+        ) {
             FilterChip(
                 selected = viewModel.repositoryOption.value,
                 onClick = { viewModel.toggleRepository() },
@@ -67,7 +78,7 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
         OutlinedTextField(
             value = viewModel.text.value,
             onValueChange = { viewModel.onTextChange(it) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.padding(8.dp).fillMaxWidth(),
             textStyle = TextStyle(fontSize = 16.sp),
             label = { Text("Enter search text") },
 //            label = { Text(stringResource(R.string.enter_search_text)) },
@@ -75,7 +86,7 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
         )
         Button(
             onClick = {},
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = viewModel.maySearch()
         ) {
             Text("Search")

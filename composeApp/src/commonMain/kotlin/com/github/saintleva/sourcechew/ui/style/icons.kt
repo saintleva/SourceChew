@@ -15,20 +15,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.domain.models
+package com.github.saintleva.sourcechew.ui.style
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import com.github.saintleva.sourcechew.domain.models.Forge
+import org.jetbrains.compose.resources.painterResource
 
 
-sealed class Forge(val name: String) {
-    data object Github : Forge("GitHub")
-    data object Gitlab : Forge("GitLab")
-    data object Bitbucket : Forge("Bitbucket")
-    data object Sourceforge : Forge("SourceForge")
-    data object Gitea : Forge("Gitea")
-    data object Sourcehut : Forge("SourceHut")
-    data object Gogs : Forge("Gogs")
-    data object Codeberg : Forge("Codeberg")
-
-    companion object {
-        val list = listOf(Github, Gitlab, Bitbucket, Sourceforge, Gitea, Sourcehut, Gogs, Codeberg)
-    }
-}
+@Composable
+fun forgeIcons() = mapOf<Forge, Painter>(
+    Forge.Github to painterResource("drawable/512px-Octicons-mark-github.svg.png"),
+    Forge.Gitlab to painterResource("drawable/512px-Octicons-mark-github.svg.png")
+)
