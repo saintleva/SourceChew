@@ -23,16 +23,22 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.saintleva.sourcechew.domain.models.Forge
+import com.github.saintleva.sourcechew.ui.style.forgeIconResources
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -47,10 +53,24 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
             verticalArrangement = Arrangement.Top
         ) {
             Forge.list.forEach { forge ->
+                val iconResource = forgeIconResources[forge]
+                val textStyle = MaterialTheme.typography.labelLarge
                 FilterChip(
                     selected = viewModel.selectedForges[forge]!!,
                     onClick = { viewModel.toggleForge(forge) },
-                    label = { Text(text = forge.name) }
+                    label = { Text(text = forge.name, style = textStyle) },
+                    leadingIcon = {
+                        if (iconResource == null)
+                            null
+                        else {
+                            val textSizeDp= with(LocalDensity.current) { textStyle.fontSize.toDp() }
+                            Icon(
+                                painter = painterResource(iconResource),
+                                contentDescription = "${forge.name} logo",
+                                modifier = Modifier.size(textSizeDp * 1.75f)
+                            )
+                        }
+                    }
                 )
             }
         }

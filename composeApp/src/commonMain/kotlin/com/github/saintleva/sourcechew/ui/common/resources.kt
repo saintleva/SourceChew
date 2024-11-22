@@ -18,7 +18,12 @@
 package com.github.saintleva.sourcechew.ui.common
 
 
-//actual class ResourcesImpl(val context: Context) {
-//    fun getDrawableResource(name: String)
-//    = context.getIdentifier(name, "drawable", context.packageName)}
+//interface Resources {
+//    fun getDrawableResource(name: String): Int
 //}
+//
+//expect class ResourcesImpl : Resources {
+//    override fun getDrawableResource(name: String): Int
+//}
+//
+////expect fun getDrawableResource(name: String, context: Context): Int
