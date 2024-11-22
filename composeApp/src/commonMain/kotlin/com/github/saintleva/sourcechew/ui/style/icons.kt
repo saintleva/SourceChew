@@ -17,14 +17,21 @@
 
 package com.github.saintleva.sourcechew.ui.style
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
 import com.github.saintleva.sourcechew.domain.models.Forge
-import org.jetbrains.compose.resources.painterResource
+import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.bitbucket_logo
+import sourcechew.composeapp.generated.resources.github_logo_64px
 
 
-@Composable
-fun forgeIcons() = mapOf<Forge, Painter>(
-    Forge.Github to painterResource("drawable/512px-Octicons-mark-github.svg.png"),
-    Forge.Gitlab to painterResource("drawable/512px-Octicons-mark-github.svg.png")
+//@Composable
+//fun forgeIcons() = mapOf<Forge, Painter>(
+//    Forge.Github to painterResource(Res.drawable.github_logo_512px),
+//    Forge.Gitlab to painterResource(Res.drawable.github_logo_64px),
+//    Forge.Bitbucket to painterResource(Res.drawable.bitbucket_logo)
+//)
+
+val forgeIconResources = mapOf(
+    Forge.Github to Res.drawable.github_logo_64px,
+    Forge.Gitlab to Res.drawable.github_logo_64px,
+    Forge.Bitbucket to Res.drawable.bitbucket_logo
 )
