@@ -67,6 +67,9 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
 
+            //implementation(libs.modo)
+            implementation(libs.modo)
+
 //            implementation(Deps.Koin.core)
 //            implementation(Deps.Koin.compose)
 //            implementation(Deps.Koin.viewmodel)

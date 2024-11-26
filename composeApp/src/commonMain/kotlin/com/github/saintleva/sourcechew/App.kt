@@ -9,6 +9,7 @@ import org.koin.compose.KoinContext
 @Composable
 @Preview
 fun App() {
+    val rootScreen = rememberRootScreen
     MaterialTheme {
         KoinContext {
             SearchScreen()

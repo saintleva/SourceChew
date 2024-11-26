@@ -1,0 +1,8 @@
+<resources>
+    <string name="logo">logo</string>
+    <string name="repositories">Repositories</string>
+    <string name="users">Users</string>
+    <string name="groups">Groups</string>
+    <string name="enter_search_text">Enter search text</string>
+    <string name="search">Search</string>
+</resources>

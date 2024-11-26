@@ -20,7 +20,8 @@ package com.github.saintleva.sourcechew.ui.style
 import com.github.saintleva.sourcechew.domain.models.Forge
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.bitbucket_logo
-import sourcechew.composeapp.generated.resources.github_logo_64px
+import sourcechew.composeapp.generated.resources.github_logo_128px
+import sourcechew.composeapp.generated.resources.gitlab_logo
 
 
 //@Composable
@@ -31,7 +32,7 @@ import sourcechew.composeapp.generated.resources.github_logo_64px
 //)
 
 val forgeIconResources = mapOf(
-    Forge.Github to Res.drawable.github_logo_64px,
-    Forge.Gitlab to Res.drawable.github_logo_64px,
+    Forge.Github to Res.drawable.github_logo_128px,
+    Forge.Gitlab to Res.drawable.gitlab_logo,
     Forge.Bitbucket to Res.drawable.bitbucket_logo
 )

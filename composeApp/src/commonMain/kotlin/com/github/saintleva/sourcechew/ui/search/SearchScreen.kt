@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -39,8 +40,20 @@ import androidx.compose.ui.unit.sp
 import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.ui.style.forgeIconResources
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.enter_search_text
+import sourcechew.composeapp.generated.resources.groups
+import sourcechew.composeapp.generated.resources.logo
+import sourcechew.composeapp.generated.resources.repositories
+import sourcechew.composeapp.generated.resources.search
+import sourcechew.composeapp.generated.resources.users
 
+
+class SearchScreen() : Screen {
+
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -49,9 +62,11 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
     Column {
         FlowRow(
             modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp,
+                alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.Top
         ) {
+            //TODO: Show right Gitlab and Bitbucket logo instead of black rectangle
             Forge.list.forEach { forge ->
                 val iconResource = forgeIconResources[forge]
                 val textStyle = MaterialTheme.typography.labelLarge
@@ -60,13 +75,11 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
                     onClick = { viewModel.toggleForge(forge) },
                     label = { Text(text = forge.name, style = textStyle) },
                     leadingIcon = {
-                        if (iconResource == null)
-                            null
-                        else {
+                        iconResource?.let {
                             val textSizeDp= with(LocalDensity.current) { textStyle.fontSize.toDp() }
                             Icon(
-                                painter = painterResource(iconResource),
-                                contentDescription = "${forge.name} logo",
+                                painter = painterResource(it),
+                                contentDescription = "${forge.name} ${stringResource(Res.string.logo)}",
                                 modifier = Modifier.size(textSizeDp * 1.75f)
                             )
                         }
@@ -76,23 +89,24 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
         }
         FlowRow(
             modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp,
+                alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.Top
         ) {
             FilterChip(
                 selected = viewModel.repositoryOption.value,
                 onClick = { viewModel.toggleRepository() },
-                label = { Text("Repositories") }
+                label = { Text(stringResource(Res.string.repositories)) }
             )
             FilterChip(
                 selected = viewModel.userOption.value,
                 onClick = { viewModel.toggleUser() },
-                label = { Text("Users") }
+                label = { Text(stringResource(Res.string.users)) }
             )
             FilterChip(
                 selected = viewModel.groupOption.value,
                 onClick = { viewModel.toggleGroup() },
-                label = { Text("Groups") }
+                label = { Text(stringResource(Res.string.groups)) }
             )
         }
         OutlinedTextField(
@@ -100,16 +114,15 @@ fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
             onValueChange = { viewModel.onTextChange(it) },
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             textStyle = TextStyle(fontSize = 16.sp),
-            label = { Text("Enter search text") },
-//            label = { Text(stringResource(R.string.enter_search_text)) },
+            label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = viewModel.text.value.isEmpty()
         )
         Button(
-            onClick = {},
+            onClick = { viewModel.search() },
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = viewModel.maySearch()
         ) {
-            Text("Search")
+            Text(stringResource(Res.string.search))
         }
     }
 }

@@ -29,9 +29,6 @@ class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
 
-//    private val _selectedForges: Map<Forge, MutableState<Boolean>>
-//    val selectedForges: Map<Forge, State<Boolean>>
-
     private val _repositoryOption = mutableStateOf(configRepository.previousConditions.typeOptions.repository)
     val repositoryOption: State<Boolean> = _repositoryOption
 
@@ -48,12 +45,6 @@ class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
         for (forge in Forge.list) {
             selectedForges[forge] = configRepository.previousConditions.forgeOptions[forge]!!
         }
-//        _selectedForges = mutableMapOf()
-//        selectedForges = mutableMapOf()
-//        for (forge in Forge.list) {
-//            _selectedForges[forge] = mutableStateOf(configRepository.previousOptions.forgeOptions[forge]!!)
-//            selectedForges[forge] = _selectedForges[forge]!!
-//        }
     }
 
     fun maySearch() =
@@ -79,5 +70,9 @@ class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
 
     fun onTextChange(newText: String) {
         _text.value = newText
+    }
+
+    fun search() {
+
     }
 }
