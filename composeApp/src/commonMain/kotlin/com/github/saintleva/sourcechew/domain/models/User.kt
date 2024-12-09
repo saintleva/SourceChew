@@ -15,13 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.di
-
-import com.github.saintleva.sourcechew.ui.search.SearchScreenModel
-import org.koin.core.module.dsl.factoryOf
-import org.koin.dsl.module
+package com.github.saintleva.sourcechew.domain.models
 
 
-val appModule = module {
-    factoryOf(::SearchScreenModel)
-}
+class User(forge: Forge, val name: String): Item(forge)

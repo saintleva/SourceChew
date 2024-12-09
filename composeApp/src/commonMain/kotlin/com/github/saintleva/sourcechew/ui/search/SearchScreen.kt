@@ -37,11 +37,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.ui.style.forgeIconResources
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.enter_search_text
 import sourcechew.composeapp.generated.resources.groups
@@ -53,76 +54,79 @@ import sourcechew.composeapp.generated.resources.users
 
 class SearchScreen() : Screen {
 
-}
+    @OptIn(ExperimentalLayoutApi::class)
+    @Composable
+    override fun Content() {
+        val screenModel = koinScreenModel<SearchScreenModel>()
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun SearchScreen(viewModel: SearchViewModel = koinViewModel()) {
-
-    Column {
-        FlowRow(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp,
-                alignment = Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.Top
-        ) {
-            //TODO: Show right Gitlab and Bitbucket logo instead of black rectangle
-            Forge.list.forEach { forge ->
-                val iconResource = forgeIconResources[forge]
-                val textStyle = MaterialTheme.typography.labelLarge
-                FilterChip(
-                    selected = viewModel.selectedForges[forge]!!,
-                    onClick = { viewModel.toggleForge(forge) },
-                    label = { Text(text = forge.name, style = textStyle) },
-                    leadingIcon = {
-                        iconResource?.let {
-                            val textSizeDp= with(LocalDensity.current) { textStyle.fontSize.toDp() }
-                            Icon(
-                                painter = painterResource(it),
-                                contentDescription = "${forge.name} ${stringResource(Res.string.logo)}",
-                                modifier = Modifier.size(textSizeDp * 1.75f)
-                            )
+        Column {
+            FlowRow(
+                modifier = Modifier.padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp,
+                    alignment = Alignment.CenterHorizontally),
+                verticalArrangement = Arrangement.Top
+            ) {
+                //TODO: Show right Gitlab and Bitbucket logo instead of black rectangle
+                Forge.list.forEach { forge ->
+                    val iconResource = forgeIconResources[forge]
+                    val textStyle = MaterialTheme.typography.labelLarge
+                    FilterChip(
+                        selected = screenModel.selectedForges[forge]!!,
+                        onClick = { screenModel.toggleForge(forge) },
+                        label = { Text(text = forge.name, style = textStyle) },
+                        leadingIcon = {
+                            iconResource?.let {
+                                val textSizeDp= with(LocalDensity.current) {
+                                    textStyle.fontSize.toDp()
+                                }
+                                Icon(
+                                    painter = painterResource(it),
+                                    contentDescription = "${forge.name} ${stringResource(Res.string.logo)}",
+                                    modifier = Modifier.size(textSizeDp * 1.75f)
+                                )
+                            }
                         }
-                    }
+                    )
+                }
+            }
+            FlowRow(
+                modifier = Modifier.padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp,
+                    alignment = Alignment.CenterHorizontally),
+                verticalArrangement = Arrangement.Top
+            ) {
+                FilterChip(
+                    selected = screenModel.repositoryOption.value,
+                    onClick = { screenModel.toggleRepository() },
+                    label = { Text(stringResource(Res.string.repositories)) }
+                )
+                FilterChip(
+                    selected = screenModel.userOption.value,
+                    onClick = { screenModel.toggleUser() },
+                    label = { Text(stringResource(Res.string.users)) }
+                )
+                FilterChip(
+                    selected = screenModel.groupOption.value,
+                    onClick = { screenModel.toggleGroup() },
+                    label = { Text(stringResource(Res.string.groups)) }
                 )
             }
-        }
-        FlowRow(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp,
-                alignment = Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.Top
-        ) {
-            FilterChip(
-                selected = viewModel.repositoryOption.value,
-                onClick = { viewModel.toggleRepository() },
-                label = { Text(stringResource(Res.string.repositories)) }
+            OutlinedTextField(
+                value = screenModel.text.value,
+                onValueChange = { screenModel.onTextChange(it) },
+                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                textStyle = TextStyle(fontSize = 16.sp),
+                label = { Text(stringResource(Res.string.enter_search_text)) },
+                isError = screenModel.text.value.isEmpty()
             )
-            FilterChip(
-                selected = viewModel.userOption.value,
-                onClick = { viewModel.toggleUser() },
-                label = { Text(stringResource(Res.string.users)) }
-            )
-            FilterChip(
-                selected = viewModel.groupOption.value,
-                onClick = { viewModel.toggleGroup() },
-                label = { Text(stringResource(Res.string.groups)) }
-            )
-        }
-        OutlinedTextField(
-            value = viewModel.text.value,
-            onValueChange = { viewModel.onTextChange(it) },
-            modifier = Modifier.padding(8.dp).fillMaxWidth(),
-            textStyle = TextStyle(fontSize = 16.sp),
-            label = { Text(stringResource(Res.string.enter_search_text)) },
-            isError = viewModel.text.value.isEmpty()
-        )
-        Button(
-            onClick = { viewModel.search() },
-            modifier = Modifier.padding(8.dp).fillMaxWidth(),
-            enabled = viewModel.maySearch()
-        ) {
-            Text(stringResource(Res.string.search))
+            Button(
+                onClick = { screenModel.search() },
+                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                enabled = screenModel.maySearch()
+            ) {
+                Text(stringResource(Res.string.search))
+            }
         }
     }
+
 }

@@ -17,8 +17,8 @@
 
 package com.github.saintleva.sourcechew.ui.found
 
-import androidx.lifecycle.ViewModel
+import cafe.adriel.voyager.core.model.ScreenModel
 
 
-class FoundViewModel : ViewModel {
+class FoundScreenModel : ScreenModel {
 }

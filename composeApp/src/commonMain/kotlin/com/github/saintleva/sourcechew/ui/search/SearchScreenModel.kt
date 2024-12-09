@@ -20,12 +20,12 @@ package com.github.saintleva.sourcechew.ui.search
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import cafe.adriel.voyager.core.model.ScreenModel
 import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 
-class SearchViewModel(configRepository: ConfigRepository) : ViewModel() {
+class SearchScreenModel(configRepository: ConfigRepository) : ScreenModel {
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
 
