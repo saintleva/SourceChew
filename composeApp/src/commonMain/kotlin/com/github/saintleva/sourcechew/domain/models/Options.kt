@@ -35,11 +35,11 @@ val defaultForgeOptions = Forge.list.associateWith { true }
 
 
 class TypeOptions(
-    val repository: Boolean,
+    val repo: Boolean,
     val user: Boolean,
     val group: Boolean
 ) {
-    fun isAny() = repository || user || group
+    fun isAny() = repo || user || group
 }
 
 class SearchConditions(

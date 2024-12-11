@@ -15,7 +15,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.domain.models
+package com.github.saintleva.sourcechew.domain.repository
+
+import com.github.saintleva.sourcechew.domain.models.FoundItems
+import com.github.saintleva.sourcechew.domain.models.SearchConditions
 
 
-class Group(forge: Forge, val name: String): Item(forge)
+interface SearchRepository {
+
+    suspend fun search(searchConditions: SearchConditions): FoundItems
+}

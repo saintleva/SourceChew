@@ -25,11 +25,11 @@ import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 
-class SearchScreenModel(configRepository: ConfigRepository) : ScreenModel {
+class SearchScreenModel(private val configRepository: ConfigRepository) : ScreenModel {
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
 
-    private val _repositoryOption = mutableStateOf(configRepository.previousConditions.typeOptions.repository)
+    private val _repositoryOption = mutableStateOf(configRepository.previousConditions.typeOptions.repo)
     val repositoryOption: State<Boolean> = _repositoryOption
 
     private val _userOption = mutableStateOf(configRepository.previousConditions.typeOptions.user)

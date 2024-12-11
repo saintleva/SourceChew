@@ -25,9 +25,9 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 object ConfigRepositoryImpl : ConfigRepository {
 
-    override var previousConditions: SearchConditions = SearchConditions(
+    override var previousConditions: SearchConditions? = SearchConditions(
         defaultForgeOptions,
-        TypeOptions(repository = true, user = false, group = false),
+        TypeOptions(repo = true, user = false, group = false),
         ""
     )
 }

@@ -18,5 +18,8 @@
 package com.github.saintleva.sourcechew.domain.models
 
 
-abstract class Item(val forge: Forge) {
+sealed class Item(val forge: Forge) {
+    class Repo(forge: Forge, val name: String): Item(forge)
+    class User(forge: Forge, val name: String): Item(forge)
+    class Group(forge: Forge, val name: String): Item(forge)
 }

@@ -17,8 +17,18 @@
 
 package com.github.saintleva.sourcechew.ui.found
 
-import cafe.adriel.voyager.core.model.ScreenModel
+import androidx.compose.runtime.Composable
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
+import com.github.saintleva.sourcechew.domain.models.SearchConditions
 
 
-class FoundScreenModel : ScreenModel {
+class FoundScreen(val conditions: SearchConditions) : Screen {
+
+    @Composable
+    override fun Content() {
+        val screenModel = koinScreenModel<FoundScreenModel>()
+        screenModel.find(conditions)
+
+    }
 }
