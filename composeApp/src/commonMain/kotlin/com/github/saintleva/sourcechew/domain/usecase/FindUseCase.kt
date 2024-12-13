@@ -15,17 +15,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.domain.models
+package com.github.saintleva.sourcechew.domain.usecase
 
+import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.ui.found.SearchItemsState
+import kotlinx.coroutines.flow.MutableStateFlow
 
-class FoundItems() {
-    val repos = mutableListOf<Item.Repo>()
-    val users = mutableListOf<Item.User>()
-    val groups = mutableListOf<Item.Group>()
-}
+interface FindUseCase {
 
-sealed interface SearchItemsState {
-    data object Searching : SearchItemsState
-    data class Error(val cause: Throwable) : SearchItemsState
-    data class Success(val items: FoundItems) : SearchItemsState
+    suspend operator fun invoke(
+        conditions: SearchConditions,
+        foundItems: MutableStateFlow<SearchItemsState>
+    )
 }

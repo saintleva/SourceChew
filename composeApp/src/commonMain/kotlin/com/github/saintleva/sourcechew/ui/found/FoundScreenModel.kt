@@ -17,14 +17,13 @@
 
 package com.github.saintleva.sourcechew.ui.found
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
-import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
@@ -34,28 +33,12 @@ sealed interface SearchItemsState {
     data class Success(val items: FoundItems) : SearchItemsState
 }
 
-class FoundScreenModel(
-    private val configRepository: ConfigRepository,
-    private val searchRepository: SearchRepository
-) : ScreenModel {
+class FoundScreenModel(private val findUseCase: FindUseCase) : ScreenModel {
 
-    private var _previousConditions: SearchConditions?
-        get() = configRepository.previousConditions
-        set(value) {
-            configRepository.previousConditions = value
-        }
-
-    private val _foundItems = mutableStateOf<SearchItemsState>(SearchItemsState.Searching)
-    val foundItems: State<SearchItemsState> = _foundItems
+    private val _foundItems = MutableStateFlow<SearchItemsState>(SearchItemsState.Searching)
+    val foundItems = _foundItems.asStateFlow()
 
     fun find(conditions: SearchConditions) {
-        if (conditions != _previousConditions) {
-            _foundItems.value = SearchItemsState.Searching
-            _previousConditions = conditions
-            screenModelScope.launch {
-                _foundItems.value = SearchItemsState.Success(searchRepository.search(conditions))
-            }
-
-        }
+        screenModelScope.launch { findUseCase(conditions, _foundItems) }
     }
 }
