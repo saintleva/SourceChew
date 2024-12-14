@@ -21,36 +21,43 @@ import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.Item
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 
 
 class SearchRepositoryMock(
     private val eachCount: Int,
-    private val delayImitation: Duration = Duration.ZERO
+    private val delayImitation: Duration = Duration.ZERO,
+    private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : SearchRepository {
 
     override suspend fun search(conditions: SearchConditions): FoundItems {
         val result = FoundItems()
-        for (forgeOption in conditions.forgeOptions) {
-            if (forgeOption.value) {
-                val forge = forgeOption.key
-                if (conditions.typeOptions.repo) {
-                    for (i in 0 until eachCount) {
-                        delay(delayImitation)
-                        result.repos.add(Item.Repo(forge,"${i}${conditions.text}${i}"))
+        withContext(searchDispatcher) {
+            for (forgeOption in conditions.forgeOptions) {
+                if (forgeOption.value) {
+                    val forge = forgeOption.key
+                    if (conditions.typeOptions.repo) {
+                        for (i in 0 until eachCount) {
+                            delay(delayImitation)
+                            result.repos.add(Item.Repo(forge, "${i}${conditions.text}${i}"))
+                        }
                     }
-                }
-                if (conditions.typeOptions.user) {
-                    for (i in 0 until eachCount) {
-                        delay(delayImitation)
-                        result.users.add(Item.User(forge,"${i}${conditions.text}${i}"))
+                    if (conditions.typeOptions.user) {
+                        for (i in 0 until eachCount) {
+                            delay(delayImitation)
+                            result.users.add(Item.User(forge, "${i}${conditions.text}${i}"))
+                        }
                     }
-                }
-                if (conditions.typeOptions.repo) {
-                    for (i in 0 until eachCount) {
-                        delay(delayImitation)
-                        result.groups.add(Item.Group(forge,"${i}${conditions.text}${i}"))
+                    if (conditions.typeOptions.repo) {
+                        for (i in 0 until eachCount) {
+                            delay(delayImitation)
+                            result.groups.add(Item.Group(forge, "${i}${conditions.text}${i}"))
+                        }
                     }
                 }
             }

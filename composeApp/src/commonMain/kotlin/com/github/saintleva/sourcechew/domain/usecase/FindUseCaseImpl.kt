@@ -35,7 +35,10 @@ class FindUseCaseImpl(
         if (conditions != configRepository.previousConditions) {
             foundItems.value = SearchItemsState.Searching
             configRepository.previousConditions = conditions
+            //TODO: Migrate to update() method
             foundItems.value = SearchItemsState.Success(searchRepository.search(conditions))
+        } else {
+            //TODO: Implement it
         }
     }
 }

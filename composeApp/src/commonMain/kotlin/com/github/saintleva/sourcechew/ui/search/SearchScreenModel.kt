@@ -17,11 +17,14 @@
 
 package com.github.saintleva.sourcechew.ui.search
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.github.saintleva.sourcechew.domain.models.Forge
+import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 
@@ -29,8 +32,8 @@ class SearchScreenModel(private val configRepository: ConfigRepository) : Screen
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
 
-    private val _repositoryOption = mutableStateOf(configRepository.previousConditions.typeOptions.repo)
-    val repositoryOption: State<Boolean> = _repositoryOption
+    private val _repoOption = mutableStateOf(configRepository.previousConditions.typeOptions.repo)
+    val repoOption: State<Boolean> = _repoOption
 
     private val _userOption = mutableStateOf(configRepository.previousConditions.typeOptions.user)
     val userOption: State<Boolean> = _userOption
@@ -41,6 +44,10 @@ class SearchScreenModel(private val configRepository: ConfigRepository) : Screen
     private val _text = mutableStateOf(configRepository.previousConditions.text)
     val text: State<String> = _text
 
+    private val _usePreviousConditionsSearch: MutableState<Boolean> =
+        mutableStateOf(configRepository.usePreviousConditionsSearch)
+    val usePreviousConditionsSearch: MutableState<Boolean> = _usePreviousConditionsSearch
+
     init {
         for (forge in Forge.list) {
             selectedForges[forge] = configRepository.previousConditions.forgeOptions[forge]!!
@@ -49,7 +56,7 @@ class SearchScreenModel(private val configRepository: ConfigRepository) : Screen
 
     fun maySearch() =
         selectedForges.values.any { it }
-                && (_repositoryOption.value || _userOption.value || _groupOption.value)
+                && (_repoOption.value || _userOption.value || _groupOption.value)
                 && text.value.isNotEmpty()
 
     fun toggleForge(forge: Forge) {
@@ -57,7 +64,7 @@ class SearchScreenModel(private val configRepository: ConfigRepository) : Screen
     }
 
     fun toggleRepository() {
-        _repositoryOption.value = !_repositoryOption.value
+        _repoOption.value = !_repoOption.value
     }
 
     fun toggleUser() {
@@ -72,7 +79,20 @@ class SearchScreenModel(private val configRepository: ConfigRepository) : Screen
         _text.value = newText
     }
 
-    fun search() {
+    fun usePreviousConditionsSearchChange(checked: Boolean) {
+        _usePreviousConditionsSearch.value = checked
+        configRepository.usePreviousConditionsSearch = checked
+    }
 
+    fun obtainConditions() = SearchConditions(
+        selectedForges.toMap(),
+        TypeOptions(repoOption.value, userOption.value, groupOption.value),
+        text.value
+    )
+
+    fun conditionsIsPrevious() = obtainConditions() == configRepository.previousConditions
+
+    fun search() {
+        //TOOO: implement it
     }
 }

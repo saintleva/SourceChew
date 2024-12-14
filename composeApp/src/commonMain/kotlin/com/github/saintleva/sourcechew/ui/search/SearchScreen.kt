@@ -21,10 +21,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -96,24 +98,24 @@ class SearchScreen() : Screen {
                 verticalArrangement = Arrangement.Top
             ) {
                 FilterChip(
-                    selected = screenModel.repositoryOption.value,
-                    onClick = { screenModel.toggleRepository() },
+                    selected = screenModel.repoOption.value,
+                    onClick = screenModel::toggleRepository,
                     label = { Text(stringResource(Res.string.repositories)) }
                 )
                 FilterChip(
                     selected = screenModel.userOption.value,
-                    onClick = { screenModel.toggleUser() },
+                    onClick = screenModel::toggleUser,
                     label = { Text(stringResource(Res.string.users)) }
                 )
                 FilterChip(
                     selected = screenModel.groupOption.value,
-                    onClick = { screenModel.toggleGroup() },
+                    onClick = screenModel::toggleGroup,
                     label = { Text(stringResource(Res.string.groups)) }
                 )
             }
             OutlinedTextField(
                 value = screenModel.text.value,
-                onValueChange = { screenModel.onTextChange(it) },
+                onValueChange = screenModel::onTextChange,
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 textStyle = TextStyle(fontSize = 16.sp),
                 label = { Text(stringResource(Res.string.enter_search_text)) },
@@ -125,6 +127,17 @@ class SearchScreen() : Screen {
                 enabled = screenModel.maySearch()
             ) {
                 Text(stringResource(Res.string.search))
+            }
+            Row(
+                modifier = Modifier.padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = screenModel.usePreviousConditionsSearch.value,
+                    onCheckedChange = screenModel::usePreviousConditionsSearchChange,
+                    enabled = screenModel.conditionsIsPrevious()
+                )
+                Text(stringResource(Res.string.use_previous_conditions_search))
             }
         }
     }

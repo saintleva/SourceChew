@@ -30,4 +30,6 @@ object ConfigRepositoryImpl : ConfigRepository {
         TypeOptions(repo = true, user = false, group = false),
         ""
     )
+
+    override var usePreviousConditionsSearch: Boolean = false
 }

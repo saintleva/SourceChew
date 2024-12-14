@@ -23,4 +23,5 @@ import com.github.saintleva.sourcechew.domain.models.SearchConditions
 interface ConfigRepository {
 
     var previousConditions: SearchConditions?
+    var usePreviousConditionsSearch: Boolean
 }

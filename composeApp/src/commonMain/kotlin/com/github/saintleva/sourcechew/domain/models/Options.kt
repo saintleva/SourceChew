@@ -34,7 +34,7 @@ val defaultForgeOptions = Forge.list.associateWith { true }
     //mapOf(Forge.Github to true, Forge.Gitlab to true, Forge.Bitbucket to true)
 
 
-class TypeOptions(
+data class TypeOptions(
     val repo: Boolean,
     val user: Boolean,
     val group: Boolean
@@ -42,7 +42,7 @@ class TypeOptions(
     fun isAny() = repo || user || group
 }
 
-class SearchConditions(
+data class SearchConditions(
     val forgeOptions: ForgeOptions,
     val typeOptions: TypeOptions,
     val text: String
