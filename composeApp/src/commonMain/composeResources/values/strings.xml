@@ -5,5 +5,5 @@
     <string name="groups">Groups</string>
     <string name="enter_search_text">Enter search text</string>
     <string name="search">Search</string>
-    <string name="use_previous_conditions_search">Use previous search results using such conditions</string>
+    <string name="use_previous_search_conditions">Use previous search results using such conditions</string>
 </resources>
