@@ -51,6 +51,7 @@ import sourcechew.composeapp.generated.resources.groups
 import sourcechew.composeapp.generated.resources.logo
 import sourcechew.composeapp.generated.resources.repositories
 import sourcechew.composeapp.generated.resources.search
+import sourcechew.composeapp.generated.resources.use_previous_conditions_search
 import sourcechew.composeapp.generated.resources.users
 
 
@@ -137,7 +138,7 @@ class SearchScreen() : Screen {
                     onCheckedChange = screenModel::usePreviousConditionsSearchChange,
                     enabled = screenModel.conditionsIsPrevious()
                 )
-                Text(stringResource(Res.string.use_previous_conditions_search))
+                Text(stringResource(Res.string.use_previous_search_conditions))
             }
         }
     }

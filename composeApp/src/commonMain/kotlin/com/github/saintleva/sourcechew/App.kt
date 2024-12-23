@@ -3,12 +3,15 @@ package com.github.saintleva.sourcechew
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.github.saintleva.sourcechew.ui.search.SearchScreen
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinContext
 
 @Composable
 @Preview
 fun App() {
+    Napier.base(DebugAntilog())
     val rootScreen = rememberRootScreen
     MaterialTheme {
         KoinContext {

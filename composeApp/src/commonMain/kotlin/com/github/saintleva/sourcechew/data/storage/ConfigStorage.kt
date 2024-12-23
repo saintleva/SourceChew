@@ -15,21 +15,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.data.repository
+package com.github.saintleva.sourcechew.data.storage
 
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.domain.models.TypeOptions
-import com.github.saintleva.sourcechew.domain.models.defaultForgeOptions
-import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 
-class ConfigRepositoryImpl(private val configStorage: ConfigStorage) : ConfigRepository {
+class Config(
+    previousConditions: SearchConditions?,
+    usePreviousConditionsSearch: Boolean
+)
 
-    override var previousConditions: SearchConditions? = SearchConditions(
-        defaultForgeOptions,
-        TypeOptions(repo = true, user = false, group = false),
-        ""
-    )
-
-    override var usePreviousConditionsSearch: Boolean = false
+interface ConfigStorage {
+    suspend fun save(config: Config)
+    suspend fun load(): Config
 }
