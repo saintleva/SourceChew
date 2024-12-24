@@ -17,11 +17,12 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
-import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.SearchItemsState
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 interface SearchRepository {
-
-    suspend fun search(searchConditions: SearchConditions): FoundItems
+    val foundItems: MutableStateFlow<SearchItemsState>
+    suspend fun search(searchConditions: SearchConditions)
 }

@@ -29,8 +29,7 @@ class FindUseCaseImpl(
 ) {
 
     suspend operator fun invoke(
-        conditions: SearchConditions,
-        foundItems: MutableStateFlow<SearchItemsState>
+        conditions: SearchConditions
     ) {
         if (conditions != configRepository.previousConditions) {
             foundItems.value = SearchItemsState.Searching

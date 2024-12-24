@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -41,7 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.Forge
+import com.github.saintleva.sourcechew.ui.found.FoundScreen
 import com.github.saintleva.sourcechew.ui.style.forgeIconResources
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -61,6 +65,16 @@ class SearchScreen() : Screen {
     @Composable
     override fun Content() {
         val screenModel = koinScreenModel<SearchScreenModel>()
+
+        val navigator = LocalNavigator.currentOrThrow
+        LaunchedEffect(Unit) {
+            screenModel.navigationEvents.collect { event ->
+                when (event) {
+                    NavigationEvent.NavigateToFoundScreen -> navigator.push(FoundScreen())
+                    NavigationEvent.NavigateBack -> navigator.pop()
+                }
+            }
+        }
 
         Column {
             FlowRow(
@@ -122,13 +136,6 @@ class SearchScreen() : Screen {
                 label = { Text(stringResource(Res.string.enter_search_text)) },
                 isError = screenModel.text.value.isEmpty()
             )
-            Button(
-                onClick = { screenModel.search() },
-                modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                enabled = screenModel.maySearch()
-            ) {
-                Text(stringResource(Res.string.search))
-            }
             Row(
                 modifier = Modifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -139,6 +146,13 @@ class SearchScreen() : Screen {
                     enabled = screenModel.conditionsIsPrevious()
                 )
                 Text(stringResource(Res.string.use_previous_search_conditions))
+            }
+            Button(
+                onClick = { screenModel.search() },
+                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                enabled = screenModel.maySearch()
+            ) {
+                Text(stringResource(Res.string.search))
             }
         }
     }

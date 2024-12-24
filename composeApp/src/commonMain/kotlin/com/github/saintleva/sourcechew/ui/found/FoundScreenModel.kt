@@ -27,11 +27,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-sealed interface SearchItemsState {
-    data object Searching : SearchItemsState
-    data class Error(val cause: Throwable) : SearchItemsState
-    data class Success(val items: FoundItems) : SearchItemsState
-}
 
 class FoundScreenModel(private val findUseCase: FindUseCase) : ScreenModel {
 

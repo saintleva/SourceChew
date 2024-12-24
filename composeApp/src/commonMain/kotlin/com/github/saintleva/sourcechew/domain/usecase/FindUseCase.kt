@@ -18,13 +18,10 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.ui.found.SearchItemsState
-import kotlinx.coroutines.flow.MutableStateFlow
 
 interface FindUseCase {
 
     suspend operator fun invoke(
-        conditions: SearchConditions,
-        foundItems: MutableStateFlow<SearchItemsState>
+        conditions: SearchConditions
     )
 }

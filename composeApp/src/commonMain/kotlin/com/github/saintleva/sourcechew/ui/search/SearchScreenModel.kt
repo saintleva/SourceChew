@@ -17,18 +17,41 @@
 
 package com.github.saintleva.sourcechew.ui.search
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.Forge
+import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
+import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 
 
-class SearchScreenModel(private val configRepository: ConfigRepository) : ScreenModel {
+sealed interface SearchItemsState {
+    data object Searching : SearchItemsState
+    data class Error(val cause: Throwable) : SearchItemsState
+    data class Success(val items: FoundItems) : SearchItemsState
+}
+
+sealed interface NavigationEvent {
+    object NavigateToFoundScreen: NavigationEvent
+    object NavigateBack: NavigationEvent
+}
+
+class SearchScreenModel(
+    private val findUseCase: FindUseCase,
+    private val configRepository: ConfigRepository
+) : ScreenModel {
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
 
@@ -44,9 +67,12 @@ class SearchScreenModel(private val configRepository: ConfigRepository) : Screen
     private val _text = mutableStateOf(configRepository.previousConditions.text)
     val text: State<String> = _text
 
-    private val _usePreviousConditionsSearch: MutableState<Boolean> =
+    private val _usePreviousConditionsSearch =
         mutableStateOf(configRepository.usePreviousConditionsSearch)
-    val usePreviousConditionsSearch: MutableState<Boolean> = _usePreviousConditionsSearch
+    val usePreviousConditionsSearch: State<Boolean> = _usePreviousConditionsSearch
+
+    private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
+    val navigationEvents = _navigationEvents.asSharedFlow()
 
     init {
         for (forge in Forge.list) {
@@ -93,6 +119,9 @@ class SearchScreenModel(private val configRepository: ConfigRepository) : Screen
     fun conditionsIsPrevious() = obtainConditions() == configRepository.previousConditions
 
     fun search() {
-        //TOOO: implement it
+        screenModelScope.launch {
+            findUseCase(obtainConditions())
+            _navigationEvents.emit(NavigationEvent.NavigateToFoundScreen)
+        }
     }
 }

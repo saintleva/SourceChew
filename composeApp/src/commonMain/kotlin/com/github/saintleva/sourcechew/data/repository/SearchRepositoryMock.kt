@@ -25,6 +25,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 
@@ -35,7 +37,9 @@ class SearchRepositoryMock(
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : SearchRepository {
 
-    override suspend fun search(conditions: SearchConditions): FoundItems {
+    override val foundItems = MutableStateFlow(FoundItems())
+
+    override suspend fun search(conditions: SearchConditions) {
         val result = FoundItems()
         withContext(searchDispatcher) {
             for (forgeOption in conditions.forgeOptions) {
@@ -62,6 +66,6 @@ class SearchRepositoryMock(
                 }
             }
         }
-        return result
+        foundItems.update { result }
     }
 }
