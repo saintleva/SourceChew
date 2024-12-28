@@ -30,8 +30,6 @@ import kotlinx.coroutines.launch
 
 class FoundScreenModel(private val findUseCase: FindUseCase) : ScreenModel {
 
-    private val _foundItems = MutableStateFlow<SearchItemsState>(SearchItemsState.Searching)
-    val foundItems = _foundItems.asStateFlow()
 
     fun find(conditions: SearchConditions) {
         screenModelScope.launch { findUseCase(conditions, _foundItems) }

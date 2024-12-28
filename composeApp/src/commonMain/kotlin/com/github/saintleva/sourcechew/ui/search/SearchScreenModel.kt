@@ -31,16 +31,22 @@ import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
+import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-sealed interface SearchItemsState {
-    data object Searching : SearchItemsState
-    data class Error(val cause: Throwable) : SearchItemsState
-    data class Success(val items: FoundItems) : SearchItemsState
+sealed interface SearchState {
+    object Idle: SearchState
+    object Searching : SearchState
+    data class Error(val cause: Throwable) : SearchState
+    data class Success(val items: FoundItems) : SearchState
 }
 
 sealed interface NavigationEvent {
@@ -50,7 +56,8 @@ sealed interface NavigationEvent {
 
 class SearchScreenModel(
     private val findUseCase: FindUseCase,
-    private val configRepository: ConfigRepository
+    private val configRepository: ConfigRepository,
+    private val searchRepository: SearchRepository
 ) : ScreenModel {
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
@@ -73,6 +80,14 @@ class SearchScreenModel(
 
     private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
     val navigationEvents = _navigationEvents.asSharedFlow()
+
+//    private val _foundItems = searchRepository.foundItems
+//    val foundItems = _foundItems.asStateFlow()
+
+    private val _searchState: MutableStateFlow<SearchState> = MutableStateFlow(SearchState.Idle)
+    val searchState = _searchState.asStateFlow()
+
+    private var _searchJob: Job? = null
 
     init {
         for (forge in Forge.list) {
@@ -119,9 +134,14 @@ class SearchScreenModel(
     fun conditionsIsPrevious() = obtainConditions() == configRepository.previousConditions
 
     fun search() {
-        screenModelScope.launch {
+        _searchJob = screenModelScope.launch {
             findUseCase(obtainConditions())
             _navigationEvents.emit(NavigationEvent.NavigateToFoundScreen)
         }
+    }
+
+    fun stop() {
+        _searchJob?.cancel()
+        _searchState.value = SearchState.Idle
     }
 }
