@@ -17,24 +17,20 @@
 
 package com.github.saintleva.sourcechew.ui.search
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -42,17 +38,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-sealed interface SearchState {
-    object Idle: SearchState
-    object Searching : SearchState
-    data class Error(val cause: Throwable) : SearchState
-    data class Success(val items: FoundItems) : SearchState
-}
-
-sealed interface NavigationEvent {
-    object NavigateToFoundScreen: NavigationEvent
-    object NavigateBack: NavigationEvent
-}
+//sealed interface NavigationEvent {
+//    object NavigateToFoundScreen: NavigationEvent
+//    object NavigateBack: NavigationEvent
+//}
 
 class SearchScreenModel(
     private val findUseCase: FindUseCase,
@@ -78,13 +67,13 @@ class SearchScreenModel(
         mutableStateOf(configRepository.usePreviousConditionsSearch)
     val usePreviousConditionsSearch: State<Boolean> = _usePreviousConditionsSearch
 
-    private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
-    val navigationEvents = _navigationEvents.asSharedFlow()
+//    private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
+//    val navigationEvents = _navigationEvents.asSharedFlow()
 
 //    private val _foundItems = searchRepository.foundItems
 //    val foundItems = _foundItems.asStateFlow()
 
-    private val _searchState: MutableStateFlow<SearchState> = MutableStateFlow(SearchState.Idle)
+    private val _searchState = searchRepository.searchState
     val searchState = _searchState.asStateFlow()
 
     private var _searchJob: Job? = null
@@ -136,12 +125,12 @@ class SearchScreenModel(
     fun search() {
         _searchJob = screenModelScope.launch {
             findUseCase(obtainConditions())
-            _navigationEvents.emit(NavigationEvent.NavigateToFoundScreen)
+//            _navigationEvents.emit(NavigationEvent.NavigateToFoundScreen)
         }
     }
 
     fun stop() {
         _searchJob?.cancel()
-        _searchState.value = SearchState.Idle
+        _searchState.value = SearchState.Selecting
     }
 }

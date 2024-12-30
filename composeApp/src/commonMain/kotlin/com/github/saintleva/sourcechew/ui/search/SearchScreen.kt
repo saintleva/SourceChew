@@ -49,6 +49,7 @@ import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.Forge
+import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.ui.found.FoundScreen
 import com.github.saintleva.sourcechew.ui.style.forgeIconResources
 import kotlinx.coroutines.flow.observeOn
@@ -71,20 +72,24 @@ class SearchScreen() : Screen {
         val screenModel = koinScreenModel<SearchScreenModel>()
 
         val navigator = LocalNavigator.currentOrThrow
-        LaunchedEffect(Unit) {
-            screenModel.navigationEvents.collect { event ->
-                when (event) {
-                    NavigationEvent.NavigateToFoundScreen -> navigator.push(FoundScreen())
-                    NavigationEvent.NavigateBack -> navigator.pop()
-                }
-            }
-        }
+//        LaunchedEffect(Unit) {
+//            screenModel.navigationEvents.collect { event ->
+//                when (event) {
+//                    NavigationEvent.NavigateToFoundScreen -> navigator.push(FoundScreen())
+//                    NavigationEvent.NavigateBack -> navigator.pop()
+//                }
+//            }
+//        }
 
         val searchState = screenModel.searchState.collectAsStateWithLifecycle()
 
+        if (searchState.value is SearchState.Success) {
+            navigator.push(FoundScreen())
+        }
+
         Column {
-            SearchContent(screenModel)
-            if (searchState.value is SearchState.Searching) {
+            SearchContent(screenModel, searchState == SearchState.Selecting)
+            if (searchState.value == SearchState.Searching) {
                 SearchProgress(screenModel)
             }
         }
@@ -98,7 +103,7 @@ class SearchScreen() : Screen {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun SearchContent(screenModel: SearchScreenModel) {
+private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
     Column {
         FlowRow(
             modifier = Modifier.padding(8.dp),
@@ -114,6 +119,7 @@ private fun SearchContent(screenModel: SearchScreenModel) {
                     selected = screenModel.selectedForges[forge]!!,
                     onClick = { screenModel.toggleForge(forge) },
                     label = { Text(text = forge.name, style = textStyle) },
+                    enabled = selectingEnabled,
                     leadingIcon = {
                         iconResource?.let {
                             val textSizeDp= with(LocalDensity.current) {
@@ -138,23 +144,27 @@ private fun SearchContent(screenModel: SearchScreenModel) {
             FilterChip(
                 selected = screenModel.repoOption.value,
                 onClick = screenModel::toggleRepository,
-                label = { Text(stringResource(Res.string.repositories)) }
+                label = { Text(stringResource(Res.string.repositories)) },
+                enabled = selectingEnabled
             )
             FilterChip(
                 selected = screenModel.userOption.value,
                 onClick = screenModel::toggleUser,
-                label = { Text(stringResource(Res.string.users)) }
+                label = { Text(stringResource(Res.string.users)) },
+                enabled = selectingEnabled
             )
             FilterChip(
                 selected = screenModel.groupOption.value,
                 onClick = screenModel::toggleGroup,
-                label = { Text(stringResource(Res.string.groups)) }
+                label = { Text(stringResource(Res.string.groups)) },
+                enabled = selectingEnabled
             )
         }
         OutlinedTextField(
             value = screenModel.text.value,
             onValueChange = screenModel::onTextChange,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
+            enabled = selectingEnabled,
             textStyle = TextStyle(fontSize = 16.sp),
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = screenModel.text.value.isEmpty()
@@ -166,14 +176,14 @@ private fun SearchContent(screenModel: SearchScreenModel) {
             Checkbox(
                 checked = screenModel.usePreviousConditionsSearch.value,
                 onCheckedChange = screenModel::usePreviousConditionsSearchChange,
-                enabled = screenModel.conditionsIsPrevious()
+                enabled = selectingEnabled && screenModel.conditionsIsPrevious()
             )
             Text(stringResource(Res.string.use_previous_search_conditions))
         }
         Button(
             onClick = screenModel::search,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
-            enabled = screenModel.maySearch()
+            enabled = selectingEnabled && screenModel.maySearch()
         ) {
             Text(stringResource(Res.string.search))
         }

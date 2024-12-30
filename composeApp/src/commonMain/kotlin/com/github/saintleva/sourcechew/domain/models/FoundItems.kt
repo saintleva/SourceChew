@@ -23,9 +23,3 @@ class FoundItems() {
     val users = mutableListOf<Item.User>()
     val groups = mutableListOf<Item.Group>()
 }
-
-sealed interface SearchItemsState {
-    data object Searching : SearchItemsState
-    data class Error(val cause: Throwable) : SearchItemsState
-    data class Success(val items: FoundItems) : SearchItemsState
-}

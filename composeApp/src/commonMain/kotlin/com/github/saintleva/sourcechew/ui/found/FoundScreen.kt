@@ -18,17 +18,28 @@
 package com.github.saintleva.sourcechew.ui.found
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.github.saintleva.sourcechew.domain.repository.SearchState
 
 
-class FoundScreen(val conditions: SearchConditions) : Screen {
+class FoundScreen : Screen {
 
     @Composable
     override fun Content() {
         val screenModel = koinScreenModel<FoundScreenModel>()
-        screenModel.find(conditions)
-
+        val navigator = LocalNavigator.currentOrThrow
+        val searchState = screenModel.searchState.collectAsStateWithLifecycle()
+        if (searchState.value == SearchState.Selecting) {
+            navigator.pop()
+        }
     }
+}
+
+@Composable
+private fun FoundContent(screenModel: FoundScreenModel) {
+    val foundItems = (screenModel.searchState.value as SearchState.Success).items
 }

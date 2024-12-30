@@ -18,20 +18,12 @@
 package com.github.saintleva.sourcechew.ui.found
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
-import com.github.saintleva.sourcechew.domain.models.FoundItems
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 
+class FoundScreenModel(private val searchRepository: SearchRepository) : ScreenModel {
 
-class FoundScreenModel(private val findUseCase: FindUseCase) : ScreenModel {
-
-
-    fun find(conditions: SearchConditions) {
-        screenModelScope.launch { findUseCase(conditions, _foundItems) }
-    }
+    private val _searchState = searchRepository.searchState
+    val searchState = _searchState.asStateFlow()
 }
