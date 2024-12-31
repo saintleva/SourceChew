@@ -15,21 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.domain.repository
+package com.github.saintleva.sourcechew.ui.common
 
-import com.github.saintleva.sourcechew.domain.models.FoundItems
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 
-sealed interface SearchState {
-    object Selecting : SearchState
-    object Searching : SearchState
-    data class Error(val cause: Throwable) : SearchState
-    data class Success(val items: FoundItems) : SearchState
-}
-
-interface SearchRepository {
-    val searchState: MutableStateFlow<SearchState>
-    suspend fun search(searchConditions: SearchConditions)
-}
+val appBarModifier = Modifier.wrapContentHeight().heightIn(max = 40.dp)

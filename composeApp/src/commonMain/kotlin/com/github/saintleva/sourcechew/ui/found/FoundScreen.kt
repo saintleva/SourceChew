@@ -17,13 +17,29 @@
 
 package com.github.saintleva.sourcechew.ui.found
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.repository.SearchState
+import com.github.saintleva.sourcechew.ui.common.NavigableUpScreen
+import org.jetbrains.compose.resources.stringResource
+import sourcechew.composeapp.generated.resources.Res
 
 
 class FoundScreen : Screen {
@@ -36,10 +52,42 @@ class FoundScreen : Screen {
         if (searchState.value == SearchState.Selecting) {
             navigator.pop()
         }
+        FoundContent(screenModel)
+    }
+}
+
+@Composable
+private fun ItemContent(type: String, forge: Forge, name: String) {
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Text("Type: $type")
+            Text("Forge: ${forge.name}")
+            Text("Name: $name")
+        }
     }
 }
 
 @Composable
 private fun FoundContent(screenModel: FoundScreenModel) {
     val foundItems = (screenModel.searchState.value as SearchState.Success).items
+    NavigableUpScreen(
+        title = stringResource(Res.string.found_items),
+        navigationUp = { screenModel.searchState.value = SearchState.Searching }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            foundItems.repos.forEach { repo -> ItemContent("Repository", repo.forge, repo.name) }
+            foundItems.users.forEach { user -> ItemContent("User", user.forge, user.name) }
+            foundItems.groups.forEach { group -> ItemContent("Group", group.forge, group.name) }
+        }
+    }
 }

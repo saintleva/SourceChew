@@ -19,11 +19,9 @@ package com.github.saintleva.sourcechew.ui.found
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
-import kotlinx.coroutines.flow.asStateFlow
 
 
 class FoundScreenModel(private val searchRepository: SearchRepository) : ScreenModel {
 
-    private val _searchState = searchRepository.searchState
-    val searchState = _searchState.asStateFlow()
+    val searchState = searchRepository.searchState
 }
