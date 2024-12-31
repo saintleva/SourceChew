@@ -7,4 +7,6 @@
     <string name="search">Search</string>
     <string name="use_previous_search_conditions">Use previous search results using such conditions</string>
     <string name="stop_search">Stop search</string>
+    <string name="go_back">Go back</string>
+    <string name="found_items">Items found</string>
 </resources>
