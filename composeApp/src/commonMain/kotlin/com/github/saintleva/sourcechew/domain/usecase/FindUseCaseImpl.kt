@@ -20,24 +20,18 @@ package com.github.saintleva.sourcechew.domain.usecase
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
-import com.github.saintleva.sourcechew.ui.found.SearchItemsState
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class FindUseCaseImpl(
     private val configRepository: ConfigRepository,
     private val searchRepository: SearchRepository,
 ) {
 
-    suspend operator fun invoke(
-        conditions: SearchConditions
-    ) {
+    suspend operator fun invoke(conditions: SearchConditions) {
         if (conditions != configRepository.previousConditions) {
-            foundItems.value = SearchItemsState.Searching
             configRepository.previousConditions = conditions
-            //TODO: Migrate to update() method
-            foundItems.value = SearchItemsState.Success(searchRepository.search(conditions))
-        } else {
-            //TODO: Implement it
+            searchRepository.search(conditions)
+        } else if (configRepository.usePreviousConditionsSearch) {
+            searchRepository.usePreviousResult()
         }
     }
 }

@@ -93,12 +93,7 @@ class SearchScreen() : Screen {
                 SearchProgress(screenModel)
             }
         }
-
-//        when (searchState) {
-//            SearchState.Idle -> SearchContent(screenModel)
-//        }
     }
-
 }
 
 @OptIn(ExperimentalLayoutApi::class)

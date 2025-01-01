@@ -17,9 +17,11 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
+import com.github.saintleva.sourcechew.domain.NeverSearchedException
 import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 
 sealed interface SearchState {
@@ -30,6 +32,25 @@ sealed interface SearchState {
 }
 
 interface SearchRepository {
+
     val searchState: MutableStateFlow<SearchState>
-    suspend fun search(searchConditions: SearchConditions)
+
+    var previousResult: FoundItems?
+
+    suspend fun find(conditions: SearchConditions): FoundItems
+
+    suspend fun search(conditions: SearchConditions) {
+        searchState.update { SearchState.Searching }
+        val result = find(conditions)
+        searchState.update { SearchState.Success(result) }
+        previousResult = result
+    }
+
+    fun usePreviousResult() {
+        if (previousResult == null) {
+            searchState.update { SearchState.Error(NeverSearchedException()) }
+        } else {
+            searchState.update { SearchState.Success(previousResult!!) }
+        }
+    }
 }

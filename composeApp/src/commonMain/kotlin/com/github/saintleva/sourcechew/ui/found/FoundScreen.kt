@@ -82,7 +82,7 @@ private fun FoundContent(screenModel: FoundScreenModel) {
     val foundItems = (screenModel.searchState.value as SearchState.Success).items
     NavigableUpScreen(
         title = stringResource(Res.string.found_items),
-        navigationUp = { screenModel.searchState.value = SearchState.Searching }
+        navigationUp = screenModel::navigateBack
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             foundItems.repos.forEach { repo -> ItemContent("Repository", repo.forge, repo.name) }

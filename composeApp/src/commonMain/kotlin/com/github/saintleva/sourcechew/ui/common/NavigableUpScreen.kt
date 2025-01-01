@@ -47,7 +47,7 @@ fun NavigableUpScreen(
                 title = { Text(title, style = MaterialTheme.typography.headlineMedium) },
                 modifier = appBarModifier,
                 navigationIcon = {
-                    IconButton(onClick = { navigationUp() }) {
+                    IconButton(onClick = navigationUp) {
                         Icon(
                             Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(Res.string.go_back)

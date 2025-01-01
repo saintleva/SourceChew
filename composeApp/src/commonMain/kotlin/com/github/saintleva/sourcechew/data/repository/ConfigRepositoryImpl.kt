@@ -25,11 +25,20 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 
 class ConfigRepositoryImpl(private val configStorage: ConfigStorage) : ConfigRepository {
 
-    override var previousConditions: SearchConditions? = SearchConditions(
-        defaultForgeOptions,
-        TypeOptions(repo = true, user = false, group = false),
-        ""
-    )
+    override var previousConditions: SearchConditions =
+        SearchConditions(
+            defaultForgeOptions,
+            TypeOptions(repo = true, user = false, group = false),
+            ""
+        )
+        set(value) {
+            field = value
+            configStorage.savePreviousConditions(value)
+        }
 
     override var usePreviousConditionsSearch: Boolean = false
+        set(value) {
+            field = value
+            configStorage.saveUsePreviousConditionsSearch(value)
+        }
 }

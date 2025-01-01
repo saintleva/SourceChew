@@ -20,12 +20,12 @@ package com.github.saintleva.sourcechew.data.storage
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 
 
-class Config(
-    previousConditions: SearchConditions?,
-    usePreviousConditionsSearch: Boolean
-)
+//class Config(
+//    previousConditions: SearchConditions?,
+//    usePreviousConditionsSearch: Boolean
+//)
 
 interface ConfigStorage {
-    suspend fun save(config: Config)
-    suspend fun load(): Config
+    suspend fun savePreviousConditions(value: SearchConditions)
+    suspend fun saveUsePreviousConditionsSearch(value: Boolean)
 }

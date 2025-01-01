@@ -21,12 +21,12 @@ import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.Item
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.repository.SearchState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 
@@ -37,9 +37,11 @@ class SearchRepositoryMock(
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : SearchRepository {
 
-    override val foundItems = MutableStateFlow(FoundItems())
+    override val searchState = MutableStateFlow<SearchState>(SearchState.Selecting)
 
-    override suspend fun search(conditions: SearchConditions) {
+    override var previousResult: FoundItems? = null
+
+    override suspend fun find(conditions: SearchConditions): FoundItems {
         val result = FoundItems()
         withContext(searchDispatcher) {
             for (forgeOption in conditions.forgeOptions) {
@@ -66,6 +68,6 @@ class SearchRepositoryMock(
                 }
             }
         }
-        foundItems.update { result }
+        return result
     }
 }

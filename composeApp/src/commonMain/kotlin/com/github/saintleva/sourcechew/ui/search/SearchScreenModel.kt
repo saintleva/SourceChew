@@ -23,7 +23,6 @@ import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.github.saintleva.sourcechew.domain.models.Forge
-import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
@@ -31,10 +30,8 @@ import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
@@ -114,7 +111,7 @@ class SearchScreenModel(
         configRepository.usePreviousConditionsSearch = checked
     }
 
-    fun obtainConditions() = SearchConditions(
+    private fun obtainConditions() = SearchConditions(
         selectedForges.toMap(),
         TypeOptions(repoOption.value, userOption.value, groupOption.value),
         text.value
@@ -131,6 +128,6 @@ class SearchScreenModel(
 
     fun stop() {
         _searchJob?.cancel()
-        _searchState.value = SearchState.Selecting
+        _searchState.update { SearchState.Selecting }
     }
 }

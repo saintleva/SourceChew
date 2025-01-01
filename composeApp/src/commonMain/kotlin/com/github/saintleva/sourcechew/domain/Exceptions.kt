@@ -15,13 +15,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.domain.repository
-
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+package com.github.saintleva.sourcechew.domain
 
 
-interface ConfigRepository {
+abstract class SourceChewException : Exception()
 
-    var previousConditions: SearchConditions
-    var usePreviousConditionsSearch: Boolean
-}
+class NeverSearchedException : SourceChewException()

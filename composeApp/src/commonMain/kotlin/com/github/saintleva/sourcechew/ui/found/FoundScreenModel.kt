@@ -19,9 +19,17 @@ package com.github.saintleva.sourcechew.ui.found
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.repository.SearchState
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 
 class FoundScreenModel(private val searchRepository: SearchRepository) : ScreenModel {
 
-    val searchState = searchRepository.searchState
+    private val _searchState = searchRepository.searchState
+    val searchState = _searchState.asStateFlow()
+
+    fun navigateBack() {
+        _searchState.update { SearchState.Selecting }
+    }
 }
