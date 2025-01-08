@@ -32,6 +32,8 @@ class FindUseCaseImpl(
             searchRepository.search(conditions)
         } else if (configRepository.usePreviousConditionsSearch) {
             searchRepository.usePreviousResult()
+        } else {
+            searchRepository.search(conditions)
         }
     }
 }

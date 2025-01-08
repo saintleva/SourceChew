@@ -68,6 +68,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
 
+            implementation(libs.datastore.preferences.core)
             implementation(libs.napier)
 
             api(libs.koin.core)
