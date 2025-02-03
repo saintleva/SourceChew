@@ -27,5 +27,7 @@ import com.github.saintleva.sourcechew.domain.models.SearchConditions
 
 interface ConfigStorage {
     suspend fun savePreviousConditions(value: SearchConditions)
-    suspend fun saveUsePreviousConditionsSearch(value: Boolean)
+    suspend fun loadPreviousConditions(): SearchConditions
+    suspend fun saveUsePreviousSearch(value: Boolean)
+    suspend fun loadUsePreviousSearch(): Boolean
 }
