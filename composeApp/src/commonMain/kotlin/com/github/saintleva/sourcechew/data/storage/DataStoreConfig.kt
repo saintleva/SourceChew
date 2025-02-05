@@ -21,8 +21,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.saintleva.sourcechew.domain.models.Forge
-import com.github.saintleva.sourcechew.domain.models.ForgeOptions
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import kotlinx.coroutines.flow.first
@@ -33,15 +33,21 @@ class DataStoreConfig(private val dataStore: DataStore<Preferences>) : ConfigSto
 
     private companion object {
 
-        private const val PREVIOUS_CONDITIONS = "PreviousConditions"
+        object PreviousConditionsKeys {
 
-        object PreviousConditionsTypeOptionsKeys {
-            val repo = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_repo")
-            val user = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_user")
-            val group = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_group")
-        }
-        val forgeOptionsKeys = Forge.list.associateWith {
-            booleanPreferencesKey("${PREVIOUS_CONDITIONS}_forge_${it.name}")
+            private const val PREVIOUS_CONDITIONS = "PreviousConditions"
+
+            val forgeOptions = Forge.list.associateWith {
+                booleanPreferencesKey("${PREVIOUS_CONDITIONS}_forge_${it.name}")
+            }
+
+            object TypeOptions {
+                val repo = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_repo")
+                val user = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_user")
+                val group = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_group")
+            }
+
+            val text = stringPreferencesKey("${PREVIOUS_CONDITIONS}_text")
         }
 
         val usePreviousSearchKey = booleanPreferencesKey("usePreviousSearch")
@@ -49,10 +55,10 @@ class DataStoreConfig(private val dataStore: DataStore<Preferences>) : ConfigSto
 
     override suspend fun savePreviousConditions(value: SearchConditions) {
         dataStore.edit { preferences ->
-            preferences[PreviousConditionsTypeOptionsKeys.repo] = value.typeOptions.repo
-            preferences[PreviousConditionsTypeOptionsKeys.user] = value.typeOptions.user
-            preferences[PreviousConditionsTypeOptionsKeys.group] = value.typeOptions.group
-            forgeOptionsKeys.forEach { entry ->
+            preferences[PreviousConditionsKeys.TypeOptions.repo] = value.typeOptions.repo
+            preferences[PreviousConditionsKeys.TypeOptions.user] = value.typeOptions.user
+            preferences[PreviousConditionsKeys.TypeOptions.group] = value.typeOptions.group
+            PreviousConditionsKeys.forgeOptions.forEach { entry ->
                 preferences[entry.value] = value.forgeOptions[entry.key]!!
             }
         }
@@ -61,16 +67,22 @@ class DataStoreConfig(private val dataStore: DataStore<Preferences>) : ConfigSto
     override suspend fun loadPreviousConditions(): SearchConditions {
         val typeOptions = TypeOptions(
             repo = dataStore.data.map {
-                preferences -> preferences[PreviousConditionsTypeOptionsKeys.repo] ?: false
+                preferences -> preferences[PreviousConditionsKeys.TypeOptions.repo] ?: false
             }.first(),
             user = dataStore.data.map {
-                    preferences -> preferences[PreviousConditionsTypeOptionsKeys.user] ?: false
+                    preferences -> preferences[PreviousConditionsKeys.TypeOptions.user] ?: false
             }.first(),
             group = dataStore.data.map {
-                    preferences -> preferences[PreviousConditionsTypeOptionsKeys.group] ?: false
+                    preferences -> preferences[PreviousConditionsKeys.TypeOptions.group] ?: false
             }.first()
         )
-
+        val forgeOptions = Forge.list.associateWith {
+            dataStore.data.map { preferences ->
+                preferences[PreviousConditionsKeys.forgeOptions[it]!!] ?: false }.first()
+        }
+        val text = dataStore.data.map { preferences ->
+            preferences[PreviousConditionsKeys.text] ?: "" }.first()
+        return SearchConditions(forgeOptions, typeOptions, text)
     }
 
 
