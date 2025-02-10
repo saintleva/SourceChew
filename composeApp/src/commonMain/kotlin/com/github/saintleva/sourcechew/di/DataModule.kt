@@ -15,14 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.data.storage
+package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.data.storage.ConfigManager
+import com.github.saintleva.sourcechew.data.storage.ConfigManagerMock
+import org.koin.dsl.module
 
 
-interface ConfigStorage {
-    suspend fun savePreviousConditions(value: SearchConditions)
-    suspend fun loadPreviousConditions(): SearchConditions
-    suspend fun saveUsePreviousSearch(value: Boolean)
-    suspend fun loadUsePreviousSearch(): Boolean
+val dataModule = module {
+    single<ConfigManager> { ConfigManagerMock }
+    //single<DataStore<Preferences>> { dataStorePreferences(get()) }
 }

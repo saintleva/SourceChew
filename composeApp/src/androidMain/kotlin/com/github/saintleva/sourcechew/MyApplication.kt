@@ -18,16 +18,24 @@
 package com.github.saintleva.sourcechew
 
 import android.app.Application
-import org.koin.android.ext.koin.androidContext
+import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import initKoin
+import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
 
 
 class MyApplication: Application() {
+
+    val configRepository: ConfigRepository by inject()
 
     override fun onCreate() {
         super.onCreate()
         initKoin {
             androidContext(this@MyApplication)
+        }
+        runBlocking {
+            configRepository.loadData()
         }
     }
 }

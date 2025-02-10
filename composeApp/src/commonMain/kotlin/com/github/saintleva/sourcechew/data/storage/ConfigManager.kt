@@ -15,25 +15,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.domain.usecase
+package com.github.saintleva.sourcechew.data.storage
 
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
-import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 
-class FindUseCaseImpl(
-    private val configRepository: ConfigRepository,
-    private val searchRepository: SearchRepository,
-) {
 
-    suspend operator fun invoke(conditions: SearchConditions) {
-        if (conditions != configRepository.previousConditions) {
-            configRepository.changePreviousConditions(conditions)
-            searchRepository.search(conditions)
-        } else if (configRepository.usePreviousSearch) {
-            searchRepository.usePreviousResult()
-        } else {
-            searchRepository.search(conditions)
-        }
-    }
+interface ConfigManager {
+    suspend fun savePreviousConditions(value: SearchConditions)
+    suspend fun loadPreviousConditions(): SearchConditions
+    suspend fun saveUsePreviousSearch(value: Boolean)
+    suspend fun loadUsePreviousSearch(): Boolean
 }

@@ -17,13 +17,21 @@
 
 package com.github.saintleva.sourcechew.data.repository
 
+import com.github.saintleva.sourcechew.data.storage.ConfigManager
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.models.defaultForgeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 
 
-class ConfigRepositoryImpl(private val configStorage: ConfigStorage) : ConfigRepository {
+class ConfigRepositoryImpl(
+    private val configManager: ConfigManager,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : ConfigRepository {
 
     override var previousConditions: SearchConditions =
         SearchConditions(
@@ -31,14 +39,25 @@ class ConfigRepositoryImpl(private val configStorage: ConfigStorage) : ConfigRep
             TypeOptions(repo = true, user = false, group = false),
             ""
         )
-        set(value) {
-            field = value
-            configStorage.savePreviousConditions(value)
-        }
 
-    override var usePreviousConditionsSearch: Boolean = false
-        set(value) {
-            field = value
-            configStorage.saveUsePreviousConditionsSearch(value)
+    override var usePreviousSearch: Boolean = false
+
+    override suspend fun loadData() {
+        previousConditions = configManager.loadPreviousConditions()
+        usePreviousSearch = configManager.loadUsePreviousSearch()
+    }
+
+    override suspend fun changePreviousConditions(newValue: SearchConditions) {
+        withContext(ioDispatcher) {
+            configManager.savePreviousConditions(newValue)
+            previousConditions = newValue
         }
+    }
+
+    override suspend fun changeUsePreviousSearch(newValue: Boolean) {
+        withContext(ioDispatcher) {
+            configManager.saveUsePreviousSearch(newValue)
+            usePreviousSearch = newValue
+        }
+    }
 }

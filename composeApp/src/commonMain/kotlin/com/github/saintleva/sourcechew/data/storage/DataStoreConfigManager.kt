@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 
-class DataStoreConfig(private val dataStore: DataStore<Preferences>) : ConfigStorage {
+class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : ConfigManager {
 
     private companion object {
 
@@ -67,7 +67,7 @@ class DataStoreConfig(private val dataStore: DataStore<Preferences>) : ConfigSto
     override suspend fun loadPreviousConditions(): SearchConditions {
         val typeOptions = TypeOptions(
             repo = dataStore.data.map {
-                preferences -> preferences[PreviousConditionsKeys.TypeOptions.repo] ?: false
+                preferences -> preferences[PreviousConditionsKeys.TypeOptions.repo] ?: true
             }.first(),
             user = dataStore.data.map {
                     preferences -> preferences[PreviousConditionsKeys.TypeOptions.user] ?: false

@@ -36,7 +36,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -52,7 +51,6 @@ import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.ui.found.FoundScreen
 import com.github.saintleva.sourcechew.ui.style.forgeIconResources
-import kotlinx.coroutines.flow.observeOn
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -61,7 +59,6 @@ import sourcechew.composeapp.generated.resources.groups
 import sourcechew.composeapp.generated.resources.logo
 import sourcechew.composeapp.generated.resources.repositories
 import sourcechew.composeapp.generated.resources.search
-import sourcechew.composeapp.generated.resources.use_previous_conditions_search
 import sourcechew.composeapp.generated.resources.users
 
 
@@ -169,7 +166,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = screenModel.usePreviousConditionsSearch.value,
+                checked = screenModel.usePreviousSearch.value,
                 onCheckedChange = screenModel::usePreviousConditionsSearchChange,
                 enabled = selectingEnabled && screenModel.conditionsIsPrevious()
             )

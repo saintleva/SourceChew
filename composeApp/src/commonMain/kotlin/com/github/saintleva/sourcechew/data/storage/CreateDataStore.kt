@@ -33,7 +33,7 @@ const val PREFERENCE_DATASTORE = "preferences_pb"
 internal fun createDataStore(
     corruptionHandler: ReplaceFileCorruptionHandler<Preferences>? = null,
     coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-    migrations: List<DataMigration<Preferences>>,
+    migrations: List<DataMigration<Preferences>> = listOf(),
     context: Any? = null,
     path: (context: Any?) -> String,
 ) = PreferenceDataStoreFactory.createWithPath(

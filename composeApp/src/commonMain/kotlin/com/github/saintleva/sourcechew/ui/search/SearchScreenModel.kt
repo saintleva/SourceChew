@@ -60,9 +60,9 @@ class SearchScreenModel(
     private val _text = mutableStateOf(configRepository.previousConditions.text)
     val text: State<String> = _text
 
-    private val _usePreviousConditionsSearch =
-        mutableStateOf(configRepository.usePreviousConditionsSearch)
-    val usePreviousConditionsSearch: State<Boolean> = _usePreviousConditionsSearch
+    private val _usePreviousSearch =
+        mutableStateOf(configRepository.usePreviousSearch)
+    val usePreviousSearch: State<Boolean> = _usePreviousSearch
 
 //    private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
 //    val navigationEvents = _navigationEvents.asSharedFlow()
@@ -107,8 +107,10 @@ class SearchScreenModel(
     }
 
     fun usePreviousConditionsSearchChange(checked: Boolean) {
-        _usePreviousConditionsSearch.value = checked
-        configRepository.usePreviousConditionsSearch = checked
+        screenModelScope.launch {
+            configRepository.changeUsePreviousSearch(checked)
+            _usePreviousSearch.value = checked
+        }
     }
 
     private fun obtainConditions() = SearchConditions(

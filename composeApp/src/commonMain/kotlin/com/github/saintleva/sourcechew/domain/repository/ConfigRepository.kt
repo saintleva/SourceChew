@@ -22,6 +22,11 @@ import com.github.saintleva.sourcechew.domain.models.SearchConditions
 
 interface ConfigRepository {
 
-    var previousConditions: SearchConditions
-    var usePreviousConditionsSearch: Boolean
+    val previousConditions: SearchConditions
+    val usePreviousSearch: Boolean
+
+    suspend fun loadData()
+
+    suspend fun changePreviousConditions(newValue: SearchConditions)
+    suspend fun changeUsePreviousSearch(newValue: Boolean)
 }
