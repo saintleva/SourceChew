@@ -35,15 +35,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-//sealed interface NavigationEvent {
-//    object NavigateToFoundScreen: NavigationEvent
-//    object NavigateBack: NavigationEvent
-//}
-
 class SearchScreenModel(
     private val findUseCase: FindUseCase,
     private val configRepository: ConfigRepository,
-    private val searchRepository: SearchRepository
+    searchRepository: SearchRepository
 ) : ScreenModel {
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
@@ -63,12 +58,6 @@ class SearchScreenModel(
     private val _usePreviousSearch =
         mutableStateOf(configRepository.usePreviousSearch)
     val usePreviousSearch: State<Boolean> = _usePreviousSearch
-
-//    private val _navigationEvents = MutableSharedFlow<NavigationEvent>()
-//    val navigationEvents = _navigationEvents.asSharedFlow()
-
-//    private val _foundItems = searchRepository.foundItems
-//    val foundItems = _foundItems.asStateFlow()
 
     private val _searchState = searchRepository.searchState
     val searchState = _searchState.asStateFlow()
@@ -124,7 +113,6 @@ class SearchScreenModel(
     fun search() {
         _searchJob = screenModelScope.launch {
             findUseCase(obtainConditions())
-//            _navigationEvents.emit(NavigationEvent.NavigateToFoundScreen)
         }
     }
 

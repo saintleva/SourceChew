@@ -18,7 +18,7 @@
 package com.github.saintleva.sourcechew.di
 
 import com.github.saintleva.sourcechew.data.repository.ConfigRepositoryImpl
-import com.github.saintleva.sourcechew.data.repository.SearchRepositoryMock
+import com.github.saintleva.sourcechew.data.repository.SearchRepositoryStub
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import org.koin.dsl.module
@@ -27,5 +27,5 @@ import kotlin.time.Duration.Companion.seconds
 
 val domainModule = module {
     single<ConfigRepository> { ConfigRepositoryImpl(get()) }
-    single<SearchRepository> { SearchRepositoryMock(10, 1.seconds) }
+    single<SearchRepository> { SearchRepositoryStub(10, 1.seconds) }
 }

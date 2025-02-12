@@ -59,24 +59,17 @@ import sourcechew.composeapp.generated.resources.groups
 import sourcechew.composeapp.generated.resources.logo
 import sourcechew.composeapp.generated.resources.repositories
 import sourcechew.composeapp.generated.resources.search
+import sourcechew.composeapp.generated.resources.stop_search
+import sourcechew.composeapp.generated.resources.use_previous_search_conditions
 import sourcechew.composeapp.generated.resources.users
 
 
-class SearchScreen() : Screen {
+class SearchScreen : Screen {
 
     @Composable
     override fun Content() {
         val screenModel = koinScreenModel<SearchScreenModel>()
-
         val navigator = LocalNavigator.currentOrThrow
-//        LaunchedEffect(Unit) {
-//            screenModel.navigationEvents.collect { event ->
-//                when (event) {
-//                    NavigationEvent.NavigateToFoundScreen -> navigator.push(FoundScreen())
-//                    NavigationEvent.NavigateBack -> navigator.pop()
-//                }
-//            }
-//        }
 
         val searchState = screenModel.searchState.collectAsStateWithLifecycle()
 

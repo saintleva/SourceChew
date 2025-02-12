@@ -7,7 +7,7 @@ import io.github.aakira.napier.Napier
 import kotlin.random.Random
 
 
-object ConfigManagerMock : ConfigManager {
+object ConfigManagerStub : ConfigManager {
 
     override suspend fun savePreviousConditions(value: SearchConditions) {
         Napier.d {

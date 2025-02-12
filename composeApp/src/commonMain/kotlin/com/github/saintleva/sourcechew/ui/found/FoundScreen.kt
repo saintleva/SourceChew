@@ -18,7 +18,6 @@
 package com.github.saintleva.sourcechew.ui.found
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +39,7 @@ import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.ui.common.NavigableUpScreen
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.found_items
 
 
 class FoundScreen : Screen {

@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 
 
-class SearchRepositoryMock(
+class SearchRepositoryStub(
     private val eachCount: Int,
     private val delayImitation: Duration = Duration.ZERO,
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO

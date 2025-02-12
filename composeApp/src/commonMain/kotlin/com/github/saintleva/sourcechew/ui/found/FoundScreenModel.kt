@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
-class FoundScreenModel(private val searchRepository: SearchRepository) : ScreenModel {
+class FoundScreenModel(searchRepository: SearchRepository) : ScreenModel {
 
     private val _searchState = searchRepository.searchState
     val searchState = _searchState.asStateFlow()

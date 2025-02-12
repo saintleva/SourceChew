@@ -18,7 +18,7 @@
 package com.github.saintleva.sourcechew.domain.models
 
 
-class FoundItems() {
+class FoundItems {
     val repos = mutableListOf<Item.Repo>()
     val users = mutableListOf<Item.User>()
     val groups = mutableListOf<Item.Group>()

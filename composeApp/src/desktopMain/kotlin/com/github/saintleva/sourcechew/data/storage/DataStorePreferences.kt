@@ -15,16 +15,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.data.storate
+package com.github.saintleva.sourcechew.data.storage
 
 import androidx.datastore.core.DataMigration
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
-import com.github.saintleva.sourcechew.data.storage.createDataStore
 import kotlinx.coroutines.CoroutineScope
 
 
+//TODO: Use right filepath on desktop
 private const val APP_PREFERENCE_DATASTORE = "asdfasdfasdfasdf"
 
 actual fun dataStorePreferences(
@@ -36,7 +36,7 @@ actual fun dataStorePreferences(
     corruptionHandler = corruptionHandler,
     coroutineScope = coroutineScope,
     migrations = migrations,
-    path = {
+    path = { _ ->
         APP_PREFERENCE_DATASTORE
     }
 )

@@ -24,9 +24,9 @@ import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 class FindUseCaseImpl(
     private val configRepository: ConfigRepository,
     private val searchRepository: SearchRepository,
-) {
+) : FindUseCase {
 
-    suspend operator fun invoke(conditions: SearchConditions) {
+    override suspend fun invoke(conditions: SearchConditions) {
         if (conditions != configRepository.previousConditions) {
             configRepository.changePreviousConditions(conditions)
             searchRepository.search(conditions)

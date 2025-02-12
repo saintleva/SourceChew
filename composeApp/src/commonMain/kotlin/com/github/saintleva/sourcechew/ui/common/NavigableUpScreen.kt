@@ -28,10 +28,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.go_back
 
 
 @OptIn(ExperimentalMaterial3Api::class)

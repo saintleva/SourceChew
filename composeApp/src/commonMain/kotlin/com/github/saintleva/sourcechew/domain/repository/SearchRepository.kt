@@ -25,8 +25,8 @@ import kotlinx.coroutines.flow.update
 
 
 sealed interface SearchState {
-    object Selecting : SearchState
-    object Searching : SearchState
+    data object Selecting : SearchState
+    data object Searching : SearchState
     data class Error(val cause: Throwable) : SearchState
     data class Success(val items: FoundItems) : SearchState
 }

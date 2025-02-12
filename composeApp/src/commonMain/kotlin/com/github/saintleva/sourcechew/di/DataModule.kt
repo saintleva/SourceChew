@@ -18,11 +18,11 @@
 package com.github.saintleva.sourcechew.di
 
 import com.github.saintleva.sourcechew.data.storage.ConfigManager
-import com.github.saintleva.sourcechew.data.storage.ConfigManagerMock
+import com.github.saintleva.sourcechew.data.storage.ConfigManagerStub
 import org.koin.dsl.module
 
 
 val dataModule = module {
-    single<ConfigManager> { ConfigManagerMock }
+    single<ConfigManager> { ConfigManagerStub }
     //single<DataStore<Preferences>> { dataStorePreferences(get()) }
 }
