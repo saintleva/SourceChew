@@ -59,7 +59,7 @@ class SearchRepositoryStub(
                             result.users.add(Item.User(forge, "${i}${conditions.text}${i}"))
                         }
                     }
-                    if (conditions.typeOptions.repo) {
+                    if (conditions.typeOptions.group) {
                         for (i in 0 until eachCount) {
                             delay(delayImitation)
                             result.groups.add(Item.Group(forge, "${i}${conditions.text}${i}"))

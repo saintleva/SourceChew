@@ -19,9 +19,9 @@ package com.github.saintleva.sourcechew.ui.found
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -60,7 +60,7 @@ class FoundScreen : Screen {
 private fun ItemContent(type: String, forge: Forge, name: String) {
     OutlinedCard(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -84,10 +84,16 @@ private fun FoundContent(screenModel: FoundScreenModel) {
         title = stringResource(Res.string.found_items),
         navigationUp = screenModel::navigateBack
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            foundItems.repos.forEach { repo -> ItemContent("Repository", repo.forge, repo.name) }
-            foundItems.users.forEach { user -> ItemContent("User", user.forge, user.name) }
-            foundItems.groups.forEach { group -> ItemContent("Group", group.forge, group.name) }
+        LazyColumn(modifier = Modifier.padding(innerPadding)) {
+            foundItems.repos.forEach {
+                repo -> item { ItemContent("Repository", repo.forge, repo.name) }
+            }
+            foundItems.users.forEach {
+                user -> item { ItemContent("User", user.forge, user.name) }
+            }
+            foundItems.groups.forEach {
+                group -> item { ItemContent("Group", group.forge, group.name) }
+            }
         }
     }
 }

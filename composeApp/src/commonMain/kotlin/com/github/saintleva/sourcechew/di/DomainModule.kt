@@ -21,11 +21,14 @@ import com.github.saintleva.sourcechew.data.repository.ConfigRepositoryImpl
 import com.github.saintleva.sourcechew.data.repository.SearchRepositoryStub
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
+import com.github.saintleva.sourcechew.domain.usecase.FindUseCaseImpl
 import org.koin.dsl.module
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 
 val domainModule = module {
     single<ConfigRepository> { ConfigRepositoryImpl(get()) }
-    single<SearchRepository> { SearchRepositoryStub(10, 1.seconds) }
+    single<SearchRepository> { SearchRepositoryStub(10, 100.milliseconds) }
+    single<FindUseCase> { FindUseCaseImpl(get(), get()) }
 }

@@ -40,7 +40,8 @@ class ConfigRepositoryImpl(
             ""
         )
 
-    override var usePreviousSearch: Boolean = false
+    override var usePreviousSearch = false
+    override var previousConditionsHasBeenUsed = false
 
     override suspend fun loadData() {
         previousConditions = configManager.loadPreviousConditions()

@@ -35,5 +35,6 @@ class FindUseCaseImpl(
         } else {
             searchRepository.search(conditions)
         }
+        configRepository.previousConditionsHasBeenUsed = true
     }
 }

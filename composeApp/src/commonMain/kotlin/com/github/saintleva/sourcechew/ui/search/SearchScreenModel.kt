@@ -108,7 +108,10 @@ class SearchScreenModel(
         text.value
     )
 
-    fun conditionsIsPrevious() = obtainConditions() == configRepository.previousConditions
+    fun canUsePreviousConditions() =
+        configRepository.previousConditionsHasBeenUsed &&
+                (obtainConditions() == configRepository.previousConditions)
+
 
     fun search() {
         _searchJob = screenModelScope.launch {

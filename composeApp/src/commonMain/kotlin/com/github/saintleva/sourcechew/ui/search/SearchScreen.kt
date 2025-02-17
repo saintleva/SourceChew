@@ -78,7 +78,7 @@ class SearchScreen : Screen {
         }
 
         Column {
-            SearchContent(screenModel, searchState == SearchState.Selecting)
+            SearchContent(screenModel, searchState.value == SearchState.Selecting)
             if (searchState.value == SearchState.Searching) {
                 SearchProgress(screenModel)
             }
@@ -161,7 +161,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             Checkbox(
                 checked = screenModel.usePreviousSearch.value,
                 onCheckedChange = screenModel::usePreviousConditionsSearchChange,
-                enabled = selectingEnabled && screenModel.conditionsIsPrevious()
+                enabled = selectingEnabled && screenModel.canUsePreviousConditions()
             )
             Text(stringResource(Res.string.use_previous_search_conditions))
         }
@@ -177,12 +177,14 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
 
 @Composable
 private fun SearchProgress(screenModel: SearchScreenModel) {
-    Column {
-        Box(modifier = Modifier.fillMaxSize()) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier.weight(1f).fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
         Button(
-            onClick = screenModel::stop
+            onClick = screenModel::stop,
+            modifier = Modifier.padding(4.dp)
         ) {
             Text(stringResource(Res.string.stop_search))
         }
