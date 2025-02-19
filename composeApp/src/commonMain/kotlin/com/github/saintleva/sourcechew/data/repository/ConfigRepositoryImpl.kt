@@ -41,7 +41,8 @@ class ConfigRepositoryImpl(
         )
 
     override var usePreviousSearch = false
-    override var previousConditionsHasBeenUsed = false
+    //TODO: remove it
+    //override var previousConditionsHasBeenUsed = false
 
     override suspend fun loadData() {
         previousConditions = configManager.loadPreviousConditions()

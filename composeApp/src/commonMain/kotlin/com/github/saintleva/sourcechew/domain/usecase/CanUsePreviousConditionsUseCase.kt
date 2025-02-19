@@ -15,15 +15,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.ui.common
+package com.github.saintleva.sourcechew.domain.usecase
+
+import com.github.saintleva.sourcechew.domain.models.SearchConditions
 
 
-//interface Resources {
-//    fun getDrawableResource(name: String): Int
-//}
-//
-//expect class ResourcesImpl : Resources {
-//    override fun getDrawableResource(name: String): Int
-//}
-//
-////expect fun getDrawableResource(name: String, context: Context): Int
+interface CanUsePreviousConditionsUseCase {
+    operator fun invoke(newConditions: SearchConditions): Boolean
+}

@@ -37,6 +37,9 @@ interface SearchRepository {
 
     var previousResult: FoundItems?
 
+    val everSearched: Boolean
+        get() = (previousResult != null)
+
     suspend fun find(conditions: SearchConditions): FoundItems
 
     suspend fun search(conditions: SearchConditions) {

@@ -114,6 +114,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.material3.android)
     debugImplementation(compose.uiTooling)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 }

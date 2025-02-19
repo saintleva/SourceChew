@@ -23,8 +23,9 @@ import org.koin.dsl.module
 
 
 val dataModule = module {
+    ////TODO: remove it
     single<ConfigManager> { ConfigManagerStub }
 
-//    single<ConfigManager> { DataStoreConfigManager(get()) } }
+    //single<ConfigManager> { DataStoreConfigManager(get()) } }
     //single<DataStore<Preferences>> { dataStorePreferences(get()) }
 }

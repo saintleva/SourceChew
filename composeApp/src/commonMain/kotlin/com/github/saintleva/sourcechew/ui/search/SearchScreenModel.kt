@@ -28,6 +28,7 @@ import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchState
+import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +38,7 @@ import kotlinx.coroutines.launch
 
 class SearchScreenModel(
     private val findUseCase: FindUseCase,
+    private val canUsePreviousConditionsUseCase: CanUsePreviousConditionsUseCase,
     private val configRepository: ConfigRepository,
     searchRepository: SearchRepository
 ) : ScreenModel {
@@ -108,10 +110,7 @@ class SearchScreenModel(
         text.value
     )
 
-    fun canUsePreviousConditions() =
-        configRepository.previousConditionsHasBeenUsed &&
-                (obtainConditions() == configRepository.previousConditions)
-
+    fun canUsePreviousConditions() = canUsePreviousConditionsUseCase(obtainConditions())
 
     fun search() {
         _searchJob = screenModelScope.launch {

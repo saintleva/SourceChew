@@ -22,13 +22,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -49,6 +47,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.repository.SearchState
+import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.found.FoundScreen
 import com.github.saintleva.sourcechew.ui.style.forgeIconResources
 import org.jetbrains.compose.resources.painterResource
@@ -154,17 +153,13 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = screenModel.text.value.isEmpty()
         )
-        Row(
-            modifier = Modifier.padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = screenModel.usePreviousSearch.value,
-                onCheckedChange = screenModel::usePreviousConditionsSearchChange,
-                enabled = selectingEnabled && screenModel.canUsePreviousConditions()
-            )
-            Text(stringResource(Res.string.use_previous_search_conditions))
-        }
+        CheckBoxWithText(
+            text = stringResource(Res.string.use_previous_search_conditions),
+            checked = screenModel.usePreviousSearch.value,
+            onCheckedChange = screenModel::usePreviousConditionsSearchChange,
+            enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
+            padding = 8.dp
+        )
         Button(
             onClick = screenModel::search,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),

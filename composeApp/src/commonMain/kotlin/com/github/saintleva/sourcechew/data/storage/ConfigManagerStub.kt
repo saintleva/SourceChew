@@ -10,16 +10,16 @@ import kotlin.random.Random
 object ConfigManagerStub : ConfigManager {
 
     override suspend fun savePreviousConditions(value: SearchConditions) {
-        Napier.d {
+        Napier.d(tag = "ConfigManagerStub") {
             """
-                |PreviousConditions:
+                |previousConditions:
                 |    forgeOptions:
                 |        ${value.forgeOptions}
                 |    typeOptions:
                 |        repo: ${value.typeOptions.repo}
                 |        user: ${value.typeOptions.user}
                 |        group: ${value.typeOptions.group}
-                |    text: ${value.text}
+                |    text: "${value.text}"
             """.trimMargin()
         }
     }
@@ -38,7 +38,7 @@ object ConfigManagerStub : ConfigManager {
     }
 
     override suspend fun saveUsePreviousSearch(value: Boolean) {
-        Napier.d { "UsePreviousSearch: $value" }
+        Napier.d(tag = "ConfigManagerStub") { "UsePreviousSearch: $value" }
     }
 
     override suspend fun loadUsePreviousSearch(): Boolean {

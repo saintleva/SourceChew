@@ -24,7 +24,8 @@ interface ConfigRepository {
 
     val previousConditions: SearchConditions
     val usePreviousSearch: Boolean
-    var previousConditionsHasBeenUsed: Boolean
+    //TODO: remove it
+    //var previousConditionsHasBeenUsed: Boolean
 
     suspend fun loadData()
 
