@@ -57,6 +57,9 @@ kotlin {
 
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+
+            //TODO: remove it
+            //implementation(libs.datastore.preferences)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

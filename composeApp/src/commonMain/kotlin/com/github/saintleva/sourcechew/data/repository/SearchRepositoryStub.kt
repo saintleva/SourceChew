@@ -20,13 +20,11 @@ package com.github.saintleva.sourcechew.data.repository
 import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.Item
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.domain.repository.SearchRepository
-import com.github.saintleva.sourcechew.domain.repository.SearchState
+import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 
@@ -35,11 +33,7 @@ class SearchRepositoryStub(
     private val eachCount: Int,
     private val delayImitation: Duration = Duration.ZERO,
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
-) : SearchRepository {
-
-    override val searchState = MutableStateFlow<SearchState>(SearchState.Selecting)
-
-    override var previousResult: FoundItems? = null
+) : StandardSearchRepository() {
 
     override suspend fun find(conditions: SearchConditions): FoundItems {
         val result = FoundItems()

@@ -18,14 +18,18 @@
 package com.github.saintleva.sourcechew.di
 
 import com.github.saintleva.sourcechew.data.storage.ConfigManager
-import com.github.saintleva.sourcechew.data.storage.ConfigManagerStub
+import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
+import com.github.saintleva.sourcechew.data.storage.ProduceDataStoreFileFactory
 import org.koin.dsl.module
 
 
 val dataModule = module {
-    ////TODO: remove it
-    single<ConfigManager> { ConfigManagerStub }
+    //TODO: remove it
+    //single<ConfigManager> { ConfigManagerStub }
 
-    //single<ConfigManager> { DataStoreConfigManager(get()) } }
-    //single<DataStore<Preferences>> { dataStorePreferences(get()) }
+    single<ConfigManager> { DataStoreConfigManager(get()) } }
+    single<DataStore<Preferences>> {
+        PreferenceDataStoreFactory.createWithPath(produceFile = ProduceDataStoreFileFactory }
+        )
+    }
 }

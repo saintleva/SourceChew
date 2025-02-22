@@ -17,43 +17,23 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
-import com.github.saintleva.sourcechew.domain.NeverSearchedException
 import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.StateFlow
 
-
-sealed interface SearchState {
-    data object Selecting : SearchState
-    data object Searching : SearchState
-    data class Error(val cause: Throwable) : SearchState
-    data class Success(val items: FoundItems) : SearchState
-}
 
 interface SearchRepository {
 
-    val searchState: MutableStateFlow<SearchState>
+    val searchState: StateFlow<SearchState>
 
     var previousResult: FoundItems?
 
     val everSearched: Boolean
         get() = (previousResult != null)
 
-    suspend fun find(conditions: SearchConditions): FoundItems
+    suspend fun search(conditions: SearchConditions)
 
-    suspend fun search(conditions: SearchConditions) {
-        searchState.update { SearchState.Searching }
-        val result = find(conditions)
-        searchState.update { SearchState.Success(result) }
-        previousResult = result
-    }
+    fun switchToSelecting()
 
-    fun usePreviousResult() {
-        if (previousResult == null) {
-            searchState.update { SearchState.Error(NeverSearchedException()) }
-        } else {
-            searchState.update { SearchState.Success(previousResult!!) }
-        }
-    }
+    fun usePreviousResult()
 }

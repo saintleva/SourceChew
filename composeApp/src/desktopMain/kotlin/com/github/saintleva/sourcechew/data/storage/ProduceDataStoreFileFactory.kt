@@ -17,26 +17,30 @@
 
 package com.github.saintleva.sourcechew.data.storage
 
-import androidx.datastore.core.DataMigration
-import androidx.datastore.core.DataStore
-import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
-import androidx.datastore.preferences.core.Preferences
-import kotlinx.coroutines.CoroutineScope
+import okio.Path
+import okio.Path.Companion.toPath
 
 
 //TODO: Use right filepath on desktop
 private const val APP_PREFERENCE_DATASTORE = "asdfasdfasdfasdf"
 
-actual fun dataStorePreferences(
-    corruptionHandler: ReplaceFileCorruptionHandler<Preferences>?,
-    coroutineScope: CoroutineScope,
-    migrations: List<DataMigration<Preferences>>,
-    context: Any?
-): DataStore<Preferences> = createDataStore(
-    corruptionHandler = corruptionHandler,
-    coroutineScope = coroutineScope,
-    migrations = migrations,
-    path = { _ ->
-        APP_PREFERENCE_DATASTORE
+actual class ProduceDataStoreFileFactory {
+
+    actual operator fun invoke(): () -> Path {
+        return { APP_PREFERENCE_DATASTORE.toPath() }
     }
-)
+}
+
+//actual fun dataStorePreferences(
+//    corruptionHandler: ReplaceFileCorruptionHandler<Preferences>?,
+//    coroutineScope: CoroutineScope,
+//    migrations: List<DataMigration<Preferences>>,
+//    context: Any?
+//): DataStore<Preferences> = createDataStore(
+//    corruptionHandler = corruptionHandler,
+//    coroutineScope = coroutineScope,
+//    migrations = migrations,
+//    path = { _ ->
+//        APP_PREFERENCE_DATASTORE
+//    }
+//)

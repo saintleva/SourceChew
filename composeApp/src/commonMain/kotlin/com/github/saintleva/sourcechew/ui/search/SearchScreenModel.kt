@@ -26,13 +26,10 @@ import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
-import com.github.saintleva.sourcechew.domain.repository.SearchRepository
-import com.github.saintleva.sourcechew.domain.repository.SearchState
+import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
@@ -40,7 +37,7 @@ class SearchScreenModel(
     private val findUseCase: FindUseCase,
     private val canUsePreviousConditionsUseCase: CanUsePreviousConditionsUseCase,
     private val configRepository: ConfigRepository,
-    searchRepository: SearchRepository
+    private val searchRepository: StandardSearchRepository
 ) : ScreenModel {
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
@@ -61,8 +58,7 @@ class SearchScreenModel(
         mutableStateOf(configRepository.usePreviousSearch)
     val usePreviousSearch: State<Boolean> = _usePreviousSearch
 
-    private val _searchState = searchRepository.searchState
-    val searchState = _searchState.asStateFlow()
+    val searchState = searchRepository.searchState
 
     private var _searchJob: Job? = null
 
@@ -120,6 +116,6 @@ class SearchScreenModel(
 
     fun stop() {
         _searchJob?.cancel()
-        _searchState.update { SearchState.Selecting }
+        searchRepository.switchToSelecting()
     }
 }
