@@ -24,13 +24,6 @@ import okio.Path.Companion.toPath
 //TODO: Use right filepath on desktop
 private const val APP_PREFERENCE_DATASTORE = "asdfasdfasdfasdf"
 
-actual class ProduceDataStoreFileFactory {
-
-    actual operator fun invoke(): () -> Path {
-        return { APP_PREFERENCE_DATASTORE.toPath() }
-    }
-}
-
 //actual fun dataStorePreferences(
 //    corruptionHandler: ReplaceFileCorruptionHandler<Preferences>?,
 //    coroutineScope: CoroutineScope,

@@ -20,6 +20,7 @@ package com.github.saintleva.sourcechew.di
 import com.github.saintleva.sourcechew.data.repository.ConfigRepositoryImpl
 import com.github.saintleva.sourcechew.data.repository.SearchRepositoryStub
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
+import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCaseImpl
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 val domainModule = module {
     single<ConfigRepository> { ConfigRepositoryImpl(get()) }
-    single<StandardSearchRepository> { SearchRepositoryStub(10, 100.milliseconds) }
-    single<CanUsePreviousConditionsUseCase> { CanUsePreviousConditionsUseCaseImpl(get(), get())}
-    single<FindUseCase> { FindUseCaseImpl(get(), get()) }
+    single<SearchRepository> { SearchRepositoryStub(10, 100.milliseconds) }
+    factory<CanUsePreviousConditionsUseCase> { CanUsePreviousConditionsUseCaseImpl(get(), get())}
+    factory<FindUseCase> { FindUseCaseImpl(get(), get()) }
 }
