@@ -2,30 +2,12 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-//repositories {
-//    google()
-//    mavenCentral()
-//}
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
 }
-
-//object Versions {
-//    const val koin = "4.0.0"
-//}
-
-//object Deps {
-//
-//    object Koin {
-//        const val core = "io.insert-koin:koin-core:${Versions.koin}"
-//        const val compose = "io.insert-koin:koin-compose:${Versions.koin}"
-//        const val viewmodel = "io.insert-koin:koin-compose-viewmodel:${Versions.koin}"
-//    }
-//}
 
 kotlin {
     androidTarget {
@@ -58,8 +40,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
 
-            //TODO: remove it
-            //implementation(libs.datastore.preferences)
+            implementation(libs.githubApi)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -85,6 +66,7 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.githubApi)
         }
     }
 }

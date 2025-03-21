@@ -26,7 +26,7 @@ import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
-import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
+import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
 import kotlinx.coroutines.Job
@@ -37,7 +37,7 @@ class SearchScreenModel(
     private val findUseCase: FindUseCase,
     private val canUsePreviousConditionsUseCase: CanUsePreviousConditionsUseCase,
     private val configRepository: ConfigRepository,
-    private val searchRepository: StandardSearchRepository
+    private val searchRepository: SearchRepository
 ) : ScreenModel {
 
     val selectedForges = mutableStateMapOf<Forge, Boolean>()

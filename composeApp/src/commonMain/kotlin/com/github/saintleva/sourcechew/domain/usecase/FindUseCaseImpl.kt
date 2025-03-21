@@ -19,11 +19,11 @@ package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
-import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
+import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 
 class FindUseCaseImpl(
     private val configRepository: ConfigRepository,
-    private val searchRepository: StandardSearchRepository,
+    private val searchRepository: SearchRepository,
 ) : FindUseCase {
 
     override suspend fun invoke(conditions: SearchConditions) {
