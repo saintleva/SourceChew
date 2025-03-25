@@ -1,0 +1,12 @@
+<resources>
+    <string name="logo">logo</string>
+    <string name="repositories">Repositories</string>
+    <string name="users">Users</string>
+    <string name="groups">Groups</string>
+    <string name="enter_search_text">Enter search text</string>
+    <string name="search">Search</string>
+    <string name="use_previous_search_conditions">Use previous search results using such conditions</string>
+    <string name="stop_search">Stop search</string>
+    <string name="go_back">Go back</string>
+    <string name="found_items">Items found</string>
+</resources>
