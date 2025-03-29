@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--TODO: implement good icon and background-->
+<resources>
+    <style name="Theme.SourceChew.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#FF0000</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/baseline_account_balance_24</item>
+<!--        <item name="postSplashScreenTheme">Theme.SourceChew.Splash</item>-->
+<!--        <item name="windowSplashScreenIconBackgroundColor">#00FF00</item>-->
+        <item name="postSplashScreenTheme">
+            @android:style/Theme.Material.NoActionBar
+        </item>
+    </style>
+</resources>

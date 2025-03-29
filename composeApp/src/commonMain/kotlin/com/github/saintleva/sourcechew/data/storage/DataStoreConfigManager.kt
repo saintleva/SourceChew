@@ -25,7 +25,10 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
+import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 
@@ -64,7 +67,8 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
         }
     }
 
-    override suspend fun loadPreviousConditions(): SearchConditions {
+    override suspend fun loadPreviousConditions(): Flow<SearchConditions> {
+        Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() started" }
         val typeOptions = TypeOptions(
             repo = dataStore.data.map {
                 preferences -> preferences[PreviousConditionsKeys.TypeOptions.repo] ?: true
@@ -82,7 +86,7 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
         }
         val text = dataStore.data.map { preferences ->
             preferences[PreviousConditionsKeys.text] ?: "" }.first()
-        return SearchConditions(forgeOptions, typeOptions, text)
+        return flowOf(SearchConditions(forgeOptions, typeOptions, text))
     }
 
 

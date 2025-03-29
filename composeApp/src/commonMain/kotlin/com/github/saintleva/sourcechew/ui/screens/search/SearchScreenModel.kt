@@ -29,7 +29,9 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 
@@ -40,18 +42,28 @@ class SearchScreenModel(
     private val searchRepository: SearchRepository
 ) : ScreenModel {
 
+    init {
+        Napier.d(tag = "Config") {
+            "Used object " +
+                    System.identityHashCode(configRepository).toUInt().toString(radix = 16)
+        }
+
+    }
+
+    private val previousConditions: Flow<SearchConditions> = configRepository.previousConditions
+
     val selectedForges = mutableStateMapOf<Forge, Boolean>()
 
-    private val _repoOption = mutableStateOf(configRepository.previousConditions.typeOptions.repo)
+    private val _repoOption = mutableStateOf(true)
     val repoOption: State<Boolean> = _repoOption
 
-    private val _userOption = mutableStateOf(configRepository.previousConditions.typeOptions.user)
+    private val _userOption = mutableStateOf(false)
     val userOption: State<Boolean> = _userOption
 
-    private val _groupOption = mutableStateOf(configRepository.previousConditions.typeOptions.group)
+    private val _groupOption = mutableStateOf(false)
     val groupOption: State<Boolean> = _groupOption
 
-    private val _text = mutableStateOf(configRepository.previousConditions.text)
+    private val _text = mutableStateOf("")
     val text: State<String> = _text
 
     private val _usePreviousSearch =
@@ -63,8 +75,17 @@ class SearchScreenModel(
     private var _searchJob: Job? = null
 
     init {
-        for (forge in Forge.list) {
-            selectedForges[forge] = configRepository.previousConditions.forgeOptions[forge]!!
+        screenModelScope.launch {
+            previousConditions.collect {
+                _repoOption.value = it.typeOptions.repo
+                _userOption.value = it.typeOptions.user
+                _groupOption.value = it.typeOptions.group
+                _text.value = it.text
+                for (forge in Forge.list) {
+                    selectedForges[forge] =
+                        it.forgeOptions[forge]!!
+                }
+            }
         }
     }
 

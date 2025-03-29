@@ -29,16 +29,11 @@ import org.koin.android.ext.koin.androidContext
 
 class MyApplication: Application() {
 
-    private val configRepository: ConfigRepository by inject()
-
     override fun onCreate() {
         super.onCreate()
         Napier.base(DebugAntilog())
         initKoin {
             androidContext(this@MyApplication)
-        }
-        runBlocking {
-            configRepository.loadData()
         }
     }
 }

@@ -22,9 +22,11 @@ import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.domain.models.defaultForgeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 
 
@@ -33,19 +35,25 @@ class ConfigRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ConfigRepository {
 
+    val data: Flow<Data>
+
     override var previousConditions: SearchConditions =
         SearchConditions(
             defaultForgeOptions,
             TypeOptions(repo = true, user = false, group = false),
             ""
         )
+        get() {
+            Napier.d(tag = "ConfigRepositoryImpl") { "previousConditions == $field" }
+            return field
+        }
 
     override var usePreviousSearch = false
     //TODO: remove it
     //override var previousConditionsHasBeenUsed = false
 
     override suspend fun loadData() {
-        previousConditions = configManager.loadPreviousConditions()
+        previousConditions = flowOf(configManager.loadPreviousConditions())
         usePreviousSearch = configManager.loadUsePreviousSearch()
     }
 
