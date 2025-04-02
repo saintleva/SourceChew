@@ -54,6 +54,14 @@ kotlin {
 
             implementation(libs.githubApi)
             implementation(libs.kgit)
+
+            implementation(kotlin("test"))
+        }
+        commonTest.dependencies {
+            testImplementation(libs.junit.jupiter.api)
+            testRuntimeOnly(libs.junit.jupiter.engine)
+            testImplementation(libs.kotlin.test)
+            testImplementation(libs.kotlin.test.junit)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
