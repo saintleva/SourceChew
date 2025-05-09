@@ -18,15 +18,15 @@
 package com.github.saintleva.sourcechew.domain.models
 
 
-sealed class Forge(val name: String) {
-    data object Github : Forge("GitHub")
-    data object Gitlab : Forge("GitLab")
-    data object Bitbucket : Forge("Bitbucket")
-    data object Sourceforge : Forge("SourceForge")
-    data object Gitea : Forge("Gitea")
-    data object Sourcehut : Forge("SourceHut")
-    data object Gogs : Forge("Gogs")
-    data object Codeberg : Forge("Codeberg")
+sealed class Forge(val name: String, val supportGroups: Boolean) {
+    data object Github : Forge("GitHub", true)
+    data object Gitlab : Forge("GitLab", true)
+    data object Bitbucket : Forge("Bitbucket", false)
+    data object Sourceforge : Forge("SourceForge", false)
+    data object Gitea : Forge("Gitea", false)
+    data object Sourcehut : Forge("SourceHut", false)
+    data object Gogs : Forge("Gogs", false)
+    data object Codeberg : Forge("Codeberg", false)
 
     companion object {
         val list = listOf(Github, Gitlab, Bitbucket, Sourceforge, Gitea, Sourcehut, Gogs, Codeberg)

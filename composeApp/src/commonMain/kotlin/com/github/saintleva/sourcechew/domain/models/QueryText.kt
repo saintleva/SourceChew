@@ -8,32 +8,73 @@ interface StringDictConverter {
     fun toString(map: Map<String, String>): String
 }
 
-sealed class QueryText {
 
-    protected val stringDictConverter: StringDictConverter by inject(StringDictConverter::class.java)
+sealed interface Matching {
 
-    abstract fun asText(): Text
-    abstract fun asDictionary(): Dictionary
+    fun matches(value: String, pattern: String): Boolean
 
-    class Text(val text: String): QueryText() {
-
-        override fun asText(): Text {
-            return this
+    object Exact: Matching {
+        override fun matches(value: String, pattern: String): Boolean {
+            return value == pattern
         }
 
-        override fun asDictionary(): Dictionary {
-            return Dictionary(stringDictConverter.toDict(text))
-        }
     }
 
-    class Dictionary(val dict: Map<String, String>): QueryText() {
-
-        override fun asText(): Text {
-            return Text(stringDictConverter.toString(dict))
-        }
-
-        override fun asDictionary(): Dictionary {
-            return this
+    object Contains: Matching {
+        override fun matches(value: String, pattern: String): Boolean {
+            return value.contains(pattern)
         }
     }
 }
+
+sealed interface Parameter {
+    class Main(val value: String): Parameter
+    class Pair(val key: String, val value: String): Parameter
+}
+
+class SearchParameter<out Param: Parameter>(
+    val matching: Matching,
+    val parameter: Param
+)
+
+class SearchQuery(
+    val mainParameter: SearchParameter<Parameter.Main>,
+    val parameters: List<SearchParameter<Parameter.Pair>>
+) {
+    //private val stringDictConverter: StringDictConverter by inject(StringDictConverter::class.java)
+
+    constructor(
+        mainParameter: SearchParameter<Parameter.Main>,
+        vararg parameters: SearchParameter<Parameter.Pair>
+    ): this(mainParameter, parameters.toList())
+}
+
+//sealed class QueryText {
+//
+//    protected val stringDictConverter: StringDictConverter by inject(StringDictConverter::class.java)
+//
+//    abstract fun asText(): Text
+//    abstract fun asDictionary(): Dictionary
+//
+//    class Text(val text: String): QueryText() {
+//
+//        override fun asText(): Text {
+//            return this
+//        }
+//
+//        override fun asDictionary(): Dictionary {
+//            return Dictionary(stringDictConverter.toDict(text))
+//        }
+//    }
+//
+//    class Dictionary(val dict: Map<String, String>): QueryText() {
+//
+//        override fun asText(): Text {
+//            return Text(stringDictConverter.toString(dict))
+//        }
+//
+//        override fun asDictionary(): Dictionary {
+//            return this
+//        }
+//    }
+//}
