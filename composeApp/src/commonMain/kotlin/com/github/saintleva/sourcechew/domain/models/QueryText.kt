@@ -1,13 +1,5 @@
 package com.github.saintleva.sourcechew.domain.models
 
-import org.koin.java.KoinJavaComponent.inject
-
-
-interface StringDictConverter {
-    fun toDict(string: String): Map<String, String>
-    fun toString(map: Map<String, String>): String
-}
-
 
 sealed interface Matching {
 
@@ -17,10 +9,47 @@ sealed interface Matching {
         override fun matches(value: String, pattern: String): Boolean {
             return value == pattern
         }
+    }
 
+    object NotEqual: Matching {
+        override fun matches(value: String, pattern: String): Boolean {
+            return value != pattern
+        }
+    }
+
+    object LessThan: Matching {
+        override fun matches(value: String, pattern: String): Boolean {
+            //TODO: Implement it
+            return false
+        }
+    }
+
+    object GreaterThan: Matching {
+        override fun matches(value: String, pattern: String): Boolean {
+            //TODO: Implement it
+            return false
+        }
+    }
+
+    object LessOrEqual: Matching {
+        override fun matches(value: String, pattern: String): Boolean {
+            return !GreaterThan.matches(value, pattern)
+        }
+    }
+
+    object GreaterOrEqual: Matching {
+        override fun matches(value: String, pattern: String): Boolean {
+            return !LessThan.matches(value, pattern)
+        }
     }
 
     object Contains: Matching {
+        override fun matches(value: String, pattern: String): Boolean {
+            return value.contains(pattern)
+        }
+    }
+
+    object NotContains: Matching {
         override fun matches(value: String, pattern: String): Boolean {
             return value.contains(pattern)
         }
@@ -38,43 +67,11 @@ class SearchParameter<out Param: Parameter>(
 )
 
 class SearchQuery(
-    val mainParameter: SearchParameter<Parameter.Main>,
+    val mainParameter: SearchParameter<Parameter.Main>?,
     val parameters: List<SearchParameter<Parameter.Pair>>
 ) {
-    //private val stringDictConverter: StringDictConverter by inject(StringDictConverter::class.java)
-
     constructor(
-        mainParameter: SearchParameter<Parameter.Main>,
+        mainParameter: SearchParameter<Parameter.Main>?,
         vararg parameters: SearchParameter<Parameter.Pair>
     ): this(mainParameter, parameters.toList())
 }
-
-//sealed class QueryText {
-//
-//    protected val stringDictConverter: StringDictConverter by inject(StringDictConverter::class.java)
-//
-//    abstract fun asText(): Text
-//    abstract fun asDictionary(): Dictionary
-//
-//    class Text(val text: String): QueryText() {
-//
-//        override fun asText(): Text {
-//            return this
-//        }
-//
-//        override fun asDictionary(): Dictionary {
-//            return Dictionary(stringDictConverter.toDict(text))
-//        }
-//    }
-//
-//    class Dictionary(val dict: Map<String, String>): QueryText() {
-//
-//        override fun asText(): Text {
-//            return Text(stringDictConverter.toString(dict))
-//        }
-//
-//        override fun asDictionary(): Dictionary {
-//            return this
-//        }
-//    }
-//}
