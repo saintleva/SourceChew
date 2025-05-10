@@ -3,62 +3,71 @@ package com.github.saintleva.sourcechew.domain.models
 
 sealed interface Matching {
 
+    val designation: String
     fun matches(value: String, pattern: String): Boolean
 
-    object Exact: Matching {
+    data object Exact: Matching {
+        override val designation: String = "=="
         override fun matches(value: String, pattern: String): Boolean {
             return value == pattern
         }
     }
 
-    object NotEqual: Matching {
+    data object NotEqual: Matching {
+        override val designation: String = "!="
         override fun matches(value: String, pattern: String): Boolean {
             return value != pattern
         }
     }
 
-    object LessThan: Matching {
+    data object LessThan: Matching {
+        override val designation: String = "<"
         override fun matches(value: String, pattern: String): Boolean {
             //TODO: Implement it
             return false
         }
     }
 
-    object GreaterThan: Matching {
+    data object GreaterThan: Matching {
+        override val designation: String = ">"
         override fun matches(value: String, pattern: String): Boolean {
             //TODO: Implement it
             return false
         }
     }
 
-    object LessOrEqual: Matching {
+    data object LessOrEqual: Matching {
+        override val designation: String = "<="
         override fun matches(value: String, pattern: String): Boolean {
             return !GreaterThan.matches(value, pattern)
         }
     }
 
-    object GreaterOrEqual: Matching {
+    data object GreaterOrEqual: Matching {
+        override val designation: String = ">="
         override fun matches(value: String, pattern: String): Boolean {
             return !LessThan.matches(value, pattern)
         }
     }
 
-    object Contains: Matching {
+    data object Contains: Matching {
+        override val designation: String = "~"
         override fun matches(value: String, pattern: String): Boolean {
             return value.contains(pattern)
         }
     }
 
-    object NotContains: Matching {
+    data object NotContains: Matching {
+        override val designation: String = "!~"
         override fun matches(value: String, pattern: String): Boolean {
             return value.contains(pattern)
         }
     }
 }
 
-sealed interface Parameter {
-    class Main(val value: String): Parameter
-    class Pair(val key: String, val value: String): Parameter
+sealed class Parameter(val value: String) {
+    class Main(value: String): Parameter(value)
+    class Pair(val key: String, value: String): Parameter(value)
 }
 
 class SearchParameter<out Param: Parameter>(
