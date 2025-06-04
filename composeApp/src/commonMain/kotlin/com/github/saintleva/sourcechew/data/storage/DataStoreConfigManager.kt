@@ -67,7 +67,7 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
         }
     }
 
-    override suspend fun loadPreviousConditions(): Flow<SearchConditions> {
+    override suspend fun loadPreviousConditions(): SearchConditions {
         Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() started" }
         val typeOptions = TypeOptions(
             repo = dataStore.data.map {
@@ -86,7 +86,7 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
         }
         val text = dataStore.data.map { preferences ->
             preferences[PreviousConditionsKeys.text] ?: "" }.first()
-        return flowOf(SearchConditions(forgeOptions, typeOptions, text))
+        return SearchConditions(forgeOptions, typeOptions, text)
     }
 
 

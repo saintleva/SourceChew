@@ -18,7 +18,7 @@ kotlin {
     }
     
     jvm("desktop")
-    
+
     sourceSets {
         val desktopMain by getting
         
@@ -30,6 +30,9 @@ kotlin {
             implementation(libs.koin.androidx.compose)
 
             implementation(libs.core.splashscreen)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.kotest.runner.junit5)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -56,7 +59,8 @@ kotlin {
             implementation(libs.kgit)
         }
         commonTest.dependencies {
-            implementation(libs.kotest.runner.junit5)
+            implementation(libs.kotest.framework.engine)
+            implementation(libs.kotest.assertions.core)
 //            implementation(kotlin("test"))
 //            testImplementation(libs.junit.jupiter.api)
 //            testRuntimeOnly(libs.junit.jupiter.engine)
@@ -101,6 +105,10 @@ android {
 dependencies {
     implementation(libs.androidx.material3.android)
     debugImplementation(compose.uiTooling)
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 compose.desktop {

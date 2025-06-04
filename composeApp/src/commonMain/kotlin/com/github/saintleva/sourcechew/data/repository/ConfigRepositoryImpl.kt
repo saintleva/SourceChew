@@ -26,6 +26,7 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 
@@ -35,39 +36,25 @@ class ConfigRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ConfigRepository {
 
-    val data: Flow<Data>
-
-    override var previousConditions: SearchConditions =
-        SearchConditions(
-            defaultForgeOptions,
-            TypeOptions(repo = true, user = false, group = false),
-            ""
-        )
-        get() {
-            Napier.d(tag = "ConfigRepositoryImpl") { "previousConditions == $field" }
-            return field
-        }
-
-    override var usePreviousSearch = false
-    //TODO: remove it
-    //override var previousConditionsHasBeenUsed = false
+    override val previousConditions = MutableSharedFlow<SearchConditions>(replay = 1)
+    override val usePreviousSearch = MutableSharedFlow<Boolean>(replay = 1)
 
     override suspend fun loadData() {
-        previousConditions = flowOf(configManager.loadPreviousConditions())
-        usePreviousSearch = configManager.loadUsePreviousSearch()
+        previousConditions.emit(configManager.loadPreviousConditions())
+        usePreviousSearch.emit(configManager.loadUsePreviousSearch())
     }
 
     override suspend fun changePreviousConditions(newValue: SearchConditions) {
         withContext(ioDispatcher) {
             configManager.savePreviousConditions(newValue)
-            previousConditions = newValue
+            previousConditions.emit(newValue) //TODO: Do I really need this?
         }
     }
 
     override suspend fun changeUsePreviousSearch(newValue: Boolean) {
         withContext(ioDispatcher) {
             configManager.saveUsePreviousSearch(newValue)
-            usePreviousSearch = newValue
+            usePreviousSearch.emit(newValue) //TODO: Do I really need this?
         }
     }
 }

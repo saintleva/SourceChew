@@ -7,7 +7,7 @@ sealed interface Matching {
     fun matches(value: String, pattern: String): Boolean
 
     data object Exact: Matching {
-        override val designation: String = "=="
+        override val designation: String = "="
         override fun matches(value: String, pattern: String): Boolean {
             return value == pattern
         }
@@ -63,6 +63,11 @@ sealed interface Matching {
             return value.contains(pattern)
         }
     }
+
+    companion object {
+        val byDesignation = mapOf("=" to Exact, "!=" to NotEqual, "<" to LessThan, ">" to GreaterThan,
+            "<=" to LessOrEqual, ">=" to GreaterOrEqual, "~" to Contains, "!~" to NotContains)
+    }
 }
 
 sealed class Parameter(val value: String) {
@@ -71,8 +76,8 @@ sealed class Parameter(val value: String) {
 }
 
 class SearchParameter<out Param: Parameter>(
-    val matching: Matching,
-    val parameter: Param
+    val parameter: Param,
+    val matching: Matching
 )
 
 class SearchQuery(
