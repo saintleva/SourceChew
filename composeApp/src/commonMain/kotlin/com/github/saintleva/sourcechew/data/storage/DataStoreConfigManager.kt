@@ -22,9 +22,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.github.saintleva.sourcechew.data.utils.searchQueryToString
 import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
+import com.github.saintleva.sourcechew.ui.common.utils.parseSearchQuery
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -50,7 +52,7 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
                 val group = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_group")
             }
 
-            val text = stringPreferencesKey("${PREVIOUS_CONDITIONS}_text")
+            val query = stringPreferencesKey("${PREVIOUS_CONDITIONS}_query")
         }
 
         val usePreviousSearchKey = booleanPreferencesKey("usePreviousSearch")
@@ -64,6 +66,7 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
             PreviousConditionsKeys.forgeOptions.forEach { entry ->
                 preferences[entry.value] = value.forgeOptions[entry.key]!!
             }
+            preferences[PreviousConditionsKeys.query] = searchQueryToString(value.query)
         }
     }
 
@@ -84,9 +87,9 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
             dataStore.data.map { preferences ->
                 preferences[PreviousConditionsKeys.forgeOptions[it]!!] ?: false }.first()
         }
-        val text = dataStore.data.map { preferences ->
-            preferences[PreviousConditionsKeys.text] ?: "" }.first()
-        return SearchConditions(forgeOptions, typeOptions, text)
+        val queryStr = dataStore.data.map { preferences ->
+            preferences[PreviousConditionsKeys.query] ?: "" }.first()
+        return SearchConditions(forgeOptions, typeOptions, parseSearchQuery(queryStr))
     }
 
 

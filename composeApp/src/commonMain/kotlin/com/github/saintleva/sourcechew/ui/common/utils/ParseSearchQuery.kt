@@ -132,6 +132,7 @@ fun parseSearchQuery(queryStr: String): SearchQuery {
                 inQuotes = !inQuotes
                 currentComponent.append(queryStr[i])
             }
+
             ' ' -> {
                 if (inQuotes) {
                     currentComponent.append(queryStr[i])
@@ -142,6 +143,7 @@ fun parseSearchQuery(queryStr: String): SearchQuery {
                     }
                 }
             }
+
             else -> {
                 currentComponent.append(queryStr[i])
             }
@@ -173,6 +175,7 @@ fun parseSearchQuery(queryStr: String): SearchQuery {
                         throw ParsingError.InvalidFormatException("Found more than one main parameter")
                     }
                 }
+
                 is Parameter.Pair -> {
                     val pairParameter = parsed.parameter as Parameter.Pair
                     parameters.add(SearchParameter(pairParameter, parsed.matching))
@@ -185,3 +188,4 @@ fun parseSearchQuery(queryStr: String): SearchQuery {
     }
 
     return SearchQuery(mainParameter, parameters)
+}

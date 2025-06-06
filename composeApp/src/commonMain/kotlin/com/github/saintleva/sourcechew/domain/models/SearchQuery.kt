@@ -81,11 +81,14 @@ class SearchParameter<out Param: Parameter>(
 )
 
 class SearchQuery(
-    val mainParameter: SearchParameter<Parameter.Main>?,
-    val parameters: List<SearchParameter<Parameter.Pair>>
+    val mainParameter: SearchParameter<Parameter.Main>? = null,
+    val parameters: List<SearchParameter<Parameter.Pair>> = emptyList()
 ) {
     constructor(
         mainParameter: SearchParameter<Parameter.Main>?,
         vararg parameters: SearchParameter<Parameter.Pair>
     ): this(mainParameter, parameters.toList())
 }
+
+fun SearchQuery.isEmpty() = mainParameter == null && parameters.isEmpty()
+fun SearchQuery.isNotEmpty() = !isEmpty()

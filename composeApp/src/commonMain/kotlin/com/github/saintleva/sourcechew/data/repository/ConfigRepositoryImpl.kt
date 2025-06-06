@@ -19,15 +19,10 @@ package com.github.saintleva.sourcechew.data.repository
 
 import com.github.saintleva.sourcechew.data.storage.ConfigManager
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.domain.models.TypeOptions
-import com.github.saintleva.sourcechew.domain.models.defaultForgeOptions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 
 

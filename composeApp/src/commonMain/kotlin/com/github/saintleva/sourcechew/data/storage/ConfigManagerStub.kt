@@ -1,7 +1,12 @@
 package com.github.saintleva.sourcechew.data.storage
 
+import com.github.saintleva.sourcechew.data.utils.searchQueryToString
 import com.github.saintleva.sourcechew.domain.models.Forge
+import com.github.saintleva.sourcechew.domain.models.Matching
+import com.github.saintleva.sourcechew.domain.models.Parameter
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.SearchParameter
+import com.github.saintleva.sourcechew.domain.models.SearchQuery
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import io.github.aakira.napier.Napier
 import kotlin.random.Random
@@ -19,7 +24,7 @@ object ConfigManagerStub : ConfigManager {
                 |        repo: ${value.typeOptions.repo}
                 |        user: ${value.typeOptions.user}
                 |        group: ${value.typeOptions.group}
-                |    text: "${value.text}"
+                |    query: "${searchQueryToString(value.query)}"
             """.trimMargin()
         }
     }
@@ -33,7 +38,7 @@ object ConfigManagerStub : ConfigManager {
                 user = random.nextBoolean(),
                 group = random.nextBoolean()
             ),
-            text = "Some text"
+            query = SearchQuery(SearchParameter(Parameter.Main("someName"), Matching.Exact))
         )
     }
 

@@ -20,30 +20,20 @@ package com.github.saintleva.sourcechew.domain.models
 
 typealias ForgeOptions = Map<Forge, Boolean>
 
-val defaultForgeOptions = Forge.list.associateWith { true }
-
-//private fun genDefaultForgeOptions(): ForgeOptions {
-//    val result = mutableMapOf<Forge, Boolean>()
-//    for (forge in Forge.list) {
-//        result[forge] = true
-//    }
-//    return result
-//}
-//
-//val defaultForgeOptions = genDefaultForgeOptions()
-    //mapOf(Forge.Github to true, Forge.Gitlab to true, Forge.Bitbucket to true)
-
+//TODO: remove this
+//val defaultForgeOptions = Forge.list.associateWith { true }
 
 data class TypeOptions(
     val repo: Boolean,
     val user: Boolean,
     val group: Boolean
 ) {
-    fun isAny() = repo || user || group
+    //TODO: remove this
+    //fun isAny() = repo || user || group
 }
 
 data class SearchConditions(
     val forgeOptions: ForgeOptions,
     val typeOptions: TypeOptions,
-    val text: String
+    val query: SearchQuery
 )

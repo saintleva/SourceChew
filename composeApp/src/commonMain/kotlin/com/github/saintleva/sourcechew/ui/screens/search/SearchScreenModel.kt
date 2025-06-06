@@ -22,13 +22,17 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.github.saintleva.sourcechew.data.utils.searchQueryToString
 import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.SearchQuery
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
+import com.github.saintleva.sourcechew.domain.models.isNotEmpty
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
+import com.github.saintleva.sourcechew.ui.common.utils.parseSearchQuery
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -42,13 +46,14 @@ class SearchScreenModel(
     private val searchRepository: SearchRepository
 ) : ScreenModel {
 
-    init {
-        Napier.d(tag = "Config") {
-            "Used object " +
-                    System.identityHashCode(configRepository).toUInt().toString(radix = 16)
-        }
-
-    }
+    //TODO: Remove this
+//    init {
+//        Napier.d(tag = "Config") {
+//            "Used object " +
+//                    System.identityHashCode(configRepository).toUInt().toString(radix = 16)
+//        }
+//
+//    }
 
     private val previousConditions: Flow<SearchConditions> = configRepository.previousConditions
 
@@ -66,8 +71,7 @@ class SearchScreenModel(
     private val _text = mutableStateOf("")
     val text: State<String> = _text
 
-    private val _usePreviousSearch =
-        mutableStateOf(configRepository.usePreviousSearch)
+    private val _usePreviousSearch = mutableStateOf(false)
     val usePreviousSearch: State<Boolean> = _usePreviousSearch
 
     val searchState = searchRepository.searchState
@@ -80,7 +84,7 @@ class SearchScreenModel(
                 _repoOption.value = it.typeOptions.repo
                 _userOption.value = it.typeOptions.user
                 _groupOption.value = it.typeOptions.group
-                _text.value = it.text
+                _text.value = searchQueryToString(it.query)
                 for (forge in Forge.list) {
                     selectedForges[forge] =
                         it.forgeOptions[forge]!!
@@ -89,10 +93,20 @@ class SearchScreenModel(
         }
     }
 
-    fun maySearch() =
-        selectedForges.values.any { it }
-                && (_repoOption.value || _userOption.value || _groupOption.value)
-                && text.value.isNotEmpty()
+    fun maySearch(): Boolean {
+
+        fun groupsUsed(): Boolean {
+            Forge.list.forEach { forge ->
+                if (selectedForges[forge]!! && forge.supportGroups)
+                    return true
+            }
+            return false
+        }
+
+        return selectedForges.values.any { it }
+                && (_repoOption.value || _userOption.value || groupsUsed())
+                && _text.value.isNotBlank()
+    }
 
     fun toggleForge(forge: Forge) {
         selectedForges[forge] = !selectedForges[forge]!!
@@ -124,7 +138,7 @@ class SearchScreenModel(
     private fun obtainConditions() = SearchConditions(
         selectedForges.toMap(),
         TypeOptions(repoOption.value, userOption.value, groupOption.value),
-        text.value
+        parseSearchQuery(text.value)
     )
 
     fun canUsePreviousConditions() = canUsePreviousConditionsUseCase(obtainConditions())

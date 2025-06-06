@@ -17,13 +17,13 @@
 
 package com.github.saintleva.sourcechew.data.repository
 
+import com.github.saintleva.sourcechew.data.utils.searchQueryToString
 import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.Item
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
@@ -36,6 +36,9 @@ class SearchRepositoryStub(
 ) : StandardSearchRepository() {
 
     override suspend fun find(conditions: SearchConditions): FoundItems {
+
+        fun name(i: Int) = "${i}${searchQueryToString(conditions.query)}${i}"
+
         val result = FoundItems()
         withContext(searchDispatcher) {
             for (forgeOption in conditions.forgeOptions) {
@@ -44,19 +47,19 @@ class SearchRepositoryStub(
                     if (conditions.typeOptions.repo) {
                         for (i in 0 until eachCount) {
                             delay(delayImitation)
-                            result.repos.add(Item.Repo(forge, "${i}${conditions.text}${i}"))
+                            result.repos.add(Item.Repo(forge, name(i)))
                         }
                     }
                     if (conditions.typeOptions.user) {
                         for (i in 0 until eachCount) {
                             delay(delayImitation)
-                            result.users.add(Item.User(forge, "${i}${conditions.text}${i}"))
+                            result.users.add(Item.User(forge, name(i)))
                         }
                     }
                     if (conditions.typeOptions.group) {
                         for (i in 0 until eachCount) {
                             delay(delayImitation)
-                            result.groups.add(Item.Group(forge, "${i}${conditions.text}${i}"))
+                            result.groups.add(Item.Group(forge, name(i)))
                         }
                     }
                 }
