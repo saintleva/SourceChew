@@ -18,17 +18,46 @@
 package com.github.saintleva.sourcechew.domain.models
 
 
-sealed class Forge(val name: String, val supportGroups: Boolean) {
-    data object Github : Forge("GitHub", true)
+sealed class Forge(
+    val name: String,
+    val supportGroups: Boolean,
+    val searchRules: ForgeSearchRules
+) {
+    data object Github : Forge("GitHub", true,
+        ForgeSearchRules(
+            repo = SearchRules(
+                allowedMainParameter = setOf(Matching.Exact, Matching.Contains),
+                allowedParameters = mapOf(
+                    "name" to setOf(Matching.Exact, Matching.Contains)
+                )
+            ),
+            user = SearchRules(
+                allowedMainParameter = setOf(Matching.Exact, Matching.Contains),
+                allowedParameters = mapOf(
+                    "name" to setOf(Matching.Exact, Matching.Contains)
+                )
+            ),
+            group = SearchRules(
+                allowedMainParameter = setOf(Matching.Exact, Matching.Contains),
+                allowedParameters = mapOf(
+                    "name" to setOf(Matching.Exact, Matching.Contains)
+                )
+            )
+        )
+    )
     data object Gitlab : Forge("GitLab", true)
     data object Bitbucket : Forge("Bitbucket", false)
-    data object Sourceforge : Forge("SourceForge", false)
-    data object Gitea : Forge("Gitea", false)
-    data object Sourcehut : Forge("SourceHut", false)
-    data object Gogs : Forge("Gogs", false)
-    data object Codeberg : Forge("Codeberg", false)
+
+        //TODO: remove this
+//    data object Sourceforge : Forge("SourceForge", false)
+//    data object Gitea : Forge("Gitea", false)
+//    data object Sourcehut : Forge("SourceHut", false)
+//    data object Gogs : Forge("Gogs", false)
+//    data object Codeberg : Forge("Codeberg", false)
 
     companion object {
-        val list = listOf(Github, Gitlab, Bitbucket, Sourceforge, Gitea, Sourcehut, Gogs, Codeberg)
+        //TODO: remove this
+        //val list = listOf(Github, Gitlab, Bitbucket, Sourceforge, Gitea, Sourcehut, Gogs, Codeberg)
+        val list = listOf(Github, Gitlab, Bitbucket)
     }
 }
