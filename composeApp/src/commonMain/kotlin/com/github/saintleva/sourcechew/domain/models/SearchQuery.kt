@@ -65,6 +65,12 @@ sealed interface Matching {
     }
 
     companion object {
+
+        val exact = setOf(Exact)
+        val contains = setOf(Contains)
+        val equaling = setOf(Exact, NotEqual)
+        val comparisons = setOf(Exact, NotEqual, LessThan, GreaterThan, LessOrEqual, GreaterOrEqual)
+
         val byDesignation = mapOf("=" to Exact, "!=" to NotEqual, "<" to LessThan, ">" to GreaterThan,
             "<=" to LessOrEqual, ">=" to GreaterOrEqual, "~" to Contains, "!~" to NotContains)
     }

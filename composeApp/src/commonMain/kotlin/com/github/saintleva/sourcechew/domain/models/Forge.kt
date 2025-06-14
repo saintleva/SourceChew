@@ -18,6 +18,17 @@
 package com.github.saintleva.sourcechew.domain.models
 
 
+private val githubUserRules = SearchRules(
+    allowedMainParameter = Matching.contains,
+    allowedParameters = mapOf(
+        "in" to Matching.exact,
+        "repos" to Matching.comparisons,
+        "location" to Matching.exact,
+        "created" to Matching.comparisons,
+        "language" to Matching.exact
+    )
+)
+
 sealed class Forge(
     val name: String,
     val supportGroups: Boolean,
@@ -26,26 +37,53 @@ sealed class Forge(
     data object Github : Forge("GitHub", true,
         ForgeSearchRules(
             repo = SearchRules(
-                allowedMainParameter = setOf(Matching.Exact, Matching.Contains),
+                allowedMainParameter = Matching.contains,
                 allowedParameters = mapOf(
-                    "name" to setOf(Matching.Exact, Matching.Contains)
+                    "in" to Matching.exact,
+                    "size" to Matching.comparisons,
+                    "forks" to Matching.comparisons,
+                    "created" to Matching.comparisons,
+                    "pushed" to Matching.comparisons,
+                    "user" to Matching.exact,
+                    "repo" to Matching.exact,
+                    "language" to Matching.exact,
+                    "stars" to Matching.comparisons,
+                    "topic" to Matching.exact,
+                    "license" to Matching.exact,
+                    "archived" to Matching.exact,
+                    "mirror" to Matching.exact,
+                    "is" to Matching.exact,
                 )
             ),
-            user = SearchRules(
-                allowedMainParameter = setOf(Matching.Exact, Matching.Contains),
-                allowedParameters = mapOf(
-                    "name" to setOf(Matching.Exact, Matching.Contains)
-                )
-            ),
-            group = SearchRules(
-                allowedMainParameter = setOf(Matching.Exact, Matching.Contains),
-                allowedParameters = mapOf(
-                    "name" to setOf(Matching.Exact, Matching.Contains)
-                )
-            )
+            user = githubUserRules,
+            group = githubUserRules
         )
     )
-    data object Gitlab : Forge("GitLab", true)
+    data object Gitlab : Forge("GitLab", true,
+        ForgeSearchRules(
+            repo = SearchRules(
+                allowedMainParameter = Matching.contains,
+                allowedParameters = mapOf(
+                    "membership" to Matching.exact,
+                    "owned" to Matching.exact,
+                    "starred" to Matching.exact,
+                    "visibility" to Matching.exact,
+                    "archived" to Matching.exact,
+                    "with_issues_enabled" to Matching.exact,
+                    "with_merge_requests_enabled" to Matching.exact,
+                    "min_access_level" to Matching.exact,
+                    "statistics" to Matching.exact,
+                    "language" to Matching.exact,
+                    "topic" to Matching.exact,
+                    "last_activity_after" to Matching.exact,
+                    "last_activity_before" to Matching.exact,
+                    "repository_checksum_failed" to Matching.exact
+                )
+            ),
+            user = ,
+            group =
+        )
+    )
     data object Bitbucket : Forge("Bitbucket", false)
 
         //TODO: remove this
