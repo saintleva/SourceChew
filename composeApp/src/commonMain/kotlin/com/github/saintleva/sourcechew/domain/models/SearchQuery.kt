@@ -50,6 +50,14 @@ sealed interface Matching {
         }
     }
 
+    data object InRange: Matching {
+        override val designation: String = ":"
+        override fun matches(value: String, pattern: String): Boolean {
+            //TODO: Implement it
+            return false
+        }
+    }
+
     data object Contains: Matching {
         override val designation: String = "~"
         override fun matches(value: String, pattern: String): Boolean {
@@ -69,10 +77,14 @@ sealed interface Matching {
         val exact = setOf(Exact)
         val contains = setOf(Contains)
         val equaling = setOf(Exact, NotEqual)
-        val comparisons = setOf(Exact, NotEqual, LessThan, GreaterThan, LessOrEqual, GreaterOrEqual)
+        val containing = setOf(Exact, NotEqual, Contains, NotContains)
+        val comparisons =
+            setOf(Exact, NotEqual, LessThan, GreaterThan, LessOrEqual, GreaterOrEqual, InRange)
+        val all = comparisons + setOf(Contains, NotContains)
 
-        val byDesignation = mapOf("=" to Exact, "!=" to NotEqual, "<" to LessThan, ">" to GreaterThan,
-            "<=" to LessOrEqual, ">=" to GreaterOrEqual, "~" to Contains, "!~" to NotContains)
+        val byDesignation = mapOf("=" to Exact, "!=" to NotEqual, "<" to LessThan,
+            ">" to GreaterThan, "<=" to LessOrEqual, ">=" to GreaterOrEqual, ":" to InRange,
+            "~" to Contains, "!~" to NotContains)
     }
 }
 

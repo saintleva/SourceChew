@@ -31,10 +31,12 @@ private val githubUserRules = SearchRules(
 
 sealed class Forge(
     val name: String,
-    val supportGroups: Boolean,
     val searchRules: ForgeSearchRules
 ) {
-    data object Github : Forge("GitHub", true,
+    val supportUsers = searchRules.user != null
+    val supportGroups = searchRules.group != null
+
+    data object Github : Forge("GitHub",
         ForgeSearchRules(
             repo = SearchRules(
                 allowedMainParameter = Matching.contains,
@@ -59,7 +61,8 @@ sealed class Forge(
             group = githubUserRules
         )
     )
-    data object Gitlab : Forge("GitLab", true,
+
+    data object Gitlab : Forge("GitLab",
         ForgeSearchRules(
             repo = SearchRules(
                 allowedMainParameter = Matching.contains,
@@ -80,11 +83,55 @@ sealed class Forge(
                     "repository_checksum_failed" to Matching.exact
                 )
             ),
-            user = ,
-            group =
+            user = SearchRules(
+                allowedMainParameter = setOf(Matching.Exact, Matching.Contains),
+                allowedParameters = mapOf(
+                    "external" to Matching.exact,
+                    "created_before" to Matching.exact,
+                    "created_after" to Matching.exact,
+                    "active" to Matching.exact,
+                    "blocked" to Matching.exact,
+                    "external_uid" to Matching.exact,
+                    "provider" to Matching.exact,
+                    "without_projects" to Matching.exact
+                )
+            ),
+            group = SearchRules(
+                allowedMainParameter = Matching.contains,
+                allowedParameters = mapOf(
+                    "all_available" to Matching.exact,
+                    "min_access_level" to Matching.exact,
+                    "all" to Matching.exact,
+                    "owned" to Matching.exact,
+                    "starred" to Matching.exact,
+                    "wiki_enabled" to Matching.exact,
+                    "top_level_only" to Matching.exact,
+                    "parent_id" to Matching.exact,
+                    "user_id" to Matching.exact
+                )
+            )
         )
     )
-    data object Bitbucket : Forge("Bitbucket", false)
+
+    data object Bitbucket : Forge("Bitbucket",
+        ForgeSearchRules(
+            repo = SearchRules(
+                allowedMainParameter = Matching.containing,
+                allowedParameters = mapOf(
+                    "full_name" to setOf(Matching.Contains, Matching.NotContains),
+                    "owner.username" to Matching.containing,
+                    "is_private" to Matching.exact,
+                    "updated" to Matching.comparisons,
+                    "created" to Matching.comparisons,
+                    "language" to Matching.equaling,
+                    "has_issues" to Matching.exact,
+                    "slug" to Matching.containing
+                )
+            ),
+            user = null,
+            group = null
+        )
+    )
 
         //TODO: remove this
 //    data object Sourceforge : Forge("SourceForge", false)

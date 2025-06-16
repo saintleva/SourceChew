@@ -41,6 +41,6 @@ class SearchRules(
 
 class ForgeSearchRules(
     val repo: SearchRules,
-    val user: SearchRules,
-    val group: SearchRules
+    val user: SearchRules?,
+    val group: SearchRules?
 )
