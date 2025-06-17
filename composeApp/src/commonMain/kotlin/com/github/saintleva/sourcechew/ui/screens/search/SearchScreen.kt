@@ -20,11 +20,9 @@ package com.github.saintleva.sourcechew.ui.screens.search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -37,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,22 +43,17 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.github.saintleva.sourcechew.domain.models.Forge
+import com.github.saintleva.sourcechew.domain.models.OnlyFlag
+import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
-import com.github.saintleva.sourcechew.ui.style.forgeIconResources
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.enter_search_text
-import sourcechew.composeapp.generated.resources.groups
-import sourcechew.composeapp.generated.resources.logo
-import sourcechew.composeapp.generated.resources.repositories
 import sourcechew.composeapp.generated.resources.search
 import sourcechew.composeapp.generated.resources.stop_search
 import sourcechew.composeapp.generated.resources.use_previous_search_conditions
-import sourcechew.composeapp.generated.resources.users
 
 
 class SearchScreen : Screen {
@@ -93,71 +85,48 @@ class SearchScreen : Screen {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
+    val scopeStrings = mapOf(
+        RepoSearchScope.NAME to stringResource(Res.string.names),
+        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
+        RepoSearchScope.README to stringResource(Res.string.readme),
+    )
+    val onlyFlagStrings = mapOf(
+        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
+        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
+        OnlyFlag.FORK to stringResource(Res.string.fork_only),
+        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
+        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
+        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only),
+    )
+
     Column {
-        FlowRow(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp,
-                alignment = Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.Top
-        ) {
-            //TODO: Show right Gitlab and Bitbucket logo instead of black rectangle
-            Forge.list.forEach { forge ->
-                val iconResource = forgeIconResources[forge]
-                val textStyle = MaterialTheme.typography.labelLarge
-                FilterChip(
-                    selected = screenModel.selectedForges[forge]!!,
-                    onClick = { screenModel.toggleForge(forge) },
-                    label = { Text(text = forge.name, style = textStyle) },
-                    enabled = selectingEnabled,
-                    leadingIcon = {
-                        iconResource?.let {
-                            val textSizeDp= with(LocalDensity.current) {
-                                textStyle.fontSize.toDp()
-                            }
-                            Icon(
-                                painter = painterResource(it),
-                                contentDescription = "${forge.name} ${stringResource(Res.string.logo)}",
-                                modifier = Modifier.size(textSizeDp * 1.75f)
-                            )
-                        }
-                    }
-                )
-            }
-        }
-        FlowRow(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp,
-                alignment = Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.Top
-        ) {
-            FilterChip(
-                selected = screenModel.repoOption.value,
-                onClick = screenModel::toggleRepository,
-                label = { Text(stringResource(Res.string.repositories)) },
-                enabled = selectingEnabled
-            )
-            FilterChip(
-                selected = screenModel.userOption.value,
-                onClick = screenModel::toggleUser,
-                label = { Text(stringResource(Res.string.users)) },
-                enabled = selectingEnabled
-            )
-            FilterChip(
-                selected = screenModel.groupOption.value,
-                onClick = screenModel::toggleGroup,
-                label = { Text(stringResource(Res.string.groups)) },
-                enabled = selectingEnabled
-            )
-        }
         OutlinedTextField(
-            value = screenModel.text.value,
-            onValueChange = screenModel::onTextChange,
+            value = screenModel.query.value,
+            onValueChange = screenModel::onQueryChange,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = selectingEnabled,
             textStyle = TextStyle(fontSize = 16.sp),
             label = { Text(stringResource(Res.string.enter_search_text)) },
-            isError = screenModel.text.value.isEmpty()
+            isError = screenModel.query.value.isBlank()
         )
+        RepoSearchScope.all.forEach { scope ->
+            val textStyle = MaterialTheme.typography.labelLarge
+            FilterChip(
+                selected = screenModel.selectedSearchScope[scope]!!,
+                onClick = { screenModel.toggleScope(scope) },
+                label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
+                enabled = selectingEnabled
+            )
+        }
+        OnlyFlag.all.forEach { flag ->
+            CheckBoxWithText(
+                text = onlyFlagStrings[flag]!!,
+                checked = screenModel.selectedOnlyFlags[flag]!!,
+                onCheckedChange = screenModel::usePreviousConditionsSearchChange,
+                enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
+                padding = 8.dp
+            )
+        }
         CheckBoxWithText(
             text = stringResource(Res.string.use_previous_search_conditions),
             checked = screenModel.usePreviousSearch.value,

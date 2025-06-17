@@ -18,8 +18,6 @@
 package com.github.saintleva.sourcechew.data.repository
 
 import com.github.saintleva.sourcechew.data.utils.searchQueryToString
-import com.github.saintleva.sourcechew.domain.models.FoundItems
-import com.github.saintleva.sourcechew.domain.models.Item
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
 import kotlinx.coroutines.CoroutineDispatcher

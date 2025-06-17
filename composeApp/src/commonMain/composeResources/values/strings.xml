@@ -3,6 +3,15 @@
     <string name="repositories">Repositories</string>
     <string name="users">Users</string>
     <string name="groups">Groups</string>
+    <string name="names">Names</string>
+    <string name="descriptions">Descriptions</string>
+    <string name="readme">Readme</string>
+    <string name="public_only">Public only</string>
+    <string name="private_only">Private only</string>
+    <string name="fork_only">Forks only</string>
+    <string name="archived_only">Archived only</string>
+    <string name="mirror_only">Mirror only</string>
+    <string name="template_only">Template only</string>
     <string name="enter_search_text">Enter search text</string>
     <string name="search">Search</string>
     <string name="use_previous_search_conditions">Use previous search results using such conditions</string>

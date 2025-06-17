@@ -1,7 +1,6 @@
 package com.github.saintleva.sourcechew.data.storage
 
 import com.github.saintleva.sourcechew.data.utils.searchQueryToString
-import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.models.Matching
 import com.github.saintleva.sourcechew.domain.models.Parameter
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
@@ -14,7 +13,7 @@ import kotlin.random.Random
 
 object ConfigManagerStub : ConfigManager {
 
-    override suspend fun savePreviousConditions(value: SearchConditions) {
+    override suspend fun saveRepoPreviousConditions(value: SearchConditions) {
         Napier.d(tag = "ConfigManagerStub") {
             """
                 |previousConditions:
@@ -29,7 +28,7 @@ object ConfigManagerStub : ConfigManager {
         }
     }
 
-    override suspend fun loadPreviousConditions(): SearchConditions {
+    override suspend fun loadRepoPreviousConditions(): SearchConditions {
         val random = Random.Default
         return SearchConditions(
             forgeOptions = Forge.list.associateWith { random.nextBoolean() },
@@ -42,11 +41,11 @@ object ConfigManagerStub : ConfigManager {
         )
     }
 
-    override suspend fun saveUsePreviousSearch(value: Boolean) {
+    override suspend fun saveUsePreviousRepoSearch(value: Boolean) {
         Napier.d(tag = "ConfigManagerStub") { "UsePreviousSearch: $value" }
     }
 
-    override suspend fun loadUsePreviousSearch(): Boolean {
+    override suspend fun loadUsePreviousRepoSearch(): Boolean {
         val random = Random.Default
         return random.nextBoolean()
     }

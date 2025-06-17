@@ -23,7 +23,6 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.saintleva.sourcechew.data.utils.searchQueryToString
-import com.github.saintleva.sourcechew.domain.models.Forge
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import com.github.saintleva.sourcechew.domain.models.TypeOptions
 import com.github.saintleva.sourcechew.ui.common.utils.parseSearchQuery
@@ -40,7 +39,7 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
 
         object PreviousConditionsKeys {
 
-            private const val PREVIOUS_CONDITIONS = "PreviousConditions"
+            private const val REPO_PREVIOUS_CONDITIONS = "RepoPreviousConditions"
 
             val forgeOptions = Forge.list.associateWith {
                 booleanPreferencesKey("${PREVIOUS_CONDITIONS}_forge_${it.name}")
@@ -58,7 +57,7 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
         val usePreviousSearchKey = booleanPreferencesKey("usePreviousSearch")
     }
 
-    override suspend fun savePreviousConditions(value: SearchConditions) {
+    override suspend fun saveRepoPreviousConditions(value: SearchConditions) {
         dataStore.edit { preferences ->
             preferences[PreviousConditionsKeys.TypeOptions.repo] = value.typeOptions.repo
             preferences[PreviousConditionsKeys.TypeOptions.user] = value.typeOptions.user
@@ -70,7 +69,7 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
         }
     }
 
-    override suspend fun loadPreviousConditions(): SearchConditions {
+    override suspend fun loadRepoPreviousConditions(): SearchConditions {
         Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() started" }
         val typeOptions = TypeOptions(
             repo = dataStore.data.map {
@@ -93,12 +92,12 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
     }
 
 
-    override suspend fun saveUsePreviousSearch(value: Boolean) {
+    override suspend fun saveUsePreviousRepoSearch(value: Boolean) {
         dataStore.edit { preferences ->
             preferences[usePreviousSearchKey] = value
         }
     }
 
-    override suspend fun loadUsePreviousSearch(): Boolean =
+    override suspend fun loadUsePreviousRepoSearch(): Boolean =
         dataStore.data.map { preferences -> preferences[usePreviousSearchKey] ?: false }.first()
 }

@@ -17,12 +17,12 @@
 
 package com.github.saintleva.sourcechew.data.storage
 
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 
 
 interface ConfigManager {
-    suspend fun savePreviousConditions(value: SearchConditions)
-    suspend fun loadPreviousConditions(): SearchConditions
-    suspend fun saveUsePreviousSearch(value: Boolean)
-    suspend fun loadUsePreviousSearch(): Boolean
+    suspend fun saveRepoPreviousConditions(value: RepoSearchConditions)
+    suspend fun loadRepoPreviousConditions(): RepoSearchConditions
+    suspend fun saveUsePreviousRepoSearch(value: Boolean)
+    suspend fun loadUsePreviousRepoSearch(): Boolean
 }

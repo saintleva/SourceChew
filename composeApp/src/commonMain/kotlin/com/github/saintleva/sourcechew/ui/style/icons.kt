@@ -17,7 +17,6 @@
 
 package com.github.saintleva.sourcechew.ui.style
 
-import com.github.saintleva.sourcechew.domain.models.Forge
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.bitbucket_logo
 import sourcechew.composeapp.generated.resources.github_logo_128px

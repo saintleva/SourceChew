@@ -18,7 +18,7 @@
 package com.github.saintleva.sourcechew.data.repository
 
 import com.github.saintleva.sourcechew.data.storage.ConfigManager
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -31,25 +31,25 @@ class ConfigRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ConfigRepository {
 
-    override val previousConditions = MutableSharedFlow<SearchConditions>(replay = 1)
-    override val usePreviousSearch = MutableSharedFlow<Boolean>(replay = 1)
+    override val previousRepoConditions = MutableSharedFlow<RepoSearchConditions>(replay = 1)
+    override val usePreviousRepoSearch = MutableSharedFlow<Boolean>(replay = 1)
 
     override suspend fun loadData() {
-        previousConditions.emit(configManager.loadPreviousConditions())
-        usePreviousSearch.emit(configManager.loadUsePreviousSearch())
+        previousRepoConditions.emit(configManager.loadRepoPreviousConditions())
+        usePreviousRepoSearch.emit(configManager.loadUsePreviousRepoSearch())
     }
 
-    override suspend fun changePreviousConditions(newValue: SearchConditions) {
+    override suspend fun changeRepoPreviousConditions(newValue: RepoSearchConditions) {
         withContext(ioDispatcher) {
-            configManager.savePreviousConditions(newValue)
-            previousConditions.emit(newValue) //TODO: Do I really need this?
+            configManager.saveRepoPreviousConditions(newValue)
+            previousRepoConditions.emit(newValue) //TODO: Do I really need this?
         }
     }
 
-    override suspend fun changeUsePreviousSearch(newValue: Boolean) {
+    override suspend fun changeUsePreviousRepoSearch(newValue: Boolean) {
         withContext(ioDispatcher) {
-            configManager.saveUsePreviousSearch(newValue)
-            usePreviousSearch.emit(newValue) //TODO: Do I really need this?
+            configManager.saveUsePreviousRepoSearch(newValue)
+            usePreviousRepoSearch.emit(newValue) //TODO: Do I really need this?
         }
     }
 }

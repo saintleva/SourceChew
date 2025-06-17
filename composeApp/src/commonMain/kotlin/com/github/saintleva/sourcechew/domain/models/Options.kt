@@ -18,22 +18,24 @@
 package com.github.saintleva.sourcechew.domain.models
 
 
-typealias ForgeOptions = Map<Forge, Boolean>
+enum class RepoSearchScope {
+    NAME, DESCRIPTION, README;
 
-//TODO: remove this
-//val defaultForgeOptions = Forge.list.associateWith { true }
-
-data class TypeOptions(
-    val repo: Boolean,
-    val user: Boolean,
-    val group: Boolean
-) {
-    //TODO: remove this
-    //fun isAny() = repo || user || group
+    companion object {
+        val all = values().toList()
+    }
 }
 
-data class SearchConditions(
-    val forgeOptions: ForgeOptions,
-    val typeOptions: TypeOptions,
-    val query: SearchQuery
+enum class OnlyFlag {
+    PUBLIC, PRIVATE, FORK, ARCHIVED, MIRROR, TEMPLATE;
+
+    companion object {
+        val all = values().toList()
+    }
+}
+
+data class RepoSearchConditions(
+    val query: String,
+    val inScope: Set<RepoSearchScope>,
+    val onlyFlags: Set<OnlyFlag>,
 )

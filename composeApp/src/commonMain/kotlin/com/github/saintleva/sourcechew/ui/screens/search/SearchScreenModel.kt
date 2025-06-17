@@ -22,18 +22,13 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.github.saintleva.sourcechew.data.utils.searchQueryToString
-import com.github.saintleva.sourcechew.domain.models.Forge
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.domain.models.SearchQuery
-import com.github.saintleva.sourcechew.domain.models.TypeOptions
-import com.github.saintleva.sourcechew.domain.models.isNotEmpty
+import com.github.saintleva.sourcechew.domain.models.OnlyFlag
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
-import com.github.saintleva.sourcechew.ui.common.utils.parseSearchQuery
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -46,31 +41,17 @@ class SearchScreenModel(
     private val searchRepository: SearchRepository
 ) : ScreenModel {
 
-    //TODO: Remove this
-//    init {
-//        Napier.d(tag = "Config") {
-//            "Used object " +
-//                    System.identityHashCode(configRepository).toUInt().toString(radix = 16)
-//        }
-//
-//    }
+    private val _query = mutableStateOf("")
+    val query: State<String> = _query
 
-    private val previousConditions: Flow<SearchConditions> = configRepository.previousConditions
+    val previousConditions: Flow<RepoSearchConditions> =
+        configRepository.previousRepoConditions
 
-    val selectedForges = mutableStateMapOf<Forge, Boolean>()
+    val selectedSearchScope = mutableStateMapOf<RepoSearchScope, Boolean>()
+    val selectedOnlyFlags = mutableStateMapOf<OnlyFlag, Boolean>()
 
-    private val _repoOption = mutableStateOf(true)
-    val repoOption: State<Boolean> = _repoOption
 
-    private val _userOption = mutableStateOf(false)
-    val userOption: State<Boolean> = _userOption
-
-    private val _groupOption = mutableStateOf(false)
-    val groupOption: State<Boolean> = _groupOption
-
-    private val _text = mutableStateOf("")
-    val text: State<String> = _text
-
+    val usePreviousConditions: Flow<Boolean> = configRepository.usePreviousRepoSearch
     private val _usePreviousSearch = mutableStateOf(false)
     val usePreviousSearch: State<Boolean> = _usePreviousSearch
 
@@ -81,64 +62,51 @@ class SearchScreenModel(
     init {
         screenModelScope.launch {
             previousConditions.collect {
-                _repoOption.value = it.typeOptions.repo
-                _userOption.value = it.typeOptions.user
-                _groupOption.value = it.typeOptions.group
-                _text.value = searchQueryToString(it.query)
-                for (forge in Forge.list) {
-                    selectedForges[forge] =
-                        it.forgeOptions[forge]!!
+                _query.value = it.query
+                for (scope in RepoSearchScope.all) {
+                    selectedSearchScope[scope] = it.inScope.contains(scope)
                 }
+                for (flag in OnlyFlag.all) {
+                    selectedOnlyFlags[flag] = it.onlyFlags.contains(flag)
+                }
+            }
+            usePreviousConditions.collect {
+                _usePreviousSearch.value = it
             }
         }
     }
 
     fun maySearch(): Boolean {
 
-        fun groupsUsed(): Boolean {
-            Forge.list.forEach { forge ->
-                if (selectedForges[forge]!! && forge.supportGroups)
-                    return true
-            }
-            return false
-        }
+        val allPrivacySelected =
+            selectedOnlyFlags[OnlyFlag.PUBLIC]!! && selectedOnlyFlags[OnlyFlag.PRIVATE]!!
 
-        return selectedForges.values.any { it }
-                && (_repoOption.value || _userOption.value || groupsUsed())
-                && _text.value.isNotBlank()
+        return selectedSearchScope.isNotEmpty() && !allPrivacySelected && query.value.isNotBlank()
     }
 
-    fun toggleForge(forge: Forge) {
-        selectedForges[forge] = !selectedForges[forge]!!
+    fun onQueryChange(newQuery: String) {
+        _query.value = newQuery
     }
 
-    fun toggleRepository() {
-        _repoOption.value = !_repoOption.value
+    fun toggleScope(scope: RepoSearchScope) {
+        selectedSearchScope[scope] = !selectedSearchScope[scope]!!
     }
 
-    fun toggleUser() {
-        _userOption.value = !_userOption.value
-    }
-
-    fun toggleGroup() {
-        _groupOption.value = !_groupOption.value
-    }
-
-    fun onTextChange(newText: String) {
-        _text.value = newText
+    fun toggleFlag(flag: OnlyFlag) {
+        selectedOnlyFlags[flag] = !selectedOnlyFlags[flag]!!
     }
 
     fun usePreviousConditionsSearchChange(checked: Boolean) {
         screenModelScope.launch {
-            configRepository.changeUsePreviousSearch(checked)
+            configRepository.changeUsePreviousRepoSearch(checked)
             _usePreviousSearch.value = checked
         }
     }
 
-    private fun obtainConditions() = SearchConditions(
-        selectedForges.toMap(),
-        TypeOptions(repoOption.value, userOption.value, groupOption.value),
-        parseSearchQuery(text.value)
+    private fun obtainConditions() = RepoSearchConditions(
+        query.value,
+        selectedSearchScope.filter { it.value }.keys.toSet(),
+        selectedOnlyFlags.filter { it.value }.keys.toSet()
     )
 
     fun canUsePreviousConditions() = canUsePreviousConditionsUseCase(obtainConditions())

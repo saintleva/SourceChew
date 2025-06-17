@@ -17,7 +17,6 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
-import com.github.saintleva.sourcechew.domain.models.FoundItems
 import com.github.saintleva.sourcechew.domain.models.SearchConditions
 import kotlinx.coroutines.flow.StateFlow
 

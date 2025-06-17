@@ -3,6 +3,15 @@
     <string name="repositories">Репозитории</string>
     <string name="users">Пользователи</string>
     <string name="groups">Группы</string>
+    <string name="names">Названия</string>
+    <string name="descriptions">Описания</string>
+    <string name="readme">Readme</string>
+    <string name="public_only">Только публичные</string>
+    <string name="private_only">Только приватные</string>
+    <string name="fork_only">Только форки</string>
+    <string name="archived_only">Только заархивированные</string>
+    <string name="mirror_only">Только зеркала</string>
+    <string name="template_only">Только шаблоны репозиториев</string>
     <string name="enter_search_text">Введите текст для поиска</string>
     <string name="search">Найти</string>
     <string name="use_previous_search_conditions">Использовать результаты предыдущего поиска по этим параметрам</string>

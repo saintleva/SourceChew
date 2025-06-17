@@ -17,19 +17,17 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.Flow
 
 
 interface ConfigRepository {
 
-    val previousConditions: Flow<SearchConditions>
-    val usePreviousSearch: Flow<Boolean>
-    //TODO: remove it
-    //var previousConditionsHasBeenUsed: Boolean
+    val previousRepoConditions: Flow<RepoSearchConditions>
+    val usePreviousRepoSearch: Flow<Boolean>
 
     suspend fun loadData()
 
-    suspend fun changePreviousConditions(newValue: SearchConditions)
-    suspend fun changeUsePreviousSearch(newValue: Boolean)
+    suspend fun changeRepoPreviousConditions(newValue: RepoSearchConditions)
+    suspend fun changeUsePreviousRepoSearch(newValue: Boolean)
 }
