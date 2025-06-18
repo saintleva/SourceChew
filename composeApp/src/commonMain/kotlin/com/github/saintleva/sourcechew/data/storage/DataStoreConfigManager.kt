@@ -22,14 +22,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.github.saintleva.sourcechew.data.utils.searchQueryToString
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
-import com.github.saintleva.sourcechew.domain.models.TypeOptions
-import com.github.saintleva.sourcechew.ui.common.utils.parseSearchQuery
-import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.Flow
+import com.github.saintleva.sourcechew.data.utils.makeSet
+import com.github.saintleva.sourcechew.domain.models.OnlyFlag
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 
@@ -37,58 +34,48 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
 
     private companion object {
 
-        object PreviousConditionsKeys {
-
-            private const val REPO_PREVIOUS_CONDITIONS = "RepoPreviousConditions"
-
-            val forgeOptions = Forge.list.associateWith {
-                booleanPreferencesKey("${PREVIOUS_CONDITIONS}_forge_${it.name}")
-            }
-
-            object TypeOptions {
-                val repo = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_repo")
-                val user = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_user")
-                val group = booleanPreferencesKey("${PREVIOUS_CONDITIONS}_group")
-            }
-
-            val query = stringPreferencesKey("${PREVIOUS_CONDITIONS}_query")
+        abstract class Group(val type: String) {
+            protected val previousConditions = "${type}_PreviousConditions"
+            val queryKey = stringPreferencesKey("${previousConditions}_query")
+            val usePreviousSearchKey = booleanPreferencesKey("${type}_usePreviousSearch")
         }
 
-        val usePreviousSearchKey = booleanPreferencesKey("usePreviousSearch")
+        object Repo : Group("Repo") {
+
+            object PreviousConditions {
+                val scopeKeys = RepoSearchScope.all.associateWith {
+                    booleanPreferencesKey("${previousConditions}_scope_${it.name}")
+                }
+                val onlyFlagKeys = OnlyFlag.all.associateWith {
+                    booleanPreferencesKey("${previousConditions}_onlyFlag_${it.name}")
+                }
+            }
+
+        }
     }
 
-    override suspend fun saveRepoPreviousConditions(value: SearchConditions) {
+    override suspend fun saveRepoPreviousConditions(value: RepoSearchConditions) {
         dataStore.edit { preferences ->
-            preferences[PreviousConditionsKeys.TypeOptions.repo] = value.typeOptions.repo
-            preferences[PreviousConditionsKeys.TypeOptions.user] = value.typeOptions.user
-            preferences[PreviousConditionsKeys.TypeOptions.group] = value.typeOptions.group
-            PreviousConditionsKeys.forgeOptions.forEach { entry ->
-                preferences[entry.value] = value.forgeOptions[entry.key]!!
+            preferences[Repo.queryKey] = value.query
+            Repo.PreviousConditions.scopeKeys.forEach { entry ->
+                preferences[entry.value] = entry.key in value.inScope
             }
-            preferences[PreviousConditionsKeys.query] = searchQueryToString(value.query)
+            Repo.PreviousConditions.onlyFlagKeys.forEach { entry ->
+                preferences[entry.value] = entry.key in value.onlyFlags
+            }
         }
     }
 
-    override suspend fun loadRepoPreviousConditions(): SearchConditions {
-        Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() started" }
-        val typeOptions = TypeOptions(
-            repo = dataStore.data.map {
-                preferences -> preferences[PreviousConditionsKeys.TypeOptions.repo] ?: true
-            }.first(),
-            user = dataStore.data.map {
-                    preferences -> preferences[PreviousConditionsKeys.TypeOptions.user] ?: false
-            }.first(),
-            group = dataStore.data.map {
-                    preferences -> preferences[PreviousConditionsKeys.TypeOptions.group] ?: false
-            }.first()
-        )
-        val forgeOptions = Forge.list.associateWith {
+    override suspend fun loadRepoPreviousConditions(): RepoSearchConditions {
+        //TODO: remove this
+        //Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() started" }
+        val query = dataStore.data.map { preferences -> preferences[Repo.queryKey] ?: "" }.first()
+        val inScope = RepoSearchScope.all.makeSet {
             dataStore.data.map { preferences ->
-                preferences[PreviousConditionsKeys.forgeOptions[it]!!] ?: false }.first()
+                preferences[Repo.PreviousConditions.scopeKeys[it]!!] ?: false
+            }.first()
         }
-        val queryStr = dataStore.data.map { preferences ->
-            preferences[PreviousConditionsKeys.query] ?: "" }.first()
-        return SearchConditions(forgeOptions, typeOptions, parseSearchQuery(queryStr))
+        return RepoSearchConditions(query, inScope, emptySet())
     }
 
 
