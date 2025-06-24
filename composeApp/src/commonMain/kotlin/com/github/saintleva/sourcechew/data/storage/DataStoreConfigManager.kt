@@ -72,19 +72,25 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
         val query = dataStore.data.map { preferences -> preferences[Repo.queryKey] ?: "" }.first()
         val inScope = RepoSearchScope.all.makeSet {
             dataStore.data.map { preferences ->
-                preferences[Repo.PreviousConditions.scopeKeys[it]!!] ?: false
+                preferences[Repo.PreviousConditions.scopeKeys[it]!!] ?:
+                if (it == RepoSearchScope.NAME) true else false
             }.first()
         }
-        return RepoSearchConditions(query, inScope, emptySet())
+        val onlyFlags = OnlyFlag.all.makeSet {
+            dataStore.data.map { preferences ->
+                preferences[Repo.PreviousConditions.onlyFlagKeys[it]!!] ?: false
+            }.first()
+        }
+        return RepoSearchConditions(query, inScope, onlyFlags)
     }
 
 
     override suspend fun saveUsePreviousRepoSearch(value: Boolean) {
         dataStore.edit { preferences ->
-            preferences[usePreviousSearchKey] = value
+            preferences[Repo.usePreviousSearchKey] = value
         }
     }
 
     override suspend fun loadUsePreviousRepoSearch(): Boolean =
-        dataStore.data.map { preferences -> preferences[usePreviousSearchKey] ?: false }.first()
+        dataStore.data.map { preferences -> preferences[Repo.usePreviousSearchKey] ?: false }.first()
 }
