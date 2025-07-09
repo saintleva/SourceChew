@@ -34,6 +34,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.ui.common.NavigableUpScreen
 import org.jetbrains.compose.resources.stringResource
@@ -56,7 +57,7 @@ class FoundScreen : Screen {
 }
 
 @Composable
-private fun ItemContent(type: String, forge: Forge, name: String) {
+private fun ItemContent(foundRepo: FoundRepo) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,29 +70,25 @@ private fun ItemContent(type: String, forge: Forge, name: String) {
                 .background(color = MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
-            Text("Type: $type")
-            Text("Forge: ${forge.name}")
-            Text("Name: $name")
+            Text("Author: ${foundRepo.author}")
+            Text("Name: ${foundRepo.name}")
+            Text("Description: ${foundRepo.description}")
+            Text("Language: ${foundRepo.language}")
+            Text("Start: ${foundRepo.stars}")
         }
     }
 }
 
 @Composable
 private fun FoundContent(screenModel: FoundScreenModel) {
-    val foundItems = (screenModel.searchState.value as SearchState.Success).items
+    val foundRepos = (screenModel.searchState.value as SearchState.Success).items
     NavigableUpScreen(
         title = stringResource(Res.string.found_items),
         navigationUp = screenModel::navigateBack
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            foundItems.repos.forEach {
-                repo -> item { ItemContent("Repository", repo.forge, repo.name) }
-            }
-            foundItems.users.forEach {
-                user -> item { ItemContent("User", user.forge, user.name) }
-            }
-            foundItems.groups.forEach {
-                group -> item { ItemContent("Group", group.forge, group.name) }
+            foundRepos.forEach {
+                item { ItemContent(it) }
             }
         }
     }

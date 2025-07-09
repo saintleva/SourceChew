@@ -17,8 +17,8 @@
 
 package com.github.saintleva.sourcechew.data.repository
 
-import com.github.saintleva.sourcechew.data.utils.searchQueryToString
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -33,36 +33,20 @@ class SearchRepositoryStub(
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : StandardSearchRepository() {
 
-    override suspend fun find(conditions: SearchConditions): FoundItems {
+    override suspend fun find(conditions: RepoSearchConditions): List<FoundRepo> {
 
-        fun name(i: Int) = "${i}${searchQueryToString(conditions.query)}${i}"
+        fun name(i: Int) = "${i}${conditions.query}${i}"
 
-        val result = FoundItems()
+        val result = mutableListOf<FoundRepo>()
         withContext(searchDispatcher) {
-            for (forgeOption in conditions.forgeOptions) {
-                if (forgeOption.value) {
-                    val forge = forgeOption.key
-                    if (conditions.typeOptions.repo) {
-                        for (i in 0 until eachCount) {
-                            delay(delayImitation)
-                            result.repos.add(Item.Repo(forge, name(i)))
-                        }
-                    }
-                    if (conditions.typeOptions.user) {
-                        for (i in 0 until eachCount) {
-                            delay(delayImitation)
-                            result.users.add(Item.User(forge, name(i)))
-                        }
-                    }
-                    if (conditions.typeOptions.group) {
-                        for (i in 0 until eachCount) {
-                            delay(delayImitation)
-                            result.groups.add(Item.Group(forge, name(i)))
-                        }
-                    }
+            for (inScope in conditions.inScope) {
+                for (i in 0 until eachCount) {
+                    delay(delayImitation)
+                    result.add(FoundRepo(name(i), name(i), inScope.name, name(i), i))
                 }
             }
         }
+
         return result
     }
 }

@@ -17,9 +17,9 @@
 
 package com.github.saintleva.sourcechew.domain.usecase
 
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 
 
 interface CanUsePreviousConditionsUseCase {
-    operator fun invoke(newConditions: SearchConditions): Boolean
+    suspend operator fun invoke(newConditions: RepoSearchConditions): Boolean
 }

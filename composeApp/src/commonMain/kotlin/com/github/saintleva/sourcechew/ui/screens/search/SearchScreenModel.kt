@@ -109,7 +109,13 @@ class SearchScreenModel(
         selectedOnlyFlags.filter { it.value }.keys.toSet()
     )
 
-    fun canUsePreviousConditions() = canUsePreviousConditionsUseCase(obtainConditions())
+    fun canUsePreviousConditions(): Boolean {
+        var result = false
+        screenModelScope.launch {
+            result = canUsePreviousConditionsUseCase(obtainConditions())
+        }
+        return result
+    }
 
     fun search() {
         _searchJob = screenModelScope.launch {

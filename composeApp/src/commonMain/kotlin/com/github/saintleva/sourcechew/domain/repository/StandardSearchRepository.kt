@@ -18,7 +18,8 @@
 package com.github.saintleva.sourcechew.domain.repository
 
 import com.github.saintleva.sourcechew.domain.NeverSearchedException
-import com.github.saintleva.sourcechew.domain.models.SearchConditions
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,11 +30,11 @@ abstract class StandardSearchRepository : SearchRepository {
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Selecting)
     final override val searchState = _searchState.asStateFlow()
 
-    final override var previousResult: FoundItems? = null
+    final override var previousResult: List<FoundRepo>? = null
 
-    protected abstract suspend fun find(conditions: SearchConditions): FoundItems
+    protected abstract suspend fun find(conditions: RepoSearchConditions): List<FoundRepo>
 
-    final override suspend fun search(conditions: SearchConditions) {
+    final override suspend fun search(conditions: RepoSearchConditions) {
         _searchState.update { SearchState.Searching }
         val result = find(conditions)
         _searchState.update { SearchState.Success(result) }

@@ -28,7 +28,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -85,18 +84,32 @@ class SearchScreen : Screen {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
+    //TODO: Use resources and uncomment it
+//    val scopeStrings = mapOf(
+//        RepoSearchScope.NAME to stringResource(Res.string.names),
+//        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
+//        RepoSearchScope.README to stringResource(Res.string.readme),
+//    )
+//    val onlyFlagStrings = mapOf(
+//        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
+//        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
+//        OnlyFlag.FORK to stringResource(Res.string.fork_only),
+//        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
+//        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
+//        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only),
+//    )
     val scopeStrings = mapOf(
-        RepoSearchScope.NAME to stringResource(Res.string.names),
-        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
-        RepoSearchScope.README to stringResource(Res.string.readme),
+        RepoSearchScope.NAME to "Названия",
+        RepoSearchScope.DESCRIPTION to "Описания",
+        RepoSearchScope.README to "Readme"
     )
     val onlyFlagStrings = mapOf(
-        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
-        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
-        OnlyFlag.FORK to stringResource(Res.string.fork_only),
-        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
-        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
-        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only),
+        OnlyFlag.PUBLIC to "Только публичные",
+        OnlyFlag.PRIVATE to "Только приватные",
+        OnlyFlag.FORK to "Только форки",
+        OnlyFlag.ARCHIVED to "Только заархивированные",
+        OnlyFlag.MIRROR to "Только зеркала",
+        OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
     )
 
     Column {

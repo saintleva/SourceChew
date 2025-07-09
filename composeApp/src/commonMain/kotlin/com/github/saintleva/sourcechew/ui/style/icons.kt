@@ -17,21 +17,10 @@
 
 package com.github.saintleva.sourcechew.ui.style
 
-import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.bitbucket_logo
-import sourcechew.composeapp.generated.resources.github_logo_128px
-import sourcechew.composeapp.generated.resources.gitlab_logo
 
-
-//@Composable
-//fun forgeIcons() = mapOf<Forge, Painter>(
-//    Forge.Github to painterResource(Res.drawable.github_logo_512px),
-//    Forge.Gitlab to painterResource(Res.drawable.github_logo_64px),
-//    Forge.Bitbucket to painterResource(Res.drawable.bitbucket_logo)
+//TODO: Remove this file
+//val forgeIconResources = mapOf(
+//    Forge.Github to Res.drawable.github_logo_128px,
+//    Forge.Gitlab to Res.drawable.gitlab_logo,
+//    Forge.Bitbucket to Res.drawable.bitbucket_logo
 //)
-
-val forgeIconResources = mapOf(
-    Forge.Github to Res.drawable.github_logo_128px,
-    Forge.Gitlab to Res.drawable.gitlab_logo,
-    Forge.Bitbucket to Res.drawable.bitbucket_logo
-)
