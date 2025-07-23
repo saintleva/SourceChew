@@ -20,6 +20,7 @@ package com.github.saintleva.sourcechew.data.repository
 import com.github.saintleva.sourcechew.data.storage.ConfigManager
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,6 +36,7 @@ class ConfigRepositoryImpl(
     override val usePreviousRepoSearch = MutableSharedFlow<Boolean>(replay = 1)
 
     override suspend fun loadData() {
+        Napier.d(tag = "ConfigRepositoryImpl", message = "loadData() started")
         previousRepoConditions.emit(configManager.loadRepoPreviousConditions())
         usePreviousRepoSearch.emit(configManager.loadUsePreviousRepoSearch())
     }

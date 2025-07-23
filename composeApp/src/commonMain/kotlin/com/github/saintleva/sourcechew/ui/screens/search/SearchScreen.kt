@@ -59,8 +59,13 @@ class SearchScreen : Screen {
 
     @Composable
     override fun Content() {
+//        Box(modifier = Modifier.fillMaxSize().background(color = Color.Green), contentAlignment = Alignment.Center) {}
+
         val screenModel = koinScreenModel<SearchScreenModel>()
+
+
         val navigator = LocalNavigator.currentOrThrow
+
 
         val searchState = screenModel.searchState.collectAsStateWithLifecycle()
 

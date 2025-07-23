@@ -29,9 +29,12 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class SearchScreenModel(
@@ -60,17 +63,21 @@ class SearchScreenModel(
     private var _searchJob: Job? = null
 
     init {
-        screenModelScope.launch {
-            previousConditions.collect {
+        runBlocking {
+            previousConditions.first().also {
                 _query.value = it.query
                 for (scope in RepoSearchScope.all) {
                     selectedSearchScope[scope] = it.inScope.contains(scope)
+                    Napier.d(
+                        tag = "SearchScreenModel",
+                        message = "selectedSearchScope[$scope] = ${selectedSearchScope[scope]}"
+                    )
                 }
                 for (flag in OnlyFlag.all) {
                     selectedOnlyFlags[flag] = it.onlyFlags.contains(flag)
                 }
             }
-            usePreviousConditions.collect {
+            usePreviousConditions.first().also {
                 _usePreviousSearch.value = it
             }
         }
