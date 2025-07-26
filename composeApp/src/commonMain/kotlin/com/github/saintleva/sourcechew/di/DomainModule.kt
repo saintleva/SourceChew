@@ -17,7 +17,6 @@
 
 package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.data.repository.ConfigRepositoryImpl
 import com.github.saintleva.sourcechew.data.repository.SearchRepositoryStub
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository

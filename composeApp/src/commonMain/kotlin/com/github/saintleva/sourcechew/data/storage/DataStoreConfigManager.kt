@@ -22,15 +22,21 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.github.saintleva.sourcechew.data.utils.makeSet
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlow
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
-import kotlinx.coroutines.flow.first
+import com.github.saintleva.sourcechew.domain.repository.ConfigManager
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 
-class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : ConfigManager {
+class DataStoreConfigManager(
+    private val dataStore: DataStore<Preferences>,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO //TODO: Do I really need this?
+) : ConfigManager {
 
     private companion object {
 
@@ -54,43 +60,45 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
         }
     }
 
-    override suspend fun saveRepoPreviousConditions(value: RepoSearchConditions) {
-        dataStore.edit { preferences ->
-            preferences[Repo.queryKey] = value.query
-            Repo.PreviousConditions.scopeKeys.forEach { entry ->
-                preferences[entry.value] = entry.key in value.inScope
-            }
-            Repo.PreviousConditions.onlyFlagKeys.forEach { entry ->
-                preferences[entry.value] = entry.key in value.onlyFlags
+    suspend fun <T> save(key: Preferences.Key<T>, value: T) {
+        withContext(ioDispatcher) {
+            dataStore.edit { preferences ->
+                preferences[key] = value
             }
         }
     }
 
-    override suspend fun loadRepoPreviousConditions(): RepoSearchConditions {
-        //TODO: remove this
-        //Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() started" }
-        val query = dataStore.data.map { preferences -> preferences[Repo.queryKey] ?: "" }.first()
-        val inScope = RepoSearchScope.all.makeSet {
-            dataStore.data.map { preferences ->
-                preferences[Repo.PreviousConditions.scopeKeys[it]!!] ?:
-                if (it == RepoSearchScope.NAME) true else false
-            }.first()
+    fun <T> read(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
+        dataStore.data.map { preferences -> preferences[key] ?: defaultValue }
+
+    override val previousRepoConditions = RepoSearchConditionsFlow(
+        query = read(Repo.queryKey, ""),
+        inScope = RepoSearchScope.all.associateWith {
+            read(Repo.PreviousConditions.scopeKeys[it]!!,
+                if (it == RepoSearchScope.NAME) true else false)
+        },
+        onlyFlags = OnlyFlag.all.associateWith {
+            read(Repo.PreviousConditions.onlyFlagKeys[it]!!, false)
+        },
+        usePreviousSearch = read(Repo.usePreviousSearchKey, false)
+    )
+
+    override val repoSearchConditionsSaver = object : ConfigManager.RepoSearchConditionsSaver {
+
+        override suspend fun saveQuery(query: String) {
+            save(Repo.queryKey, query)
         }
-        val onlyFlags = OnlyFlag.all.makeSet {
-            dataStore.data.map { preferences ->
-                preferences[Repo.PreviousConditions.onlyFlagKeys[it]!!] ?: false
-            }.first()
+
+        override suspend fun saveScopeItem(item: RepoSearchScope) {
+            save(Repo.PreviousConditions.scopeKeys[item]!!, true)
         }
-        return RepoSearchConditions(query, inScope, onlyFlags)
+
+        override suspend fun saveOnlyFlag(onlyFlag: OnlyFlag) {
+            save(Repo.PreviousConditions.onlyFlagKeys[onlyFlag]!!, true)
+        }
+
+        override suspend fun saveUsePreviousSearch(value: Boolean) {
+            save(Repo.usePreviousSearchKey, value)
+        }
     }
-
-
-    override suspend fun saveUsePreviousRepoSearch(value: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[Repo.usePreviousSearchKey] = value
-        }
-    }
-
-    override suspend fun loadUsePreviousRepoSearch(): Boolean =
-        dataStore.data.map { preferences -> preferences[Repo.usePreviousSearchKey] ?: false }.first()
 }

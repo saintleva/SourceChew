@@ -25,6 +25,7 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
+import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
@@ -40,48 +41,18 @@ import kotlinx.coroutines.runBlocking
 class SearchScreenModel(
     private val findUseCase: FindUseCase,
     private val canUsePreviousConditionsUseCase: CanUsePreviousConditionsUseCase,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val searchRepository: SearchRepository
 ) : ScreenModel {
 
     private val _query = mutableStateOf("")
     val query: State<String> = _query
 
-    val previousConditions: Flow<RepoSearchConditions> =
-        configRepository.previousRepoConditions
-
-    val selectedSearchScope = mutableStateMapOf<RepoSearchScope, Boolean>()
-    val selectedOnlyFlags = mutableStateMapOf<OnlyFlag, Boolean>()
-
-
-    val usePreviousConditions: Flow<Boolean> = configRepository.usePreviousRepoSearch
-    private val _usePreviousSearch = mutableStateOf(false)
-    val usePreviousSearch: State<Boolean> = _usePreviousSearch
+    val previousConditions = configManager.previousRepoConditions
 
     val searchState = searchRepository.searchState
 
     private var _searchJob: Job? = null
-
-    init {
-        runBlocking {
-            previousConditions.first().also {
-                _query.value = it.query
-                for (scope in RepoSearchScope.all) {
-                    selectedSearchScope[scope] = it.inScope.contains(scope)
-                    Napier.d(
-                        tag = "SearchScreenModel",
-                        message = "selectedSearchScope[$scope] = ${selectedSearchScope[scope]}"
-                    )
-                }
-                for (flag in OnlyFlag.all) {
-                    selectedOnlyFlags[flag] = it.onlyFlags.contains(flag)
-                }
-            }
-            usePreviousConditions.first().also {
-                _usePreviousSearch.value = it
-            }
-        }
-    }
 
     fun maySearch(): Boolean {
 

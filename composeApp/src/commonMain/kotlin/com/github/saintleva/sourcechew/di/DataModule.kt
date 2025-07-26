@@ -17,7 +17,6 @@
 
 package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.data.storage.ConfigManager
 import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
 import org.koin.dsl.module
 
