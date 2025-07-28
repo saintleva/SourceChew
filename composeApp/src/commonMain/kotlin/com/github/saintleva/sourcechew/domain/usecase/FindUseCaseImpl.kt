@@ -18,18 +18,19 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import kotlinx.coroutines.flow.first
 
 class FindUseCaseImpl(
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager,
     private val searchRepository: SearchRepository,
 ) : FindUseCase {
 
     //TODO: May I use there first() terminal operator of Flow or I need to switch to StateFlow?
     override suspend fun invoke(conditions: RepoSearchConditions) {
-        if (conditions != configRepository.previousRepoConditions.first()) {
+        if (conditions != configManager.previousRepoConditions.first()) {
             configRepository.changeRepoPreviousConditions(conditions)
             searchRepository.search(conditions)
         } else if (configRepository.usePreviousRepoSearch.first()) {

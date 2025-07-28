@@ -8,3 +8,5 @@ data class FoundRepo(
     val language: String,
     val stars: Int
 )
+
+typealias FoundRepos = List<FoundRepo>

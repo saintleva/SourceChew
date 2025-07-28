@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlow
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
@@ -41,19 +42,19 @@ class DataStoreConfigManager(
     private companion object {
 
         abstract class Group(val type: String) {
-            protected val previousConditions = "${type}_PreviousConditions"
-            val queryKey = stringPreferencesKey("${previousConditions}_query")
+            protected val conditions = "${type}_Conditions"
+            val queryKey = stringPreferencesKey("${conditions}_query")
             val usePreviousSearchKey = booleanPreferencesKey("${type}_usePreviousSearch")
         }
 
         object Repo : Group("Repo") {
 
-            object PreviousConditions {
+            object Conditions {
                 val scopeKeys = RepoSearchScope.all.associateWith {
-                    booleanPreferencesKey("${previousConditions}_scope_${it.name}")
+                    booleanPreferencesKey("${conditions}_scope_${it.name}")
                 }
                 val onlyFlagKeys = OnlyFlag.all.associateWith {
-                    booleanPreferencesKey("${previousConditions}_onlyFlag_${it.name}")
+                    booleanPreferencesKey("${conditions}_onlyFlag_${it.name}")
                 }
             }
 
@@ -61,6 +62,7 @@ class DataStoreConfigManager(
     }
 
     suspend fun <T> save(key: Preferences.Key<T>, value: T) {
+        //TODO: Do I really need withContext() ?
         withContext(ioDispatcher) {
             dataStore.edit { preferences ->
                 preferences[key] = value
@@ -71,14 +73,15 @@ class DataStoreConfigManager(
     fun <T> read(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
         dataStore.data.map { preferences -> preferences[key] ?: defaultValue }
 
-    override val previousRepoConditions = RepoSearchConditionsFlow(
-        query = read(Repo.queryKey, ""),
+    override val repoConditions = RepoSearchConditionsFlow(
+        query = read(Repo.queryKey, RepoSearchConditions.default.query),
         inScope = RepoSearchScope.all.associateWith {
-            read(Repo.PreviousConditions.scopeKeys[it]!!,
-                if (it == RepoSearchScope.NAME) true else false)
+            read(Repo.Conditions.scopeKeys[it]!!,
+                it in RepoSearchConditions.default.inScope)
         },
         onlyFlags = OnlyFlag.all.associateWith {
-            read(Repo.PreviousConditions.onlyFlagKeys[it]!!, false)
+            read(Repo.Conditions.onlyFlagKeys[it]!!,
+                it in RepoSearchConditions.default.onlyFlags)
         },
         usePreviousSearch = read(Repo.usePreviousSearchKey, false)
     )
@@ -90,11 +93,11 @@ class DataStoreConfigManager(
         }
 
         override suspend fun saveScopeItem(item: RepoSearchScope) {
-            save(Repo.PreviousConditions.scopeKeys[item]!!, true)
+            save(Repo.Conditions.scopeKeys[item]!!, true)
         }
 
         override suspend fun saveOnlyFlag(onlyFlag: OnlyFlag) {
-            save(Repo.PreviousConditions.onlyFlagKeys[onlyFlag]!!, true)
+            save(Repo.Conditions.onlyFlagKeys[onlyFlag]!!, true)
         }
 
         override suspend fun saveUsePreviousSearch(value: Boolean) {

@@ -48,7 +48,8 @@ class SearchScreenModel(
     private val _query = mutableStateOf("")
     val query: State<String> = _query
 
-    val previousConditions = configManager.previousRepoConditions
+    val previousConditions =
+        configManager.previousRepoConditions.toConditionsStateFlow(screenModelScope)
 
     val searchState = searchRepository.searchState
 
@@ -57,7 +58,7 @@ class SearchScreenModel(
     fun maySearch(): Boolean {
 
         val allPrivacySelected =
-            selectedOnlyFlags[OnlyFlag.PUBLIC]!! && selectedOnlyFlags[OnlyFlag.PRIVATE]!!
+            previousConditions.onlyFlags[OnlyFlag.PUBLIC]!!.value && selectedOnlyFlags[OnlyFlag.PRIVATE]!!
 
         return selectedSearchScope.isNotEmpty() && !allPrivacySelected && query.value.isNotBlank()
     }

@@ -24,7 +24,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 
 interface ConfigManager {
 
-    val previousRepoConditions: RepoSearchConditionsFlow
+    val repoConditions: RepoSearchConditionsFlow
 
     interface RepoSearchConditionsSaver {
         suspend fun saveQuery(query: String)

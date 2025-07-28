@@ -21,7 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 
 
@@ -44,8 +43,16 @@ enum class OnlyFlag {
 data class RepoSearchConditions(
     val query: String,
     val inScope: Set<RepoSearchScope>,
-    val onlyFlags: Set<OnlyFlag>,
-)
+    val onlyFlags: Set<OnlyFlag>
+) {
+    companion object {
+        val default = RepoSearchConditions(
+            query = "",
+            inScope = setOf(RepoSearchScope.NAME),
+            onlyFlags = emptySet()
+        )
+    }
+}
 
 data class RepoSearchConditionsFlow(
     val query: Flow<String>,
@@ -53,21 +60,23 @@ data class RepoSearchConditionsFlow(
     val onlyFlags: Map<OnlyFlag, Flow<Boolean>>,
     val usePreviousSearch: Flow<Boolean>
 ) {
-    fun toConditionsStateFlow(scope: CoroutineScope): RepoSearchConditionsStateFlow {
-        val started = SharingStarted.WhileSubscribed(5000)
-        return RepoSearchConditionsStateFlow(
-            query.stateIn(scope, started, initialValue = ""),
-            inScope.mapValues { scope, started, it.value.stateIn(initialValue = false) },
-            onlyFlags.mapValues { it.value.stateIn(initialValue = false) },
-            usePreviousSearch.stateIn(initialValue = false)
-        )
-    }
-
-    suspend fun toConditions() = RepoSearchConditions(
-        query.first(),
-        inScope.filter { it.value.first() }.keys,
-        onlyFlags.filter { it.value.first() }.keys
+    fun toConditionsStateFlow(
+        scope: CoroutineScope,
+        started: SharingStarted = SharingStarted.WhileSubscribed(5000)
+    ) = RepoSearchConditionsStateFlow(
+        query.stateIn(scope, started, initialValue = RepoSearchConditions.default.query),
+        inScope.mapValues { it.value.stateIn(scope, started,
+            initialValue = RepoSearchConditions.default.inScope.contains(it.key)) },
+        onlyFlags.mapValues { it.value.stateIn(scope, started,
+            initialValue = RepoSearchConditions.default.onlyFlags.contains(it.key)) },
+        usePreviousSearch.stateIn(scope, started, initialValue = false)
     )
+
+//    suspend fun toConditions() = RepoSearchConditions(
+//        query.first(),
+//        inScope.filter { it.value.first() }.keys,
+//        onlyFlags.filter { it.value.first() }.keys
+//    )
 }
 
 data class RepoSearchConditionsStateFlow(

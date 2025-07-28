@@ -18,7 +18,7 @@
 package com.github.saintleva.sourcechew.domain.repository
 
 import com.github.saintleva.sourcechew.domain.NeverSearchedException
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.FoundRepos
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,22 +30,36 @@ abstract class StandardSearchRepository : SearchRepository {
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Selecting)
     final override val searchState = _searchState.asStateFlow()
 
-    final override var previousResult: List<FoundRepo>? = null
+    final override var previousConditions: RepoSearchConditions? = null
+    final override var previousResult: FoundRepos? = null
 
-    protected abstract suspend fun find(conditions: RepoSearchConditions): List<FoundRepo>
+    protected abstract suspend fun find(conditions: RepoSearchConditions): FoundRepos
 
     final override suspend fun search(conditions: RepoSearchConditions) {
         _searchState.update { SearchState.Searching }
-        val result = find(conditions)
-        _searchState.update { SearchState.Success(result) }
-        previousResult = result
+        if (conditions == previousConditions) {
+            if (usePreviousSearch) {
+                usePreviousResult()
+            } else {
+                obtainNewResult(conditions)
+            }
+        } else {
+            previousConditions = conditions
+            obtainNewResult(conditions)
+        }
     }
 
     final override fun switchToSelecting() {
         _searchState.update { SearchState.Selecting }
     }
 
-    final override fun usePreviousResult() {
+    private suspend fun obtainNewResult(conditions: RepoSearchConditions) {
+        val result = find(conditions)
+        previousResult = result
+        _searchState.update { SearchState.Success(result) }
+    }
+
+    private fun usePreviousResult() {
         if (previousResult == null) {
             _searchState.update { SearchState.Error(NeverSearchedException()) }
         } else {

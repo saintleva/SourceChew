@@ -18,6 +18,7 @@
 package com.github.saintleva.sourcechew.domain.repository
 
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.FoundRepos
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.StateFlow
 
@@ -33,7 +34,10 @@ interface SearchRepository {
 
     val searchState: StateFlow<SearchState>
 
-    var previousResult: List<FoundRepo>?
+    var previousConditions: RepoSearchConditions?
+    var usePreviousSearch: Boolean
+
+    var previousResult: FoundRepos?
 
     val everSearched: Boolean
         get() = (previousResult != null)
@@ -41,6 +45,4 @@ interface SearchRepository {
     suspend fun search(conditions: RepoSearchConditions)
 
     fun switchToSelecting()
-
-    fun usePreviousResult()
 }
