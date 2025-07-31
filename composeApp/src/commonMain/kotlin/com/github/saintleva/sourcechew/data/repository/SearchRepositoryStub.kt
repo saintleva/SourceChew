@@ -24,8 +24,6 @@ import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepositor
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 
@@ -36,11 +34,6 @@ class SearchRepositoryStub(
     private val delayImitation: Duration = Duration.ZERO,
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : StandardSearchRepository() {
-
-    //TODO: May I use there first() terminal operator of Flow or I need to switch to StateFlow?
-    override var usePreviousSearch: Boolean = runBlocking {
-        configManager.repoConditions.usePreviousSearch.first()
-    }
 
     override suspend fun find(conditions: RepoSearchConditions): List<FoundRepo> {
 
