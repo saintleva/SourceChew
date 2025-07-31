@@ -39,17 +39,13 @@ import kotlinx.coroutines.runBlocking
 
 
 class SearchScreenModel(
-    private val findUseCase: FindUseCase,
     private val canUsePreviousConditionsUseCase: CanUsePreviousConditionsUseCase,
-    private val configManager: ConfigManager,
+    configManager: ConfigManager,
     private val searchRepository: SearchRepository
 ) : ScreenModel {
 
-    private val _query = mutableStateOf("")
-    val query: State<String> = _query
-
-    val previousConditions =
-        configManager.previousRepoConditions.toConditionsStateFlow(screenModelScope)
+    val conditions = configManager.repoConditions.toConditionsStateFlow(screenModelScope)
+    val saver = configManager.repoSearchConditionsSaver
 
     val searchState = searchRepository.searchState
 
@@ -57,18 +53,22 @@ class SearchScreenModel(
 
     fun maySearch(): Boolean {
 
-        val allPrivacySelected =
-            previousConditions.onlyFlags[OnlyFlag.PUBLIC]!!.value && selectedOnlyFlags[OnlyFlag.PRIVATE]!!
+        val allPrivacySelected = conditions.onlyFlags[OnlyFlag.PUBLIC]!!.value &&
+                conditions.onlyFlags[OnlyFlag.PRIVATE]!!.value
 
-        return selectedSearchScope.isNotEmpty() && !allPrivacySelected && query.value.isNotBlank()
+        return conditions.inScope.isNotEmpty() && !allPrivacySelected && conditions.query.value.isNotBlank()
     }
 
     fun onQueryChange(newQuery: String) {
-        _query.value = newQuery
+        screenModelScope.launch {
+            saver.saveQuery(newQuery)
+        }
     }
 
     fun toggleScope(scope: RepoSearchScope) {
-        selectedSearchScope[scope] = !selectedSearchScope[scope]!!
+        screenModelScope.launch {
+            saver.saveScopeItem(scope)
+        }
     }
 
     fun toggleFlag(flag: OnlyFlag) {
@@ -82,12 +82,6 @@ class SearchScreenModel(
         }
     }
 
-    private fun obtainConditions() = RepoSearchConditions(
-        query.value,
-        selectedSearchScope.filter { it.value }.keys.toSet(),
-        selectedOnlyFlags.filter { it.value }.keys.toSet()
-    )
-
     fun canUsePreviousConditions(): Boolean {
         var result = false
         screenModelScope.launch {
@@ -98,7 +92,8 @@ class SearchScreenModel(
 
     fun search() {
         _searchJob = screenModelScope.launch {
-            findUseCase(obtainConditions())
+            searchRepository.search(conditions.toConditions(),
+                conditions.usePreviousSearch.value)
         }
     }
 

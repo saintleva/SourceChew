@@ -35,14 +35,13 @@ interface SearchRepository {
     val searchState: StateFlow<SearchState>
 
     var previousConditions: RepoSearchConditions?
-    var usePreviousSearch: Boolean
 
     var previousResult: FoundRepos?
 
     val everSearched: Boolean
         get() = (previousResult != null)
 
-    suspend fun search(conditions: RepoSearchConditions)
+    suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean)
 
     fun switchToSelecting()
 }

@@ -71,12 +71,6 @@ data class RepoSearchConditionsFlow(
             initialValue = RepoSearchConditions.default.onlyFlags.contains(it.key)) },
         usePreviousSearch.stateIn(scope, started, initialValue = false)
     )
-
-//    suspend fun toConditions() = RepoSearchConditions(
-//        query.first(),
-//        inScope.filter { it.value.first() }.keys,
-//        onlyFlags.filter { it.value.first() }.keys
-//    )
 }
 
 data class RepoSearchConditionsStateFlow(
@@ -84,4 +78,10 @@ data class RepoSearchConditionsStateFlow(
     val inScope: Map<RepoSearchScope, StateFlow<Boolean>>,
     val onlyFlags: Map<OnlyFlag, StateFlow<Boolean>>,
     val usePreviousSearch: StateFlow<Boolean>
-)
+) {
+        fun toConditions() = RepoSearchConditions(
+        query.value,
+        inScope.filter { it.value.value }.keys,
+        onlyFlags.filter { it.value.value }.keys
+    )
+}

@@ -117,20 +117,26 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
     )
 
+    val conditions = screenModel.conditions
+    var query = conditions.query.collectAsStateWithLifecycle()
+    var selectedSearchScope = conditions.inScope.mapValues { it.value.collectAsStateWithLifecycle() }
+    var selectedOnlyFlags = conditions.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
+    var usePreviousSearch = conditions.usePreviousSearch.collectAsStateWithLifecycle()
+
     Column {
         OutlinedTextField(
-            value = screenModel.query.value,
+            value = query.value,
             onValueChange = screenModel::onQueryChange,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = selectingEnabled,
             textStyle = TextStyle(fontSize = 16.sp),
             label = { Text(stringResource(Res.string.enter_search_text)) },
-            isError = screenModel.query.value.isBlank()
+            isError = query.value.isBlank()
         )
         RepoSearchScope.all.forEach { scope ->
             val textStyle = MaterialTheme.typography.labelLarge
             FilterChip(
-                selected = screenModel.selectedSearchScope[scope]!!,
+                selected = selectedSearchScope[scope].value,
                 onClick = { screenModel.toggleScope(scope) },
                 label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
                 enabled = selectingEnabled

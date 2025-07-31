@@ -35,7 +35,7 @@ abstract class StandardSearchRepository : SearchRepository {
 
     protected abstract suspend fun find(conditions: RepoSearchConditions): FoundRepos
 
-    final override suspend fun search(conditions: RepoSearchConditions) {
+    final override suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean) {
         _searchState.update { SearchState.Searching }
         if (conditions == previousConditions) {
             if (usePreviousSearch) {
