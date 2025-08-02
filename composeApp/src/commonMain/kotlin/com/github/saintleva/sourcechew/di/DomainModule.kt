@@ -18,19 +18,14 @@
 package com.github.saintleva.sourcechew.di
 
 import com.github.saintleva.sourcechew.data.repository.SearchRepositoryStub
-import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
+import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
+import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
-import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
-import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCaseImpl
-import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
-import com.github.saintleva.sourcechew.domain.usecase.FindUseCaseImpl
 import org.koin.dsl.module
 import kotlin.time.Duration.Companion.milliseconds
 
 
 val domainModule = module {
-    single<ConfigRepository> { ConfigRepositoryImpl(get()) }
+    single<ConfigManager> { DataStoreConfigManager(get()) }
     single<SearchRepository> { SearchRepositoryStub(10, 200.milliseconds) }
-    factory<CanUsePreviousConditionsUseCase> { CanUsePreviousConditionsUseCaseImpl(get(), get()) }
-    factory<FindUseCase> { FindUseCaseImpl(get(), get()) }
 }

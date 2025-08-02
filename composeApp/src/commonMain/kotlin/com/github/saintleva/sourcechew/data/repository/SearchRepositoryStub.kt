@@ -19,7 +19,6 @@ package com.github.saintleva.sourcechew.data.repository
 
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +28,6 @@ import kotlin.time.Duration
 
 
 class SearchRepositoryStub(
-    configManager: ConfigManager,
     private val eachCount: Int,
     private val delayImitation: Duration = Duration.ZERO,
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO

@@ -24,7 +24,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlow
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlows
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -73,7 +73,14 @@ class DataStoreConfigManager(
     fun <T> read(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
         dataStore.data.map { preferences -> preferences[key] ?: defaultValue }
 
-    override val repoConditions = RepoSearchConditionsFlow(
+    suspend fun toggle(key: Preferences.Key<Boolean>) {
+        withContext(ioDispatcher) {
+            dataStore.edit { preferences ->
+                preferences[key] = !preferences[key]!!
+            }
+        }
+    }
+    override val repoConditions = RepoSearchConditionsFlows(
         query = read(Repo.queryKey, RepoSearchConditions.default.query),
         inScope = RepoSearchScope.all.associateWith {
             read(Repo.Conditions.scopeKeys[it]!!,
@@ -92,12 +99,12 @@ class DataStoreConfigManager(
             save(Repo.queryKey, query)
         }
 
-        override suspend fun saveScopeItem(item: RepoSearchScope) {
-            save(Repo.Conditions.scopeKeys[item]!!, true)
+        override suspend fun toggleScopeItem(item: RepoSearchScope) {
+            toggle(Repo.Conditions.scopeKeys[item]!!)
         }
 
-        override suspend fun saveOnlyFlag(onlyFlag: OnlyFlag) {
-            save(Repo.Conditions.onlyFlagKeys[onlyFlag]!!, true)
+        override suspend fun toggleOnlyFlag(onlyFlag: OnlyFlag) {
+            toggle(Repo.Conditions.onlyFlagKeys[onlyFlag]!!)
         }
 
         override suspend fun saveUsePreviousSearch(value: Boolean) {

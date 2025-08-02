@@ -17,6 +17,7 @@
 
 package com.github.saintleva.sourcechew.domain.models
 
+import com.github.saintleva.sourcechew.domain.utils.makeSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -54,7 +55,7 @@ data class RepoSearchConditions(
     }
 }
 
-data class RepoSearchConditionsFlow(
+class RepoSearchConditionsFlows(
     val query: Flow<String>,
     val inScope: Map<RepoSearchScope, Flow<Boolean>>,
     val onlyFlags: Map<OnlyFlag, Flow<Boolean>>,
@@ -63,17 +64,17 @@ data class RepoSearchConditionsFlow(
     fun toConditionsStateFlow(
         scope: CoroutineScope,
         started: SharingStarted = SharingStarted.WhileSubscribed(5000)
-    ) = RepoSearchConditionsStateFlow(
+    ) = RepoSearchConditionsStateFlows(
         query.stateIn(scope, started, initialValue = RepoSearchConditions.default.query),
         inScope.mapValues { it.value.stateIn(scope, started,
-            initialValue = RepoSearchConditions.default.inScope.contains(it.key)) },
+            initialValue = it.key in RepoSearchConditions.default.inScope) },
         onlyFlags.mapValues { it.value.stateIn(scope, started,
-            initialValue = RepoSearchConditions.default.onlyFlags.contains(it.key)) },
+            initialValue = it.key in RepoSearchConditions.default.onlyFlags) },
         usePreviousSearch.stateIn(scope, started, initialValue = false)
     )
 }
 
-data class RepoSearchConditionsStateFlow(
+class RepoSearchConditionsStateFlows(
     val query: StateFlow<String>,
     val inScope: Map<RepoSearchScope, StateFlow<Boolean>>,
     val onlyFlags: Map<OnlyFlag, StateFlow<Boolean>>,
@@ -81,7 +82,7 @@ data class RepoSearchConditionsStateFlow(
 ) {
         fun toConditions() = RepoSearchConditions(
         query.value,
-        inScope.filter { it.value.value }.keys,
-        onlyFlags.filter { it.value.value }.keys
+        inScope.makeSet { it.value },
+        onlyFlags.makeSet { it.value }
     )
 }

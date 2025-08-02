@@ -117,11 +117,11 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
     )
 
-    val conditions = screenModel.conditions
-    var query = conditions.query.collectAsStateWithLifecycle()
-    var selectedSearchScope = conditions.inScope.mapValues { it.value.collectAsStateWithLifecycle() }
-    var selectedOnlyFlags = conditions.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
-    var usePreviousSearch = conditions.usePreviousSearch.collectAsStateWithLifecycle()
+    val conditions = screenModel.conditionsStateFlows
+    val query = conditions.query.collectAsStateWithLifecycle()
+    val selectedSearchScope = conditions.inScope.mapValues { it.value.collectAsStateWithLifecycle() }
+    val selectedOnlyFlags = conditions.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
+    val usePreviousSearch = conditions.usePreviousSearch.collectAsStateWithLifecycle()
 
     Column {
         OutlinedTextField(
@@ -136,7 +136,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         RepoSearchScope.all.forEach { scope ->
             val textStyle = MaterialTheme.typography.labelLarge
             FilterChip(
-                selected = selectedSearchScope[scope].value,
+                selected = selectedSearchScope[scope]!!.value,
                 onClick = { screenModel.toggleScope(scope) },
                 label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
                 enabled = selectingEnabled
@@ -145,16 +145,16 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         OnlyFlag.all.forEach { flag ->
             CheckBoxWithText(
                 text = onlyFlagStrings[flag]!!,
-                checked = screenModel.selectedOnlyFlags[flag]!!,
-                onCheckedChange = screenModel::usePreviousConditionsSearchChange,
-                enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
+                checked = selectedOnlyFlags[flag]!!.value,
+                onCheckedChange = screenModel::usePreviousSearchChange,
+                enabled = selectingEnabled,
                 padding = 8.dp
             )
         }
         CheckBoxWithText(
             text = stringResource(Res.string.use_previous_search_conditions),
-            checked = screenModel.usePreviousSearch.value,
-            onCheckedChange = screenModel::usePreviousConditionsSearchChange,
+            checked = usePreviousSearch.value,
+            onCheckedChange = screenModel::usePreviousSearchChange,
             enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
             padding = 8.dp
         )

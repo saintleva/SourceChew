@@ -17,34 +17,22 @@
 
 package com.github.saintleva.sourcechew.ui.screens.search
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
-import com.github.saintleva.sourcechew.domain.repository.ConfigRepository
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
-import com.github.saintleva.sourcechew.domain.usecase.CanUsePreviousConditionsUseCase
-import com.github.saintleva.sourcechew.domain.usecase.FindUseCase
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 class SearchScreenModel(
-    private val canUsePreviousConditionsUseCase: CanUsePreviousConditionsUseCase,
     configManager: ConfigManager,
     private val searchRepository: SearchRepository
 ) : ScreenModel {
 
-    val conditions = configManager.repoConditions.toConditionsStateFlow(screenModelScope)
+    val conditionsStateFlows = configManager.repoConditions.toConditionsStateFlow(screenModelScope)
     val saver = configManager.repoSearchConditionsSaver
 
     val searchState = searchRepository.searchState
@@ -53,10 +41,11 @@ class SearchScreenModel(
 
     fun maySearch(): Boolean {
 
-        val allPrivacySelected = conditions.onlyFlags[OnlyFlag.PUBLIC]!!.value &&
-                conditions.onlyFlags[OnlyFlag.PRIVATE]!!.value
+        val allPrivacySelected = conditionsStateFlows.onlyFlags[OnlyFlag.PUBLIC]!!.value &&
+                conditionsStateFlows.onlyFlags[OnlyFlag.PRIVATE]!!.value
 
-        return conditions.inScope.isNotEmpty() && !allPrivacySelected && conditions.query.value.isNotBlank()
+        return conditionsStateFlows.query.value.isNotBlank() &&
+                conditionsStateFlows.inScope.isNotEmpty() && !allPrivacySelected
     }
 
     fun onQueryChange(newQuery: String) {
@@ -67,33 +56,29 @@ class SearchScreenModel(
 
     fun toggleScope(scope: RepoSearchScope) {
         screenModelScope.launch {
-            saver.saveScopeItem(scope)
+            saver.toggleScopeItem(scope)
         }
     }
 
     fun toggleFlag(flag: OnlyFlag) {
-        selectedOnlyFlags[flag] = !selectedOnlyFlags[flag]!!
-    }
-
-    fun usePreviousConditionsSearchChange(checked: Boolean) {
         screenModelScope.launch {
-            configRepository.changeUsePreviousRepoSearch(checked)
-            _usePreviousSearch.value = checked
+            saver.toggleOnlyFlag(flag)
         }
     }
 
-    fun canUsePreviousConditions(): Boolean {
-        var result = false
+    fun usePreviousSearchChange(checked: Boolean) {
         screenModelScope.launch {
-            result = canUsePreviousConditionsUseCase(obtainConditions())
+            saver.saveUsePreviousSearch(checked)
         }
-        return result
     }
+
+    fun canUsePreviousConditions() =
+        searchRepository.сanUsePreviousConditions(conditionsStateFlows.toConditions())
 
     fun search() {
         _searchJob = screenModelScope.launch {
-            searchRepository.search(conditions.toConditions(),
-                conditions.usePreviousSearch.value)
+            searchRepository.search(conditionsStateFlows.toConditions(),
+                conditionsStateFlows.usePreviousSearch.value)
         }
     }
 

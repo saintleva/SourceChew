@@ -18,18 +18,18 @@
 package com.github.saintleva.sourcechew.domain.repository
 
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlow
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlows
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 
 
 interface ConfigManager {
 
-    val repoConditions: RepoSearchConditionsFlow
+    val repoConditions: RepoSearchConditionsFlows
 
     interface RepoSearchConditionsSaver {
         suspend fun saveQuery(query: String)
-        suspend fun saveScopeItem(item: RepoSearchScope)
-        suspend fun saveOnlyFlag(onlyFlag: OnlyFlag)
+        suspend fun toggleScopeItem(item: RepoSearchScope)
+        suspend fun toggleOnlyFlag(onlyFlag: OnlyFlag)
         suspend fun saveUsePreviousSearch(value: Boolean)
     }
 

@@ -17,13 +17,10 @@
 
 package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
-import org.koin.dsl.module
 
-
-val dataModule = module {
-    //TODO: remove it
-    //single<ConfigManager> { ConfigManagerStub }
-
-    single<ConfigManager> { DataStoreConfigManager(get()) }
-}
+//TODO: Remove this
+//val dataModule = module {
+//    //TODO: remove it
+//    //single<ConfigManager> { ConfigManagerStub }
+//
+//}

@@ -49,6 +49,9 @@ abstract class StandardSearchRepository : SearchRepository {
         }
     }
 
+    final override fun сanUsePreviousConditions(newConditions: RepoSearchConditions) =
+        everSearched && (newConditions == previousConditions)
+
     final override fun switchToSelecting() {
         _searchState.update { SearchState.Selecting }
     }
