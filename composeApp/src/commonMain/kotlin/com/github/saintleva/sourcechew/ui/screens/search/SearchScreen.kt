@@ -20,6 +20,7 @@ package com.github.saintleva.sourcechew.ui.screens.search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -133,20 +134,27 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = query.value.isBlank()
         )
-        RepoSearchScope.all.forEach { scope ->
-            val textStyle = MaterialTheme.typography.labelLarge
-            FilterChip(
-                selected = selectedSearchScope[scope]!!.value,
-                onClick = { screenModel.toggleScope(scope) },
-                label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
-                enabled = selectingEnabled
-            )
+        FlowRow(
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp,
+                alignment = Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.Top
+        ) {
+            RepoSearchScope.all.forEach { scope ->
+                val textStyle = MaterialTheme.typography.labelLarge
+                FilterChip(
+                    selected = selectedSearchScope[scope]!!.value,
+                    onClick = { screenModel.toggleScope(scope) },
+                    label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
+                    enabled = selectingEnabled
+                )
+            }
         }
         OnlyFlag.all.forEach { flag ->
             CheckBoxWithText(
                 text = onlyFlagStrings[flag]!!,
                 checked = selectedOnlyFlags[flag]!!.value,
-                onCheckedChange = screenModel::usePreviousSearchChange,
+                onCheckedChange = { screenModel.toggleOnlyFlag(flag) },
                 enabled = selectingEnabled,
                 padding = 8.dp
             )

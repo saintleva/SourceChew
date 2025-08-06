@@ -41,7 +41,7 @@ class DataStoreConfigManager(
 
     private companion object {
 
-        abstract class Group(val type: String) {
+        abstract class Group(type: String) {
             protected val conditions = "${type}_Conditions"
             val queryKey = stringPreferencesKey("${conditions}_query")
             val usePreviousSearchKey = booleanPreferencesKey("${type}_usePreviousSearch")
@@ -73,13 +73,14 @@ class DataStoreConfigManager(
     fun <T> read(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
         dataStore.data.map { preferences -> preferences[key] ?: defaultValue }
 
-    suspend fun toggle(key: Preferences.Key<Boolean>) {
+    suspend fun toggle(key: Preferences.Key<Boolean>, defaultPrevious: Boolean) {
         withContext(ioDispatcher) {
             dataStore.edit { preferences ->
-                preferences[key] = !preferences[key]!!
+                preferences[key] = !(preferences[key] ?: defaultPrevious)
             }
         }
     }
+
     override val repoConditions = RepoSearchConditionsFlows(
         query = read(Repo.queryKey, RepoSearchConditions.default.query),
         inScope = RepoSearchScope.all.associateWith {
@@ -100,11 +101,13 @@ class DataStoreConfigManager(
         }
 
         override suspend fun toggleScopeItem(item: RepoSearchScope) {
-            toggle(Repo.Conditions.scopeKeys[item]!!)
+            toggle(Repo.Conditions.scopeKeys[item]!!,
+                item in RepoSearchConditions.default.inScope)
         }
 
         override suspend fun toggleOnlyFlag(onlyFlag: OnlyFlag) {
-            toggle(Repo.Conditions.onlyFlagKeys[onlyFlag]!!)
+            toggle(Repo.Conditions.onlyFlagKeys[onlyFlag]!!,
+                onlyFlag in RepoSearchConditions.default.onlyFlags)
         }
 
         override suspend fun saveUsePreviousSearch(value: Boolean) {

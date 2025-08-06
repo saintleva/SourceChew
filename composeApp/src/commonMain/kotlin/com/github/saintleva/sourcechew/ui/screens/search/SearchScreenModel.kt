@@ -23,6 +23,7 @@ import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -39,13 +40,24 @@ class SearchScreenModel(
 
     private var _searchJob: Job? = null
 
+    //TODO: Why it is run 2 times at start?
     fun maySearch(): Boolean {
 
         val allPrivacySelected = conditionsStateFlows.onlyFlags[OnlyFlag.PUBLIC]!!.value &&
                 conditionsStateFlows.onlyFlags[OnlyFlag.PRIVATE]!!.value
 
-        return conditionsStateFlows.query.value.isNotBlank() &&
-                conditionsStateFlows.inScope.isNotEmpty() && !allPrivacySelected
+        val inScopeIsNotEmpty = conditionsStateFlows.inScope[RepoSearchScope.NAME]!!.value
+                || conditionsStateFlows.inScope[RepoSearchScope.DESCRIPTION]!!.value
+                || conditionsStateFlows.inScope[RepoSearchScope.README]!!.value
+        Napier.d(tag = "SearchScreenModel", message = "inScopeIsNotEmpty: $inScopeIsNotEmpty")
+
+        //val inScope = conditionsStateFlows.inScope.makeSet { it!!.value }
+        //TODO: Remove this debug log
+//        Napier.d(tag = "SearchScreenModel", message = "inScope: $inScope")
+//        Napier.d(tag = "SearchScreenModel", message = "inScope.isNotEmpty(): ${inScope.isNotEmpty()}")
+
+        return conditionsStateFlows.query.value.isNotBlank() && inScopeIsNotEmpty
+                && !allPrivacySelected
     }
 
     fun onQueryChange(newQuery: String) {
@@ -60,7 +72,7 @@ class SearchScreenModel(
         }
     }
 
-    fun toggleFlag(flag: OnlyFlag) {
+    fun toggleOnlyFlag(flag: OnlyFlag) {
         screenModelScope.launch {
             saver.toggleOnlyFlag(flag)
         }
