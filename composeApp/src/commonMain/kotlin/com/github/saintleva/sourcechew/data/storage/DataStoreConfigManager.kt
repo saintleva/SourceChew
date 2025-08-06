@@ -30,7 +30,11 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 
@@ -81,22 +85,39 @@ class DataStoreConfigManager(
         }
     }
 
+    private val _queryStateFlow: MutableStateFlow<String>
+        get() {
+            var loadedQuery: String = RepoSearchConditions.default.query
+            runBlocking {
+                loadedQuery = read(Repo.queryKey, RepoSearchConditions.default.query).first()
+            }
+            val result = MutableStateFlow(loadedQuery)
+            return result
+        }
+
     override val repoConditions = RepoSearchConditionsFlows(
-        query = read(Repo.queryKey, RepoSearchConditions.default.query),
-        inScope = RepoSearchScope.all.associateWith {
-            read(Repo.Conditions.scopeKeys[it]!!,
-                it in RepoSearchConditions.default.inScope)
-        },
-        onlyFlags = OnlyFlag.all.associateWith {
-            read(Repo.Conditions.onlyFlagKeys[it]!!,
-                it in RepoSearchConditions.default.onlyFlags)
-        },
-        usePreviousSearch = read(Repo.usePreviousSearchKey, false)
-    )
+            query = _queryStateFlow,
+            //TODO: Remove this
+            //query = read(Repo.queryKey, RepoSearchConditions.default.query),
+            inScope = RepoSearchScope.all.associateWith {
+                read(
+                    Repo.Conditions.scopeKeys[it]!!,
+                    it in RepoSearchConditions.default.inScope
+                )
+            },
+            onlyFlags = OnlyFlag.all.associateWith {
+                read(
+                    Repo.Conditions.onlyFlagKeys[it]!!,
+                    it in RepoSearchConditions.default.onlyFlags
+                )
+            },
+            usePreviousSearch = read(Repo.usePreviousSearchKey, false)
+        )
 
     override val repoSearchConditionsSaver = object : ConfigManager.RepoSearchConditionsSaver {
 
         override suspend fun saveQuery(query: String) {
+            _queryStateFlow.update { query }
             save(Repo.queryKey, query)
         }
 
