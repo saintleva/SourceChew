@@ -85,15 +85,15 @@ class DataStoreConfigManager(
         }
     }
 
-    private val _queryStateFlow: MutableStateFlow<String>
-        get() {
-            var loadedQuery: String = RepoSearchConditions.default.query
-            runBlocking {
-                loadedQuery = read(Repo.queryKey, RepoSearchConditions.default.query).first()
-            }
-            val result = MutableStateFlow(loadedQuery)
-            return result
+    private fun loadQueryFirstTime(): String {
+        var loadedQuery: String = RepoSearchConditions.default.query
+        runBlocking {
+            loadedQuery = read(Repo.queryKey, RepoSearchConditions.default.query).first()
         }
+        return loadedQuery
+    }
+
+    private val _queryStateFlow: MutableStateFlow<String> = MutableStateFlow(loadQueryFirstTime())
 
     override val repoConditions = RepoSearchConditionsFlows(
             query = _queryStateFlow,
