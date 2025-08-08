@@ -52,18 +52,10 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.koin)
-
-            implementation(libs.githubApi)
-            implementation(libs.kgit)
         }
         commonTest.dependencies {
             implementation(libs.kotest.framework.engine)
             implementation(libs.kotest.assertions.core)
-//            implementation(kotlin("test"))
-//            testImplementation(libs.junit.jupiter.api)
-//            testRuntimeOnly(libs.junit.jupiter.engine)
-//            testImplementation(libs.kotlin.test)
-//            testImplementation(libs.kotlin.test.junit)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -101,7 +93,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.material3.android)
     debugImplementation(compose.uiTooling)
 }
 
