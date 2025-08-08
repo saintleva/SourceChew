@@ -17,24 +17,36 @@
 
 package com.github.saintleva.sourcechew.ui.screens.search
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,7 +62,10 @@ import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.additional_filters
+import sourcechew.composeapp.generated.resources.collapse
 import sourcechew.composeapp.generated.resources.enter_search_text
+import sourcechew.composeapp.generated.resources.expand
 import sourcechew.composeapp.generated.resources.search
 import sourcechew.composeapp.generated.resources.stop_search
 import sourcechew.composeapp.generated.resources.use_previous_search_conditions
@@ -87,6 +102,64 @@ class SearchScreen : Screen {
     }
 }
 
+
+@Composable
+private fun OnlyFlagsContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
+
+    val selected = screenModel.conditionsStateFlows.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
+
+    var expanded by remember { mutableStateOf(false) }
+
+    val strings = mapOf(
+        OnlyFlag.PUBLIC to "Только публичные",
+        OnlyFlag.PRIVATE to "Только приватные",
+        OnlyFlag.FORK to "Только форки",
+        OnlyFlag.ARCHIVED to "Только заархивированные",
+        OnlyFlag.MIRROR to "Только зеркала",
+        OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
+    )
+
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(Res.string.additional_filters), // Или другое название для блока
+                style = MaterialTheme.typography.titleSmall, // Или другой подходящий стиль
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = if (expanded) {
+                        stringResource(Res.string.collapse)
+                    } else {
+                        stringResource(Res.string.expand)
+                    },
+                    modifier = Modifier.rotate(if (expanded) 180f else 0f) // Поворачиваем иконку
+                )
+            }
+        }
+        AnimatedVisibility(visible = expanded) {
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                OnlyFlag.all.forEach { flag ->
+                    CheckBoxWithText(
+                        text = strings[flag]!!,
+                        checked = selected[flag]!!.value,
+                        onCheckedChange = { screenModel.toggleOnlyFlag(flag) },
+                        enabled = selectingEnabled,
+                        paddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
@@ -96,7 +169,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
 //        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
 //        RepoSearchScope.README to stringResource(Res.string.readme),
 //    )
-//    val onlyFlagStrings = mapOf(
+////    val onlyFlagStrings = mapOf(
 //        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
 //        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
 //        OnlyFlag.FORK to stringResource(Res.string.fork_only),
@@ -109,19 +182,10 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         RepoSearchScope.DESCRIPTION to "Описания",
         RepoSearchScope.README to "Readme"
     )
-    val onlyFlagStrings = mapOf(
-        OnlyFlag.PUBLIC to "Только публичные",
-        OnlyFlag.PRIVATE to "Только приватные",
-        OnlyFlag.FORK to "Только форки",
-        OnlyFlag.ARCHIVED to "Только заархивированные",
-        OnlyFlag.MIRROR to "Только зеркала",
-        OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
-    )
 
     val conditions = screenModel.conditionsStateFlows
     val query = conditions.query.collectAsStateWithLifecycle()
     val selectedSearchScope = conditions.inScope.mapValues { it.value.collectAsStateWithLifecycle() }
-    val selectedOnlyFlags = conditions.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
     val usePreviousSearch = conditions.usePreviousSearch.collectAsStateWithLifecycle()
 
     Column {
@@ -134,11 +198,10 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = query.value.isBlank()
         )
-        FlowRow(
+        Row(
             modifier = Modifier.padding(8.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp,
-                alignment = Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.Top
+                alignment = Alignment.CenterHorizontally)
         ) {
             RepoSearchScope.all.forEach { scope ->
                 val textStyle = MaterialTheme.typography.labelLarge
@@ -150,21 +213,13 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                 )
             }
         }
-        OnlyFlag.all.forEach { flag ->
-            CheckBoxWithText(
-                text = onlyFlagStrings[flag]!!,
-                checked = selectedOnlyFlags[flag]!!.value,
-                onCheckedChange = { screenModel.toggleOnlyFlag(flag) },
-                enabled = selectingEnabled,
-                padding = 8.dp
-            )
-        }
+        OnlyFlagsContent(screenModel, selectingEnabled)
         CheckBoxWithText(
             text = stringResource(Res.string.use_previous_search_conditions),
             checked = usePreviousSearch.value,
             onCheckedChange = screenModel::usePreviousSearchChange,
             enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
-            padding = 8.dp
+            paddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
         )
         Button(
             onClick = screenModel::search,

@@ -26,7 +26,7 @@ interface ConfigManager {
 
     val repoConditions: RepoSearchConditionsFlows
 
-    interface RepoSearchConditionsSaver {
+    interface  RepoSearchConditionsSaver {
         suspend fun saveQuery(query: String)
         suspend fun toggleScopeItem(item: RepoSearchScope)
         suspend fun toggleOnlyFlag(onlyFlag: OnlyFlag)

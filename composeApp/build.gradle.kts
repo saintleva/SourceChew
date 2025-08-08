@@ -28,8 +28,6 @@ kotlin {
 
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
-
-            implementation(libs.core.splashscreen)
         }
         androidUnitTest.dependencies {
             implementation(libs.kotest.runner.junit5)
