@@ -85,17 +85,19 @@ class DataStoreConfigManager(
         }
     }
 
-    private fun loadQueryFirstTime(): String {
-        var loadedQuery: String = RepoSearchConditions.default.query
-        runBlocking {
-            loadedQuery = read(Repo.queryKey, RepoSearchConditions.default.query).first()
+    override val repoConditions = object : ConfigManager.RepoSearchConditionsAccessor {
+
+        private fun loadQueryFirstTime(): String {
+            var loadedQuery: String = RepoSearchConditions.default.query
+            runBlocking {
+                loadedQuery = read(Repo.queryKey, RepoSearchConditions.default.query).first()
+            }
+            return loadedQuery
         }
-        return loadedQuery
-    }
 
-    private val _queryStateFlow: MutableStateFlow<String> = MutableStateFlow(loadQueryFirstTime())
+        private val _queryStateFlow: MutableStateFlow<String> = MutableStateFlow(loadQueryFirstTime())
 
-    override val repoConditions = RepoSearchConditionsFlows(
+        override val flows = RepoSearchConditionsFlows(
             query = _queryStateFlow,
             //TODO: Remove this
             //query = read(Repo.queryKey, RepoSearchConditions.default.query),
@@ -113,10 +115,7 @@ class DataStoreConfigManager(
             },
             usePreviousSearch = read(Repo.usePreviousSearchKey, false)
         )
-
-    override val repoSearchConditionsSaver = object : ConfigManager.RepoSearchConditionsSaver {
-
-        override suspend fun saveQuery(query: String) {
+        override suspend fun changeQuery(query: String) {
             _queryStateFlow.update { query }
             save(Repo.queryKey, query)
         }
@@ -131,7 +130,37 @@ class DataStoreConfigManager(
                 onlyFlag in RepoSearchConditions.default.onlyFlags)
         }
 
-        override suspend fun saveUsePreviousSearch(value: Boolean) {
+        override suspend fun togglePublicOnlyFlag() {
+            val publicKey = Repo.Conditions.onlyFlagKeys[OnlyFlag.PUBLIC]!!
+            val privateKey = Repo.Conditions.onlyFlagKeys[OnlyFlag.PRIVATE]!!
+            withContext(ioDispatcher) {
+                dataStore.edit { preferences ->
+                    val newPublic =
+                        !(preferences[publicKey] ?: (OnlyFlag.PUBLIC in RepoSearchConditions.default.onlyFlags))
+                    preferences[publicKey] = newPublic
+                    if (newPublic) {
+                        preferences[privateKey] = false
+                    }
+                }
+            }
+        }
+
+        override suspend fun togglePrivateOnlyFlag() {
+            val publicKey = Repo.Conditions.onlyFlagKeys[OnlyFlag.PUBLIC]!!
+            val privateKey = Repo.Conditions.onlyFlagKeys[OnlyFlag.PRIVATE]!!
+            withContext(ioDispatcher) {
+                dataStore.edit { preferences ->
+                    val newPrivate =
+                        !(preferences[privateKey] ?: (OnlyFlag.PRIVATE in RepoSearchConditions.default.onlyFlags))
+                    preferences[privateKey] = newPrivate
+                    if (newPrivate) {
+                        preferences[publicKey] = false
+                    }
+                }
+            }
+        }
+
+        override suspend fun changeUsePreviousSearch(value: Boolean) {
             save(Repo.usePreviousSearchKey, value)
         }
     }

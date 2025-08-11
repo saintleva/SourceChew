@@ -24,14 +24,15 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 
 interface ConfigManager {
 
-    val repoConditions: RepoSearchConditionsFlows
-
-    interface  RepoSearchConditionsSaver {
-        suspend fun saveQuery(query: String)
+    interface RepoSearchConditionsAccessor {
+        val flows: RepoSearchConditionsFlows
+        suspend fun changeQuery(query: String)
         suspend fun toggleScopeItem(item: RepoSearchScope)
         suspend fun toggleOnlyFlag(onlyFlag: OnlyFlag)
-        suspend fun saveUsePreviousSearch(value: Boolean)
+        suspend fun togglePublicOnlyFlag()
+        suspend fun togglePrivateOnlyFlag()
+        suspend fun changeUsePreviousSearch(value: Boolean)
     }
 
-    val repoSearchConditionsSaver: RepoSearchConditionsSaver
+    val repoConditions: RepoSearchConditionsAccessor
 }

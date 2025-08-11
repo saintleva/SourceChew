@@ -33,8 +33,8 @@ class SearchScreenModel(
     private val searchRepository: SearchRepository
 ) : ScreenModel {
 
-    val conditionsStateFlows = configManager.repoConditions.toConditionsStateFlow(screenModelScope)
-    val saver = configManager.repoSearchConditionsSaver
+    val accessor = configManager.repoConditions
+    val conditionsStateFlows = accessor.flows.toConditionsStateFlow(screenModelScope)
 
     val searchState = searchRepository.searchState
 
@@ -62,25 +62,29 @@ class SearchScreenModel(
 
     fun onQueryChange(newQuery: String) {
         screenModelScope.launch {
-            saver.saveQuery(newQuery)
+            accessor.changeQuery(newQuery)
         }
     }
 
     fun toggleScope(scope: RepoSearchScope) {
         screenModelScope.launch {
-            saver.toggleScopeItem(scope)
+            accessor.toggleScopeItem(scope)
         }
     }
 
     fun toggleOnlyFlag(flag: OnlyFlag) {
         screenModelScope.launch {
-            saver.toggleOnlyFlag(flag)
+            when (flag) {
+                OnlyFlag.PUBLIC -> accessor.togglePublicOnlyFlag()
+                OnlyFlag.PRIVATE -> accessor.togglePrivateOnlyFlag()
+                else -> accessor.toggleOnlyFlag(flag)
+            }
         }
     }
 
     fun usePreviousSearchChange(checked: Boolean) {
         screenModelScope.launch {
-            saver.saveUsePreviousSearch(checked)
+            accessor.changeUsePreviousSearch(checked)
         }
     }
 
