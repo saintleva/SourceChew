@@ -14,6 +14,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Napier.d(tag = "MainActivity") { "OnCreate() started" }
         super.onCreate(savedInstanceState)
+        viewModel //TODO: Implement good using of "viewModel"
         Napier.d(tag = "MainActivity") { "Before setContent()" }
         setContent {
             App()

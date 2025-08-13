@@ -26,6 +26,7 @@ import com.github.saintleva.sourcechew.data.utils.makeSet
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -68,12 +69,14 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
 
     override suspend fun loadRepoPreviousConditions(): RepoSearchConditions {
         //TODO: remove this
-        //Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() started" }
+        Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() started" }
+
+        //TODO: Use good default values
         val query = dataStore.data.map { preferences -> preferences[Repo.queryKey] ?: "" }.first()
+        Napier.d(tag = "DataStoreConfigManager") { "query = '$query' red" }
         val inScope = RepoSearchScope.all.makeSet {
             dataStore.data.map { preferences ->
-                preferences[Repo.PreviousConditions.scopeKeys[it]!!] ?:
-                if (it == RepoSearchScope.NAME) true else false
+                preferences[Repo.PreviousConditions.scopeKeys[it]!!] ?: it == RepoSearchScope.NAME
             }.first()
         }
         val onlyFlags = OnlyFlag.all.makeSet {
@@ -81,6 +84,9 @@ class DataStoreConfigManager(private val dataStore: DataStore<Preferences>) : Co
                 preferences[Repo.PreviousConditions.onlyFlagKeys[it]!!] ?: false
             }.first()
         }
+
+        Napier.d(tag = "DataStoreConfigManager") { "loadPreviousConditions() finished" }
+
         return RepoSearchConditions(query, inScope, onlyFlags)
     }
 

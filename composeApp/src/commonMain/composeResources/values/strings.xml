@@ -13,6 +13,9 @@
     <string name="mirror_only">Mirror only</string>
     <string name="template_only">Template only</string>
     <string name="enter_search_text">Enter search text</string>
+    <string name="additional_filters">Additional filters</string>
+    <string name="collapse">Collapse</string>
+    <string name="expand">Expand</string>
     <string name="search">Search</string>
     <string name="use_previous_search_conditions">Use previous search results using such conditions</string>
     <string name="stop_search">Stop search</string>

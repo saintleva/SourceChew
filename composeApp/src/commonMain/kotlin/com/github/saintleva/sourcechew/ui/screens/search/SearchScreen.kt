@@ -17,9 +17,13 @@
 
 package com.github.saintleva.sourcechew.ui.screens.search
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,12 +32,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,11 +58,25 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.additional_filters
+import sourcechew.composeapp.generated.resources.archived_only
+import sourcechew.composeapp.generated.resources.collapse
+import sourcechew.composeapp.generated.resources.descriptions
 import sourcechew.composeapp.generated.resources.enter_search_text
+import sourcechew.composeapp.generated.resources.expand
+import sourcechew.composeapp.generated.resources.fork_only
+import sourcechew.composeapp.generated.resources.github_logo_64px
+import sourcechew.composeapp.generated.resources.mirror_only
+import sourcechew.composeapp.generated.resources.names
+import sourcechew.composeapp.generated.resources.private_only
+import sourcechew.composeapp.generated.resources.public_only
+import sourcechew.composeapp.generated.resources.readme
 import sourcechew.composeapp.generated.resources.search
 import sourcechew.composeapp.generated.resources.stop_search
+import sourcechew.composeapp.generated.resources.template_only
 import sourcechew.composeapp.generated.resources.use_previous_search_conditions
 
 
@@ -78,9 +103,65 @@ class SearchScreen : Screen {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            SearchContent(screenModel, searchState.value == SearchState.Selecting)
+            SearchContent(screenModel, searchState.value == SearchState.Selecting) //TODO: Is it good?
             if (searchState.value == SearchState.Searching) {
                 SearchProgress(screenModel)
+            }
+        }
+    }
+}
+
+@Composable
+private fun OnlyFlagsContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
+    //TODO: Do I need used rememberSaveable() these?
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    val strings = mapOf(
+        OnlyFlag.PUBLIC to "Только публичные",
+        OnlyFlag.PRIVATE to "Только приватные",
+        OnlyFlag.FORK to "Только форки",
+        OnlyFlag.ARCHIVED to "Только заархивированные",
+        OnlyFlag.MIRROR to "Только зеркала",
+        OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
+    )
+
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(Res.string.additional_filters),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.weight(1f)
+            )
+            //TODO: Use normal arrow icon
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    painter = painterResource(Res.drawable.github_logo_64px),
+                    contentDescription = if (expanded) {
+                        stringResource(Res.string.collapse)
+                    } else {
+                        stringResource(Res.string.expand)
+                    },
+                    modifier = Modifier.rotate(if (expanded) 180f else 0f),
+                )
+            }
+        }
+        AnimatedVisibility(visible = expanded) {
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                OnlyFlag.all.forEach { flag ->
+                    CheckBoxWithText(
+                        text = strings[flag]!!,
+                        checked = screenModel.selectedOnlyFlags[flag]!!,
+                        onCheckedChange = { screenModel.toggleOnlyFlag(flag) },
+                        enabled = selectingEnabled,
+                        paddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
             }
         }
     }
@@ -89,32 +170,18 @@ class SearchScreen : Screen {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
-    //TODO: Use resources and uncomment it
-//    val scopeStrings = mapOf(
-//        RepoSearchScope.NAME to stringResource(Res.string.names),
-//        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
-//        RepoSearchScope.README to stringResource(Res.string.readme),
-//    )
-//    val onlyFlagStrings = mapOf(
-//        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
-//        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
-//        OnlyFlag.FORK to stringResource(Res.string.fork_only),
-//        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
-//        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
-//        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only),
-//    )
     val scopeStrings = mapOf(
-        RepoSearchScope.NAME to "Названия",
-        RepoSearchScope.DESCRIPTION to "Описания",
-        RepoSearchScope.README to "Readme"
+        RepoSearchScope.NAME to stringResource(Res.string.names),
+        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
+        RepoSearchScope.README to stringResource(Res.string.readme),
     )
     val onlyFlagStrings = mapOf(
-        OnlyFlag.PUBLIC to "Только публичные",
-        OnlyFlag.PRIVATE to "Только приватные",
-        OnlyFlag.FORK to "Только форки",
-        OnlyFlag.ARCHIVED to "Только заархивированные",
-        OnlyFlag.MIRROR to "Только зеркала",
-        OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
+        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
+        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
+        OnlyFlag.FORK to stringResource(Res.string.fork_only),
+        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
+        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
+        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only),
     )
 
     Column {
@@ -142,7 +209,8 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                 checked = screenModel.selectedOnlyFlags[flag]!!,
                 onCheckedChange = screenModel::usePreviousConditionsSearchChange,
                 enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
-                padding = 8.dp
+                paddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+
             )
         }
         CheckBoxWithText(
@@ -150,7 +218,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             checked = screenModel.usePreviousSearch.value,
             onCheckedChange = screenModel::usePreviousConditionsSearchChange,
             enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
-            padding = 8.dp
+            paddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
         )
         Button(
             onClick = screenModel::search,

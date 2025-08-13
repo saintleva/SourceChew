@@ -53,7 +53,6 @@ class SearchScreenModel(
     val selectedSearchScope = mutableStateMapOf<RepoSearchScope, Boolean>()
     val selectedOnlyFlags = mutableStateMapOf<OnlyFlag, Boolean>()
 
-
     val usePreviousConditions: Flow<Boolean> = configRepository.usePreviousRepoSearch
     private val _usePreviousSearch = mutableStateOf(false)
     val usePreviousSearch: State<Boolean> = _usePreviousSearch
@@ -99,7 +98,7 @@ class SearchScreenModel(
         selectedSearchScope[scope] = !selectedSearchScope[scope]!!
     }
 
-    fun toggleFlag(flag: OnlyFlag) {
+    fun toggleOnlyFlag(flag: OnlyFlag) {
         selectedOnlyFlags[flag] = !selectedOnlyFlags[flag]!!
     }
 
@@ -117,6 +116,7 @@ class SearchScreenModel(
     )
 
     fun canUsePreviousConditions(): Boolean {
+        //TODO: Is it right?
         var result = false
         screenModelScope.launch {
             result = canUsePreviousConditionsUseCase(obtainConditions())
