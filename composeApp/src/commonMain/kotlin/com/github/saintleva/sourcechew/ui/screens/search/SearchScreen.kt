@@ -194,25 +194,22 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = screenModel.query.value.isBlank()
         )
-        RepoSearchScope.all.forEach { scope ->
-            val textStyle = MaterialTheme.typography.labelLarge
-            FilterChip(
-                selected = screenModel.selectedSearchScope[scope]!!,
-                onClick = { screenModel.toggleScope(scope) },
-                label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
-                enabled = selectingEnabled
-            )
+        Row(
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp,
+                alignment = Alignment.CenterHorizontally)
+        ) {
+            RepoSearchScope.all.forEach { scope ->
+                val textStyle = MaterialTheme.typography.labelLarge
+                FilterChip(
+                    selected = screenModel.selectedSearchScope[scope]!!,
+                    onClick = { screenModel.toggleScope(scope) },
+                    label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
+                    enabled = selectingEnabled
+                )
+            }
         }
-        OnlyFlag.all.forEach { flag ->
-            CheckBoxWithText(
-                text = onlyFlagStrings[flag]!!,
-                checked = screenModel.selectedOnlyFlags[flag]!!,
-                onCheckedChange = screenModel::usePreviousConditionsSearchChange,
-                enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
-                paddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-
-            )
-        }
+        OnlyFlagsContent(screenModel, selectingEnabled)
         CheckBoxWithText(
             text = stringResource(Res.string.use_previous_search_conditions),
             checked = screenModel.usePreviousSearch.value,
