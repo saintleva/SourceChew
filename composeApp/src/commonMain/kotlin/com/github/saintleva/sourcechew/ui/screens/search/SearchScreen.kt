@@ -117,12 +117,12 @@ private fun OnlyFlagsContent(screenModel: SearchScreenModel, selectingEnabled: B
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     val strings = mapOf(
-        OnlyFlag.PUBLIC to "Только публичные",
-        OnlyFlag.PRIVATE to "Только приватные",
-        OnlyFlag.FORK to "Только форки",
-        OnlyFlag.ARCHIVED to "Только заархивированные",
-        OnlyFlag.MIRROR to "Только зеркала",
-        OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
+        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
+        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
+        OnlyFlag.FORK to stringResource(Res.string.fork_only),
+        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
+        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
+        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only),
     )
 
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -174,14 +174,6 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         RepoSearchScope.NAME to stringResource(Res.string.names),
         RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
         RepoSearchScope.README to stringResource(Res.string.readme),
-    )
-    val onlyFlagStrings = mapOf(
-        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
-        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
-        OnlyFlag.FORK to stringResource(Res.string.fork_only),
-        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
-        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
-        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only),
     )
 
     Column {
