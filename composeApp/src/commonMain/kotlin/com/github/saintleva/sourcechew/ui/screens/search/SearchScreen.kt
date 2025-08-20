@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +61,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.repository.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
+import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.additional_filters
@@ -111,7 +113,11 @@ class SearchScreen : Screen {
 
 
 @Composable
-private fun OnlyFlagsContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
+private fun OnlyFlagsContent(
+    screenModel: SearchScreenModel,
+    selectedOnlyFlags: Map<OnlyFlag, State<Boolean>>,
+    selectingEnabled: Boolean
+) {
 
     val selected = screenModel.conditionsStateFlows.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
 
@@ -179,7 +185,22 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
     val conditions = screenModel.conditionsStateFlows
     val query = conditions.query.collectAsStateWithLifecycle()
     val selectedSearchScope = conditions.inScope.mapValues { it.value.collectAsStateWithLifecycle() }
+    val selectedOnlyFlags = screenModel.conditionsStateFlows.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
     val usePreviousSearch = conditions.usePreviousSearch.collectAsStateWithLifecycle()
+
+
+    fun maySearch(): Boolean {
+        Napier.d(tag = "SearchContent") { "maySearch() called" }
+
+        val allPrivacySelected = selectedOnlyFlags[OnlyFlag.PUBLIC]!!.value &&
+                selectedOnlyFlags[OnlyFlag.PRIVATE]!!.value
+
+        val inScopeIsNotEmpty = selectedSearchScope[RepoSearchScope.NAME]!!.value
+                || selectedSearchScope[RepoSearchScope.DESCRIPTION]!!.value
+                || selectedSearchScope[RepoSearchScope.README]!!.value
+
+        return query.value.isNotBlank() && inScopeIsNotEmpty && !allPrivacySelected
+    }
 
     Column {
         OutlinedTextField(
@@ -206,7 +227,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                 )
             }
         }
-        OnlyFlagsContent(screenModel, selectingEnabled)
+        OnlyFlagsContent(screenModel, selectedOnlyFlags, selectingEnabled)
         CheckBoxWithText(
             text = stringResource(Res.string.use_previous_search_conditions),
             checked = usePreviousSearch.value,
@@ -217,7 +238,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         Button(
             onClick = screenModel::search,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
-            enabled = selectingEnabled && screenModel.maySearch()
+            enabled = selectingEnabled && maySearch()
         ) {
             Text(stringResource(Res.string.search))
         }
