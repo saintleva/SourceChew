@@ -63,11 +63,20 @@ import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.additional_filters
+import sourcechew.composeapp.generated.resources.archived_only
 import sourcechew.composeapp.generated.resources.collapse
+import sourcechew.composeapp.generated.resources.descriptions
 import sourcechew.composeapp.generated.resources.enter_search_text
 import sourcechew.composeapp.generated.resources.expand
+import sourcechew.composeapp.generated.resources.fork_only
+import sourcechew.composeapp.generated.resources.mirror_only
+import sourcechew.composeapp.generated.resources.names
+import sourcechew.composeapp.generated.resources.private_only
+import sourcechew.composeapp.generated.resources.public_only
+import sourcechew.composeapp.generated.resources.readme
 import sourcechew.composeapp.generated.resources.search
 import sourcechew.composeapp.generated.resources.stop_search
+import sourcechew.composeapp.generated.resources.template_only
 import sourcechew.composeapp.generated.resources.use_previous_search_conditions
 
 
@@ -75,8 +84,6 @@ class SearchScreen : Screen {
 
     @Composable
     override fun Content() {
-//        Box(modifier = Modifier.fillMaxSize().background(color = Color.Green), contentAlignment = Alignment.Center) {}
-
         val screenModel = koinScreenModel<SearchScreenModel>()
 
 
@@ -111,12 +118,12 @@ private fun OnlyFlagsContent(screenModel: SearchScreenModel, selectingEnabled: B
     var expanded by remember { mutableStateOf(false) }
 
     val strings = mapOf(
-        OnlyFlag.PUBLIC to "Только публичные",
-        OnlyFlag.PRIVATE to "Только приватные",
-        OnlyFlag.FORK to "Только форки",
-        OnlyFlag.ARCHIVED to "Только заархивированные",
-        OnlyFlag.MIRROR to "Только зеркала",
-        OnlyFlag.TEMPLATE to "Только шаблоны репозиториев"
+        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
+        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
+        OnlyFlag.FORK to stringResource(Res.string.fork_only),
+        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
+        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
+        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only)
     )
 
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -128,8 +135,8 @@ private fun OnlyFlagsContent(screenModel: SearchScreenModel, selectingEnabled: B
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(Res.string.additional_filters), // Или другое название для блока
-                style = MaterialTheme.typography.titleSmall, // Или другой подходящий стиль
+                text = stringResource(Res.string.additional_filters),
+                style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = { expanded = !expanded }) {
@@ -140,7 +147,7 @@ private fun OnlyFlagsContent(screenModel: SearchScreenModel, selectingEnabled: B
                     } else {
                         stringResource(Res.string.expand)
                     },
-                    modifier = Modifier.rotate(if (expanded) 180f else 0f) // Поворачиваем иконку
+                    modifier = Modifier.rotate(if (expanded) 180f else 0f)
                 )
             }
         }
@@ -163,24 +170,10 @@ private fun OnlyFlagsContent(screenModel: SearchScreenModel, selectingEnabled: B
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
-    //TODO: Use resources and uncomment it
-//    val scopeStrings = mapOf(
-//        RepoSearchScope.NAME to stringResource(Res.string.names),
-//        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
-//        RepoSearchScope.README to stringResource(Res.string.readme),
-//    )
-////    val onlyFlagStrings = mapOf(
-//        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
-//        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
-//        OnlyFlag.FORK to stringResource(Res.string.fork_only),
-//        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
-//        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
-//        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only),
-//    )
     val scopeStrings = mapOf(
-        RepoSearchScope.NAME to "Названия",
-        RepoSearchScope.DESCRIPTION to "Описания",
-        RepoSearchScope.README to "Readme"
+        RepoSearchScope.NAME to stringResource(Res.string.names),
+        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
+        RepoSearchScope.README to stringResource(Res.string.readme)
     )
 
     val conditions = screenModel.conditionsStateFlows
