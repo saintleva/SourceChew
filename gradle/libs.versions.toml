@@ -25,6 +25,7 @@ napier = "2.7.1"
 koin = "4.1.0"
 voyager = "1.1.0-beta03"
 appdirs = "2.0.0"
+app-cash-paging = "3.3.0-alpha02-0.5.1"
 
 [libraries]
 
@@ -54,3 +55,7 @@ voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", vers
 voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
 
 appdirs = { group = "ca.gosyer", name = "kotlin-multiplatform-appdirs", version.ref = "appdirs" }
+
+app-cash-paging-common = { group = "app.cash.paging", name = "paging-common", version.ref = "app-cash-paging" }
+app-cash-paging-compose-common = { group = "app.cash.paging", name = "paging-compose-common", version.ref = "app-cash-paging" }
+app-cash-paging-testing = { group = "app.cash.paging", name = "paging-testing", version.ref = "app-cash-paging" }

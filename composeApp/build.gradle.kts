@@ -55,6 +55,10 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.koin)
+
+            implementation(libs.app.cash.paging.common)
+            implementation(libs.app.cash.paging.compose.common)
+            implementation(libs.app.cash.paging.testing)
         }
         commonTest.dependencies {
             implementation(libs.kotest.framework.engine)
