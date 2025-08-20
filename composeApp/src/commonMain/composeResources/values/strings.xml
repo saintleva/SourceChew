@@ -3,6 +3,7 @@
     <string name="repositories">Repositories</string>
     <string name="users">Users</string>
     <string name="groups">Groups</string>
+    <string name="search_in">Search in:</string>
     <string name="names">Names</string>
     <string name="descriptions">Descriptions</string>
     <string name="readme">Readme</string>

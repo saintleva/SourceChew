@@ -22,11 +22,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -77,6 +81,7 @@ import sourcechew.composeapp.generated.resources.private_only
 import sourcechew.composeapp.generated.resources.public_only
 import sourcechew.composeapp.generated.resources.readme
 import sourcechew.composeapp.generated.resources.search
+import sourcechew.composeapp.generated.resources.search_in
 import sourcechew.composeapp.generated.resources.stop_search
 import sourcechew.composeapp.generated.resources.template_only
 import sourcechew.composeapp.generated.resources.use_previous_search_conditions
@@ -202,7 +207,9 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         return query.value.isNotBlank() && inScopeIsNotEmpty && !allPrivacySelected
     }
 
-    Column {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(WindowInsets.statusBars.asPaddingValues())
+    ) {
         OutlinedTextField(
             value = query.value,
             onValueChange = screenModel::onQueryChange,
@@ -212,19 +219,26 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = query.value.isBlank()
         )
-        Row(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp,
-                alignment = Alignment.CenterHorizontally)
-        ) {
-            RepoSearchScope.all.forEach { scope ->
-                val textStyle = MaterialTheme.typography.labelLarge
-                FilterChip(
-                    selected = selectedSearchScope[scope]!!.value,
-                    onClick = { screenModel.toggleScope(scope) },
-                    label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
-                    enabled = selectingEnabled
-                )
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(
+                text = stringResource(Res.string.search_in),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp,
+                    alignment = Alignment.CenterHorizontally)
+            ) {
+                RepoSearchScope.all.forEach { scope ->
+                    val textStyle = MaterialTheme.typography.labelLarge
+                    FilterChip(
+                        selected = selectedSearchScope[scope]!!.value,
+                        onClick = { screenModel.toggleScope(scope) },
+                        label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
+                        enabled = selectingEnabled
+                    )
+                }
             }
         }
         OnlyFlagsContent(screenModel, selectedOnlyFlags, selectingEnabled)

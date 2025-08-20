@@ -3,6 +3,7 @@
     <string name="repositories">Репозитории</string>
     <string name="users">Пользователи</string>
     <string name="groups">Группы</string>
+    <string name="search_in">Искать в:</string>
     <string name="names">Названия</string>
     <string name="descriptions">Описания</string>
     <string name="readme">Readme</string>
