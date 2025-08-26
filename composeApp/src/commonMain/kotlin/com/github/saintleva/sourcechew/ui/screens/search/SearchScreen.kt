@@ -30,7 +30,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -106,6 +106,8 @@ class SearchScreen : Screen {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                //TODO: Make good top padding
+                .padding(WindowInsets.safeContent.asPaddingValues())
                 .verticalScroll(rememberScrollState())
         ) {
             SearchContent(screenModel, searchState.value == SearchState.Selecting)
@@ -208,7 +210,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(WindowInsets.statusBars.asPaddingValues())
+        modifier = Modifier.fillMaxSize()
     ) {
         OutlinedTextField(
             value = query.value,
