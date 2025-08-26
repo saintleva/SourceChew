@@ -54,10 +54,10 @@ class DataStoreConfigManager(
         object Repo : Group("Repo") {
 
             object Conditions {
-                val scopeKeys = RepoSearchScope.all.associateWith {
+                val scopeKeys = RepoSearchScope.entries.associateWith {
                     booleanPreferencesKey("${conditions}_scope_${it.name}")
                 }
-                val onlyFlagKeys = OnlyFlag.all.associateWith {
+                val onlyFlagKeys = OnlyFlag.entries.associateWith {
                     booleanPreferencesKey("${conditions}_onlyFlag_${it.name}")
                 }
             }
@@ -101,13 +101,13 @@ class DataStoreConfigManager(
             query = _queryStateFlow,
             //TODO: Remove this
             //query = read(Repo.queryKey, RepoSearchConditions.default.query),
-            inScope = RepoSearchScope.all.associateWith {
+            inScope = RepoSearchScope.entries.associateWith {
                 read(
                     Repo.Conditions.scopeKeys[it]!!,
                     it in RepoSearchConditions.default.inScope
                 )
             },
-            onlyFlags = OnlyFlag.all.associateWith {
+            onlyFlags = OnlyFlag.entries.associateWith {
                 read(
                     Repo.Conditions.onlyFlagKeys[it]!!,
                     it in RepoSearchConditions.default.onlyFlags

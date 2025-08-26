@@ -26,19 +26,11 @@ import kotlinx.coroutines.flow.stateIn
 
 
 enum class RepoSearchScope {
-    NAME, DESCRIPTION, README;
-
-    companion object {
-        val all = values().toList()
-    }
+    NAME, DESCRIPTION, README
 }
 
 enum class OnlyFlag {
-    PUBLIC, PRIVATE, FORK, ARCHIVED, MIRROR, TEMPLATE;
-
-    companion object {
-        val all = values().toList()
-    }
+    PUBLIC, PRIVATE, FORK, ARCHIVED, MIRROR, TEMPLATE
 }
 
 data class RepoSearchConditions(

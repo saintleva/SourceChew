@@ -164,7 +164,7 @@ private fun OnlyFlagsContent(
         }
         AnimatedVisibility(visible = expanded) {
             Column(modifier = Modifier.padding(start = 16.dp)) {
-                OnlyFlag.all.forEach { flag ->
+                OnlyFlag.entries.forEach { flag ->
                     CheckBoxWithText(
                         text = strings[flag]!!,
                         checked = selected[flag]!!.value,
@@ -219,7 +219,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = query.value.isBlank()
         )
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
             Text(
                 text = stringResource(Res.string.search_in),
                 style = MaterialTheme.typography.titleSmall,
@@ -230,7 +230,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                 horizontalArrangement = Arrangement.spacedBy(4.dp,
                     alignment = Alignment.CenterHorizontally)
             ) {
-                RepoSearchScope.all.forEach { scope ->
+                RepoSearchScope.entries.forEach { scope ->
                     val textStyle = MaterialTheme.typography.labelLarge
                     FilterChip(
                         selected = selectedSearchScope[scope]!!.value,
