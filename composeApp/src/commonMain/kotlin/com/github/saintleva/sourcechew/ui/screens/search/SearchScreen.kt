@@ -126,8 +126,6 @@ private fun OnlyFlagsContent(
     selectingEnabled: Boolean
 ) {
 
-    val selected = screenModel.conditionsStateFlows.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
-
     var expanded by remember { mutableStateOf(false) }
 
     val strings = mapOf(
@@ -169,7 +167,7 @@ private fun OnlyFlagsContent(
                 OnlyFlag.entries.forEach { flag ->
                     CheckBoxWithText(
                         text = strings[flag]!!,
-                        checked = selected[flag]!!.value,
+                        checked = selectedOnlyFlags[flag]!!.value,
                         onCheckedChange = { screenModel.toggleOnlyFlag(flag) },
                         enabled = selectingEnabled,
                         paddingValues = PaddingValues(horizontal = 8.dp, vertical = 4.dp)

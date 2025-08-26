@@ -17,9 +17,10 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
+import app.cash.paging.PagingData
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.models.FoundRepos
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 
@@ -36,7 +37,7 @@ interface SearchRepository {
 
     var previousConditions: RepoSearchConditions?
 
-    var previousResult: FoundRepos?
+    var previousResult: Flow<PagingData<FoundRepo>>? //TODO: May I use nullable here?
 
     val everSearched: Boolean
         get() = (previousResult != null)

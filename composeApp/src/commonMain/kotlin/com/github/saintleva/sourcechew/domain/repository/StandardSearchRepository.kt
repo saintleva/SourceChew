@@ -17,9 +17,11 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
+import app.cash.paging.PagingData
 import com.github.saintleva.sourcechew.domain.NeverSearchedException
-import com.github.saintleva.sourcechew.domain.models.FoundRepos
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -31,9 +33,9 @@ abstract class StandardSearchRepository : SearchRepository {
     final override val searchState = _searchState.asStateFlow()
 
     final override var previousConditions: RepoSearchConditions? = null
-    final override var previousResult: FoundRepos? = null
+    final override var previousResult: Flow<PagingData<FoundRepo>>? = null
 
-    protected abstract suspend fun find(conditions: RepoSearchConditions): FoundRepos
+    protected abstract suspend fun find(conditions: RepoSearchConditions): Flow<PagingData<FoundRepo>>
 
     final override suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean) {
         _searchState.update { SearchState.Searching }
