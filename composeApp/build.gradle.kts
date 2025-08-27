@@ -30,6 +30,8 @@ kotlin {
 
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+
+            implementation(libs.ktor.client.cio)
         }
         androidUnitTest.dependencies {
             implementation(libs.kotest.runner.junit5)
@@ -59,6 +61,11 @@ kotlin {
             implementation(libs.app.cash.paging.common)
             implementation(libs.app.cash.paging.compose.common)
             implementation(libs.app.cash.paging.testing)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
         }
         commonTest.dependencies {
             implementation(libs.kotest.framework.engine)

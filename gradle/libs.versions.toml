@@ -26,6 +26,7 @@ koin = "4.1.0"
 voyager = "1.1.0-beta03"
 appdirs = "2.0.0"
 app-cash-paging = "3.3.0-alpha02-0.5.1"
+ktor = "3.2.3"
 
 [libraries]
 
@@ -59,3 +60,10 @@ appdirs = { group = "ca.gosyer", name = "kotlin-multiplatform-appdirs", version.
 app-cash-paging-common = { group = "app.cash.paging", name = "paging-common", version.ref = "app-cash-paging" }
 app-cash-paging-compose-common = { group = "app.cash.paging", name = "paging-compose-common", version.ref = "app-cash-paging" }
 app-cash-paging-testing = { group = "app.cash.paging", name = "paging-testing", version.ref = "app-cash-paging" }
+
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+

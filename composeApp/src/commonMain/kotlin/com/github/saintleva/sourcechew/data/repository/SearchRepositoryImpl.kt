@@ -17,36 +17,52 @@
 
 package com.github.saintleva.sourcechew.data.repository
 
+import app.cash.paging.Pager
+import app.cash.paging.PagingConfig
+import app.cash.paging.PagingData
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.StandardSearchRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration
 
 
-class SearchRepositoryStub(
+class SearchRepositoryImpl(
     private val eachCount: Int,
     private val delayImitation: Duration = Duration.ZERO,
+    private val pageSize: Int = 10,
     private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : StandardSearchRepository() {
 
-    override suspend fun find(conditions: RepoSearchConditions): List<FoundRepo> {
-
-        fun name(i: Int) = "${i}${conditions.query}${i}"
-
-        val result = mutableListOf<FoundRepo>()
-        withContext(searchDispatcher) {
-            for (inScope in conditions.inScope) {
-                for (i in 0 until eachCount) {
-                    delay(delayImitation)
-                    result.add(FoundRepo(name(i), name(i), inScope.name, name(i), i))
-                }
+    override suspend fun find(conditions: RepoSearchConditions): Flow<PagingData<FoundRepo>> {
+        return Pager(
+            config = PagingConfig(pageSize, enablePlaceholders = true),
+            pagingSourceFactory = {
+                SearchPagingSource(
+                    conditions,
+                    eachCount,
+                    delayImitation,
+                    searchDispatcher
+                )
             }
-        }
+        )
 
-        return result
+
+        //TODO: Remove this
+//        fun name(i: Int) = "${i}${conditions.query}${i}"
+//
+//        val result = mutableListOf<FoundRepo>()
+//        withContext(searchDispatcher) {
+//            for (inScope in conditions.inScope) {
+//                for (i in 0 until eachCount) {
+//                    delay(delayImitation)
+//                    result.add(FoundRepo(name(i), name(i), inScope.name, name(i), i))
+//                }
+//            }
+//        }
+//
+//        return result
     }
 }

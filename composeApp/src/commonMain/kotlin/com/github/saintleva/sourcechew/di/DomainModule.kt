@@ -17,7 +17,7 @@
 
 package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.data.repository.SearchRepositoryStub
+import com.github.saintleva.sourcechew.data.repository.SearchRepositoryImpl
 import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
@@ -27,5 +27,5 @@ import kotlin.time.Duration.Companion.milliseconds
 
 val domainModule = module {
     single<ConfigManager> { DataStoreConfigManager(get()) }
-    single<SearchRepository> { SearchRepositoryStub(10, 200.milliseconds) }
+    single<SearchRepository> { SearchRepositoryImpl(10, 200.milliseconds) }
 }
