@@ -1,18 +1,24 @@
 package com.github.saintleva.sourcechew.data.paging
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlin.time.Duration
+import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 
 class SearchPagingSource(
     private val searchApiService: SearchApiService,
-    private val conditions: RepoSearchConditions
-    private val eachCount: Int,
-    private val delayImitation: Duration = Duration.ZERO,
-    private val pageSize: Int = 10,
-    private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val conditions: RepoSearchConditions,
+    private val sort: String,
+    private val
 ): PagingSource<Int, FoundRepo>() {
+
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FoundRepo> {
+        val currentPageNumber = params.key ?: 1
+
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, FoundRepo>): Int? {
+        TODO("Not yet implemented")
+    }
 }

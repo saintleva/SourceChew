@@ -1,6 +1,8 @@
 package com.github.saintleva.sourcechew.data.remote
 
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import kotlin.random.Random
 import kotlin.time.Duration
 
@@ -30,21 +32,21 @@ class MockSearchApiService(
         order: String,
         page: Int,
         pageSize: Int
-    ): SearchResponseDto {
+    ): List<FoundRepo> {
         if (simulateError) {
             //TODO: Use every condition to simulate error
             throw Exception("Mock API Error: Failed to fetch search results for query: ${conditions.query}")
         }
         if (returnEmptyList) {
-            return SearchResponseDto(totalCount = 0, items = emptyList())
+            return emptyList()
         }
 
-        val items = mutableListOf<FoundRepoDto>()
+        val items = mutableListOf<FoundRepo>()
         val totalItemsToGenerate = if (page == 1) Random.nextInt(pageSize / 2, pageSize) else pageSize
         val totalCount = conditions.inScope.size * eachCount
         val startIndex = (page - 1) * pageSize
         if (startIndex >= totalCount) {
-            return SearchResponseDto(totalCount = totalCount, items = emptyList())
+            return emptyList()
         }
 
         val itemsOnThisPageCount = minOf(pageSize, totalCount - startIndex)
@@ -52,7 +54,7 @@ class MockSearchApiService(
         for (i in 0 until itemsOnThisPageCount) {
             val uniqueId = startIndex + i + 1
             items.add(
-                FoundRepoDto(
+                FoundRepo(
                     author = sampleAuthors.random(),
                     name = "Repo_${conditions.query.replace(" ", "_")}_${uniqueId}",
                     description = sampleDescriptions.random() + " (Page $page, Item ${i + 1})",
@@ -62,9 +64,6 @@ class MockSearchApiService(
             )
         }
 
-        return SearchResponseDto(
-            totalCount = totalCount,
-            items = items
-        )
+        return items
     }
 }

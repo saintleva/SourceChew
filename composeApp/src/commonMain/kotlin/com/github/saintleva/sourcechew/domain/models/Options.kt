@@ -33,16 +33,28 @@ enum class OnlyFlag {
     PUBLIC, PRIVATE, FORK, ARCHIVED, MIRROR, TEMPLATE
 }
 
+enum class RepoSearchSort {
+    BEST_MATCH, STARS, FORKS, UPDATED
+}
+
+enum class RepoSearchOrder {
+    ASCENDING, DESCENDING
+}
+
 data class RepoSearchConditions(
     val query: String,
     val inScope: Set<RepoSearchScope>,
-    val onlyFlags: Set<OnlyFlag>
+    val onlyFlags: Set<OnlyFlag>,
+    val sort: RepoSearchSort,
+    val order: RepoSearchOrder
 ) {
     companion object {
         val default = RepoSearchConditions(
             query = "",
             inScope = setOf(RepoSearchScope.NAME),
-            onlyFlags = emptySet()
+            onlyFlags = emptySet(),
+            sort = RepoSearchSort.BEST_MATCH,
+            order = RepoSearchOrder.DESCENDING
         )
     }
 }
