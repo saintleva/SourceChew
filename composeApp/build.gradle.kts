@@ -58,9 +58,8 @@ kotlin {
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.koin)
 
-            implementation(libs.app.cash.paging.common)
-            implementation(libs.app.cash.paging.compose.common)
-            implementation(libs.app.cash.paging.testing)
+            implementation(libs.androidx.paging.common)
+            implementation(libs.androidx.paging.compose)
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)

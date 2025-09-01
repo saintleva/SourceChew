@@ -1,6 +1,6 @@
 package com.github.saintleva.sourcechew.data.paging
 
-import app.cash.paging.PagingSource
+import androidx.paging.PagingSource
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.CoroutineDispatcher

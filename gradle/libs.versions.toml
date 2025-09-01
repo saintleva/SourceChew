@@ -25,7 +25,9 @@ napier = "2.7.1"
 koin = "4.1.0"
 voyager = "1.1.0-beta03"
 appdirs = "2.0.0"
-app-cash-paging = "3.3.0-alpha02-0.5.1"
+#TODO: Migrate to Jetpack Paging 3 and remove this
+#app-cash-paging = "3.3.0-alpha02-0.5.1"
+androidx-paging = "3.4.0-alpha03"
 ktor = "3.2.3"
 
 [libraries]
@@ -57,9 +59,13 @@ voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voy
 
 appdirs = { group = "ca.gosyer", name = "kotlin-multiplatform-appdirs", version.ref = "appdirs" }
 
-app-cash-paging-common = { group = "app.cash.paging", name = "paging-common", version.ref = "app-cash-paging" }
-app-cash-paging-compose-common = { group = "app.cash.paging", name = "paging-compose-common", version.ref = "app-cash-paging" }
-app-cash-paging-testing = { group = "app.cash.paging", name = "paging-testing", version.ref = "app-cash-paging" }
+androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "androidx-paging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging" }
+
+#TODO: Migrate to Jetpack Paging 3 and remove this
+#app-cash-paging-common = { group = "app.cash.paging", name = "paging-common", version.ref = "app-cash-paging" }
+#app-cash-paging-compose-common = { group = "app.cash.paging", name = "paging-compose-common", version.ref = "app-cash-paging" }
+#app-cash-paging-testing = { group = "app.cash.paging", name = "paging-testing", version.ref = "app-cash-paging" }
 
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }

@@ -17,7 +17,7 @@
 
 package com.github.saintleva.sourcechew.domain.repository
 
-import app.cash.paging.PagingData
+import androidx.paging.PagingData
 import com.github.saintleva.sourcechew.domain.NeverSearchedException
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
