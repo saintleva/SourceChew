@@ -21,11 +21,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlows
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
+import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
+import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -60,8 +63,13 @@ class DataStoreConfigManager(
                 val onlyFlagKeys = OnlyFlag.entries.associateWith {
                     booleanPreferencesKey("${conditions}_onlyFlag_${it.name}")
                 }
+                val sortKey = intPreferencesKey("${conditions}_sort")
             }
 
+        }
+
+        object App {
+            val searchOrderKey = intPreferencesKey("searchOrder")
         }
     }
 
@@ -113,6 +121,9 @@ class DataStoreConfigManager(
                     it in RepoSearchConditions.default.onlyFlags
                 )
             },
+            sort = dataStore.data.map { preferences ->
+                RepoSearchSort.fromCode(preferences[Repo.Conditions.sortKey] ?: RepoSearchSort.default.code)
+            },
             usePreviousSearch = read(Repo.usePreviousSearchKey, false)
         )
         override suspend fun changeQuery(query: String) {
@@ -160,8 +171,23 @@ class DataStoreConfigManager(
             }
         }
 
+        override suspend fun changeSort(sort: RepoSearchSort) {
+            save(Repo.Conditions.sortKey, sort.code)
+        }
+
         override suspend fun changeUsePreviousSearch(value: Boolean) {
             save(Repo.usePreviousSearchKey, value)
+        }
+    }
+
+    override val appSettings = object : ConfigManager.AppSettingsAccessor {
+
+        override val searchOrder = dataStore.data.map { preferences ->
+            SearchOrder.fromCode(preferences[App.searchOrderKey] ?: SearchOrder.default.code)
+        }
+
+        override suspend fun changeSearchOrder(order: SearchOrder) {
+            save(App.searchOrderKey, order.code)
         }
     }
 }

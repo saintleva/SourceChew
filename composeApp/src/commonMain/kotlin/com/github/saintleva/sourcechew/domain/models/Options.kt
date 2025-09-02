@@ -33,12 +33,22 @@ enum class OnlyFlag {
     PUBLIC, PRIVATE, FORK, ARCHIVED, MIRROR, TEMPLATE
 }
 
-enum class RepoSearchSort {
-    BEST_MATCH, STARS, FORKS, UPDATED
+enum class RepoSearchSort(val code: Int) {
+    BEST_MATCH(0), STARS(1), FORKS(2), UPDATED(3);
+
+    companion object {
+        val default = BEST_MATCH
+        fun fromCode(code: Int) = entries.find { it.code == code } ?: default
+    }
 }
 
-enum class RepoSearchOrder {
-    ASCENDING, DESCENDING
+enum class SearchOrder(val code: Int) {
+    ASCENDING(0), DESCENDING(1);
+
+    companion object {
+        val default = DESCENDING
+        fun fromCode(code: Int) = entries.find { it.code == code } ?: default
+    }
 }
 
 data class RepoSearchConditions(
@@ -46,7 +56,6 @@ data class RepoSearchConditions(
     val inScope: Set<RepoSearchScope>,
     val onlyFlags: Set<OnlyFlag>,
     val sort: RepoSearchSort,
-    val order: RepoSearchOrder
 ) {
     companion object {
         val default = RepoSearchConditions(
@@ -54,7 +63,6 @@ data class RepoSearchConditions(
             inScope = setOf(RepoSearchScope.NAME),
             onlyFlags = emptySet(),
             sort = RepoSearchSort.BEST_MATCH,
-            order = RepoSearchOrder.DESCENDING
         )
     }
 }
@@ -63,6 +71,7 @@ class RepoSearchConditionsFlows(
     val query: Flow<String>,
     val inScope: Map<RepoSearchScope, Flow<Boolean>>,
     val onlyFlags: Map<OnlyFlag, Flow<Boolean>>,
+    val sort: Flow<RepoSearchSort>,
     val usePreviousSearch: Flow<Boolean>
 ) {
     fun toConditionsStateFlow(
@@ -74,6 +83,7 @@ class RepoSearchConditionsFlows(
             initialValue = it.key in RepoSearchConditions.default.inScope) },
         onlyFlags.mapValues { it.value.stateIn(scope, started,
             initialValue = it.key in RepoSearchConditions.default.onlyFlags) },
+        sort.stateIn(scope, started, initialValue = RepoSearchConditions.default.sort),
         usePreviousSearch.stateIn(scope, started, initialValue = false)
     )
 }
@@ -82,11 +92,13 @@ class RepoSearchConditionsStateFlows(
     val query: StateFlow<String>,
     val inScope: Map<RepoSearchScope, StateFlow<Boolean>>,
     val onlyFlags: Map<OnlyFlag, StateFlow<Boolean>>,
+    val sort: StateFlow<RepoSearchSort>,
     val usePreviousSearch: StateFlow<Boolean>
 ) {
         fun toConditions() = RepoSearchConditions(
         query.value,
         inScope.makeSet { it.value },
-        onlyFlags.makeSet { it.value }
+        onlyFlags.makeSet { it.value },
+            sort.value
     )
 }

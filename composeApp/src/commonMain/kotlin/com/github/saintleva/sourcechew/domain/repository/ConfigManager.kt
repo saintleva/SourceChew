@@ -20,6 +20,9 @@ package com.github.saintleva.sourcechew.domain.repository
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlows
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
+import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
+import com.github.saintleva.sourcechew.domain.models.SearchOrder
+import kotlinx.coroutines.flow.Flow
 
 
 interface ConfigManager {
@@ -31,8 +34,16 @@ interface ConfigManager {
         suspend fun toggleOnlyFlag(onlyFlag: OnlyFlag)
         suspend fun togglePublicOnlyFlag()
         suspend fun togglePrivateOnlyFlag()
+        suspend fun changeSort(sort: RepoSearchSort)
         suspend fun changeUsePreviousSearch(value: Boolean)
     }
 
     val repoConditions: RepoSearchConditionsAccessor
+
+    interface AppSettingsAccessor {
+        val searchOrder: Flow<SearchOrder>
+        suspend fun changeSearchOrder(order: SearchOrder)
+    }
+
+    val appSettings: AppSettingsAccessor
 }
