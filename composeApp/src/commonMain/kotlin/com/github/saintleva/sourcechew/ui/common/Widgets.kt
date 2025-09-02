@@ -17,6 +17,7 @@
 
 package com.github.saintleva.sourcechew.ui.common
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -27,7 +28,42 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 
+
+@Composable
+fun SomethingWithText(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    role: Role
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.small)
+            .clickable(
+                enabled = enabled,
+                onClick = { if (enabled) onCheckedChange(!checked) },
+                role = role
+            )
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { if (enabled) onCheckedChange(it) },
+            enabled = enabled
+        )
+        val textColor = if (enabled) LocalContentColor.current else
+            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+        Text(
+            text = text,
+            color = textColor
+        )
+    }
+}
 
 @Composable
 fun CheckBoxWithText(
