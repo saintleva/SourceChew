@@ -21,6 +21,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
+import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import kotlinx.coroutines.Job
@@ -58,6 +59,12 @@ class SearchScreenModel(
                 OnlyFlag.PRIVATE -> accessor.togglePrivateOnlyFlag()
                 else -> accessor.toggleOnlyFlag(flag)
             }
+        }
+    }
+
+    fun onSortChange(sort: RepoSearchSort) {
+        screenModelScope.launch {
+            accessor.changeSort(sort)
         }
     }
 
