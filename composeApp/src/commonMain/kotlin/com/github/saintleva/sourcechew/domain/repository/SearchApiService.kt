@@ -2,13 +2,13 @@ package com.github.saintleva.sourcechew.domain.repository
 
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.models.SearchOrder
 
 
 interface SearchApiService {
     suspend fun searchItems(
         conditions: RepoSearchConditions,
-        sort: String,
-        order: String,
+        order: SearchOrder,
         page: Int,
         pageSize: Int
     ): List<FoundRepo>

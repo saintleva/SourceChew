@@ -8,25 +8,23 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 
 [versions]
 
-agp = "8.12.0"
+agp = "8.13.0"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
 androidx-activityCompose = "1.10.1"
-androidx-lifecycle = "2.9.1"
+androidx-lifecycle = "2.9.3"
 compose-multiplatform = "1.8.2"
 androidxMaterialIcons = "1.7.3"
-kotlin = "2.2.0"
+kotlin = "2.2.10"
 kotlinx-coroutines = "1.10.2"
 
-kotest = "6.0.0.M12"
+kotest = "6.0.3"
 datastore = "1.1.7"
 napier = "2.7.1"
-koin = "4.1.0"
+koin = "4.1.1"
 voyager = "1.1.0-beta03"
 appdirs = "2.0.0"
-#TODO: Migrate to Jetpack Paging 3 and remove this
-#app-cash-paging = "3.3.0-alpha02-0.5.1"
 androidx-paging = "3.4.0-alpha03"
 ktor = "3.2.3"
 
@@ -62,14 +60,8 @@ appdirs = { group = "ca.gosyer", name = "kotlin-multiplatform-appdirs", version.
 androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "androidx-paging" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging" }
 
-#TODO: Migrate to Jetpack Paging 3 and remove this
-#app-cash-paging-common = { group = "app.cash.paging", name = "paging-common", version.ref = "app-cash-paging" }
-#app-cash-paging-compose-common = { group = "app.cash.paging", name = "paging-compose-common", version.ref = "app-cash-paging" }
-#app-cash-paging-testing = { group = "app.cash.paging", name = "paging-testing", version.ref = "app-cash-paging" }
-
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
-

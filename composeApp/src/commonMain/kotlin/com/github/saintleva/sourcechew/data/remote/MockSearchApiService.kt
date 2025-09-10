@@ -2,6 +2,7 @@ package com.github.saintleva.sourcechew.data.remote
 
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -28,8 +29,7 @@ class MockSearchApiService(
 
     override suspend fun searchItems(
         conditions: RepoSearchConditions,
-        sort: String,
-        order: String,
+        order: SearchOrder,
         page: Int,
         pageSize: Int
     ): List<FoundRepo> {

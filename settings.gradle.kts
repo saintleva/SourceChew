@@ -30,6 +30,7 @@ dependencyResolutionManagement {
 
 plugins {
     id("de.fayard.refreshVersions") version "0.60.5" // Используйте последнюю версию
+////                            # available:"0.60.6"
 }
 
 include(":composeApp")
