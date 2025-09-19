@@ -63,14 +63,13 @@ class KtorRestApiService(
 
     override suspend fun searchItems(
         conditions: RepoSearchConditions,
-        order: SearchOrder,
         page: Int,
         pageSize: Int
     ): List<FoundRepo> {
         val dto: SearchResponseDto = httpClient.get(BASE_URL) {
             parameter("q", conditions.query)
             parameter("sort", sortVariants[conditions.sort]!!)
-            parameter("order", orderVariants[order]!!)
+            parameter("order", orderVariants[conditions.order]!!)
             parameter("page", page)
             parameter("per_page", pageSize)
         }.body()

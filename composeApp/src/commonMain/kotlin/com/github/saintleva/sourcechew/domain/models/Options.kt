@@ -56,6 +56,7 @@ data class RepoSearchConditions(
     val inScope: Set<RepoSearchScope>,
     val onlyFlags: Set<OnlyFlag>,
     val sort: RepoSearchSort,
+    val order: SearchOrder
 ) {
     companion object {
         val default = RepoSearchConditions(
@@ -63,6 +64,7 @@ data class RepoSearchConditions(
             inScope = setOf(RepoSearchScope.NAME),
             onlyFlags = emptySet(),
             sort = RepoSearchSort.BEST_MATCH,
+            order = SearchOrder.default
         )
     }
 }
@@ -72,6 +74,7 @@ class RepoSearchConditionsFlows(
     val inScope: Map<RepoSearchScope, Flow<Boolean>>,
     val onlyFlags: Map<OnlyFlag, Flow<Boolean>>,
     val sort: Flow<RepoSearchSort>,
+    val order: Flow<SearchOrder>,
     val usePreviousSearch: Flow<Boolean>
 ) {
     fun toConditionsStateFlow(
@@ -84,6 +87,7 @@ class RepoSearchConditionsFlows(
         onlyFlags.mapValues { it.value.stateIn(scope, started,
             initialValue = it.key in RepoSearchConditions.default.onlyFlags) },
         sort.stateIn(scope, started, initialValue = RepoSearchConditions.default.sort),
+        order.stateIn(scope, started, initialValue = RepoSearchConditions.default.order),
         usePreviousSearch.stateIn(scope, started, initialValue = false)
     )
 }
@@ -93,12 +97,20 @@ class RepoSearchConditionsStateFlows(
     val inScope: Map<RepoSearchScope, StateFlow<Boolean>>,
     val onlyFlags: Map<OnlyFlag, StateFlow<Boolean>>,
     val sort: StateFlow<RepoSearchSort>,
+    val order: StateFlow<SearchOrder>,
     val usePreviousSearch: StateFlow<Boolean>
 ) {
         fun toConditions() = RepoSearchConditions(
         query.value,
         inScope.makeSet { it.value },
         onlyFlags.makeSet { it.value },
-            sort.value
+            sort.value,
+            order.value
     )
 }
+
+data class FetchConfig(
+    val pageSize: Int
+)
+
+val defaultPaginationPageSize = 30

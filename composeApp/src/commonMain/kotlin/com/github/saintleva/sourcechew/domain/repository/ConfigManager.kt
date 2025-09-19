@@ -35,14 +35,14 @@ interface ConfigManager {
         suspend fun togglePublicOnlyFlag()
         suspend fun togglePrivateOnlyFlag()
         suspend fun changeSort(sort: RepoSearchSort)
+        suspend fun changeOrder(order: SearchOrder)
         suspend fun changeUsePreviousSearch(value: Boolean)
     }
 
     val repoConditions: RepoSearchConditionsAccessor
 
     interface AppSettingsAccessor {
-        val searchOrder: Flow<SearchOrder>
-        suspend fun changeSearchOrder(order: SearchOrder)
+        val paginationPageSize: Flow<Int>
     }
 
     val appSettings: AppSettingsAccessor

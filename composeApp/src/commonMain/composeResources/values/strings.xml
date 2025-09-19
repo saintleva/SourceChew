@@ -16,6 +16,9 @@
     <string name="enter_search_text">Enter search text</string>
     <string name="additional_filters">Additional filters</string>
     <string name="sort_by">Sort by</string>
+    <string name="order">Order</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
     <string name="best_match">Best match</string>
     <string name="stars">Stars</string>
     <string name="forks">Forks</string>

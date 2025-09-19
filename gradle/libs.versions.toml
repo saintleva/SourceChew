@@ -5,6 +5,7 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [versions]
 
@@ -16,7 +17,7 @@ androidx-activityCompose = "1.10.1"
 androidx-lifecycle = "2.9.3"
 compose-multiplatform = "1.8.2"
 androidxMaterialIcons = "1.7.3"
-kotlin = "2.2.10"
+kotlin = "2.2.20"
 kotlinx-coroutines = "1.10.2"
 
 kotest = "6.0.3"
@@ -25,7 +26,7 @@ napier = "2.7.1"
 koin = "4.1.1"
 voyager = "1.1.0-beta03"
 appdirs = "2.0.0"
-androidx-paging = "3.4.0-alpha03"
+androidx-paging = "3.4.0-alpha04"
 ktor = "3.2.3"
 
 [libraries]

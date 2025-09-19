@@ -22,15 +22,16 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
+import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
-import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
 class SearchScreenModel(
     configManager: ConfigManager,
-    private val searchRepository: SearchRepository
+    private val searchRepository: RepoSearchInteractor
 ) : ScreenModel {
 
     val accessor = configManager.repoConditions
@@ -65,6 +66,12 @@ class SearchScreenModel(
     fun onSortChange(sort: RepoSearchSort) {
         screenModelScope.launch {
             accessor.changeSort(sort)
+        }
+    }
+
+    fun onOrderChange(order: SearchOrder) {
+        screenModelScope.launch {
+            accessor.changeOrder(order)
         }
     }
 

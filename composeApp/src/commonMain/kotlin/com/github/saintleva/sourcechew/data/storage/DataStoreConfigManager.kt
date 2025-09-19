@@ -29,6 +29,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditionsFlows
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
+import com.github.saintleva.sourcechew.domain.models.defaultPaginationPageSize
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -64,12 +65,13 @@ class DataStoreConfigManager(
                     booleanPreferencesKey("${conditions}_onlyFlag_${it.name}")
                 }
                 val sortKey = intPreferencesKey("${conditions}_sort")
+                val orderKey = intPreferencesKey("${conditions}_order")
             }
 
         }
 
         object App {
-            val searchOrderKey = intPreferencesKey("searchOrder")
+            val paginationPageSize = intPreferencesKey("paginationPageSize")
         }
     }
 
@@ -124,6 +126,9 @@ class DataStoreConfigManager(
             sort = dataStore.data.map { preferences ->
                 RepoSearchSort.fromCode(preferences[Repo.Conditions.sortKey] ?: RepoSearchSort.default.code)
             },
+            order = dataStore.data.map { preferences ->
+                SearchOrder.fromCode(preferences[Repo.Conditions.orderKey] ?: SearchOrder.default.code)
+            },
             usePreviousSearch = read(Repo.usePreviousSearchKey, false)
         )
         override suspend fun changeQuery(query: String) {
@@ -175,6 +180,10 @@ class DataStoreConfigManager(
             save(Repo.Conditions.sortKey, sort.code)
         }
 
+        override suspend fun changeOrder(order: SearchOrder) {
+            save(Repo.Conditions.orderKey, order.code)
+        }
+
         override suspend fun changeUsePreviousSearch(value: Boolean) {
             save(Repo.usePreviousSearchKey, value)
         }
@@ -182,12 +191,8 @@ class DataStoreConfigManager(
 
     override val appSettings = object : ConfigManager.AppSettingsAccessor {
 
-        override val searchOrder = dataStore.data.map { preferences ->
-            SearchOrder.fromCode(preferences[App.searchOrderKey] ?: SearchOrder.default.code)
-        }
-
-        override suspend fun changeSearchOrder(order: SearchOrder) {
-            save(App.searchOrderKey, order.code)
-        }
+        override val paginationPageSize = read(
+            App.paginationPageSize, defaultPaginationPageSize
+        )
     }
 }

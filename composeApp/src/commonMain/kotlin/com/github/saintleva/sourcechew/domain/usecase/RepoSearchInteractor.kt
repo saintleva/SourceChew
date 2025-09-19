@@ -15,9 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.github.saintleva.sourcechew.domain.repository
+package com.github.saintleva.sourcechew.domain.usecase
 
 import androidx.paging.PagingData
+import com.github.saintleva.sourcechew.domain.models.FetchConfig
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +32,7 @@ sealed interface SearchState {
     data class Success(val items: List<FoundRepo>) : SearchState
 }
 
-interface SearchRepository {
+interface RepoSearchInteractor {
 
     val searchState: StateFlow<SearchState>
 
@@ -43,7 +44,7 @@ interface SearchRepository {
         get() = (previousResult != null)
 
 
-    suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean)
+    suspend fun search(conditions: RepoSearchConditions, fetchConfig: FetchConfig, usePreviousSearch: Boolean)
 
     fun сanUsePreviousConditions(newConditions: RepoSearchConditions): Boolean
 

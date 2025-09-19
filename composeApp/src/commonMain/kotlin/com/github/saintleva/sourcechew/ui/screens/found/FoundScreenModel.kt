@@ -18,10 +18,10 @@
 package com.github.saintleva.sourcechew.ui.screens.found
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 
 
-class FoundScreenModel(private val searchRepository: SearchRepository) : ScreenModel {
+class FoundScreenModel(private val searchRepository: RepoSearchInteractor) : ScreenModel {
 
     val searchState = searchRepository.searchState
 

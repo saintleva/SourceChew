@@ -16,6 +16,9 @@
     <string name="enter_search_text">Введите текст для поиска</string>
     <string name="additional_filters">Дополнительные фильтры</string>
     <string name="sort_by">Сортировать по</string>
+    <string name="order">Порядок</string>
+    <string name="ascending">По возростанию</string>
+    <string name="descending">По убыванию</string>
     <string name="best_match">Лучшему соответствию</string>
     <string name="stars">Количетсву звёзд</string>
     <string name="forks">Количеству форков</string>

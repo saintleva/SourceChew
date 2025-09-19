@@ -48,7 +48,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
-import com.github.saintleva.sourcechew.domain.repository.SearchState
+import com.github.saintleva.sourcechew.domain.models.SearchOrder
+import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
@@ -128,12 +129,17 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         RepoSearchSort.FORKS to stringResource(Res.string.forks),
         RepoSearchSort.UPDATED to stringResource(Res.string.updated_time)
     )
+    val orderStrings = mapOf(
+        SearchOrder.ASCENDING to stringResource(Res.string.ascending),
+        SearchOrder.DESCENDING to stringResource(Res.string.descending),
+    )
 
     val conditions = screenModel.conditionsStateFlows
     val query = conditions.query.collectAsStateWithLifecycle()
     val selectedSearchScope = conditions.inScope.mapValues { it.value.collectAsStateWithLifecycle() }
     val selectedOnlyFlags = conditions.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
     val selectedSort = conditions.sort.collectAsStateWithLifecycle()
+    val selectedOrder = conditions.order.collectAsStateWithLifecycle()
     val usePreviousSearch = conditions.usePreviousSearch.collectAsStateWithLifecycle()
 
 
@@ -201,6 +207,17 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                     text = sortStrings[sort]!!,
                     selected = selectedSort.value == sort,
                     onClick = { screenModel.onSortChange(sort) },
+                    enabled = selectingEnabled,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
+        }
+        ExpandableSection(title = stringResource(Res.string.order)) {
+            SearchOrder.entries.forEach { order ->
+                RadioButtonWithText(
+                    text = orderStrings[order]!!,
+                    selected = selectedOrder.value == order,
+                    onClick = { screenModel.onOrderChange(order) },
                     enabled = selectingEnabled,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )

@@ -17,15 +17,15 @@
 
 package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.data.repository.SearchRepositoryImpl
+import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
 import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
-import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import org.koin.dsl.module
 import kotlin.time.Duration.Companion.milliseconds
 
 
 val domainModule = module {
     single<ConfigManager> { DataStoreConfigManager(get()) }
-    single<SearchRepository> { SearchRepositoryImpl(10, 200.milliseconds) }
+    single<RepoSearchInteractor> { GetReposUseCaseImpl(10, 200.milliseconds) }
 }
