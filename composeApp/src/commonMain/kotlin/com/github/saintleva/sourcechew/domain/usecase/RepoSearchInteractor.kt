@@ -18,7 +18,7 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import androidx.paging.PagingData
-import com.github.saintleva.sourcechew.domain.models.FetchConfig
+import com.github.saintleva.sourcechew.domain.models.FetchParams
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +29,7 @@ sealed interface SearchState {
     data object Selecting : SearchState
     data object Searching : SearchState
     data class Error(val cause: Throwable) : SearchState
-    data class Success(val items: List<FoundRepo>) : SearchState
+    data class Success(val flow: Flow<PagingData<FoundRepo>>) : SearchState
 }
 
 interface RepoSearchInteractor {
@@ -44,7 +44,7 @@ interface RepoSearchInteractor {
         get() = (previousResult != null)
 
 
-    suspend fun search(conditions: RepoSearchConditions, fetchConfig: FetchConfig, usePreviousSearch: Boolean)
+    suspend fun search(conditions: RepoSearchConditions, fetchParams: FetchParams, usePreviousSearch: Boolean)
 
     fun сanUsePreviousConditions(newConditions: RepoSearchConditions): Boolean
 

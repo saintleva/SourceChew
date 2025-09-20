@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 
 import androidx.paging.PagingData
 import com.github.saintleva.sourcechew.domain.NeverSearchedException
-import com.github.saintleva.sourcechew.domain.models.FetchConfig
+import com.github.saintleva.sourcechew.domain.models.FetchParams
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +22,7 @@ class RepoSearchInteractorImpl(
 
     override suspend fun search(
         conditions: RepoSearchConditions,
-        fetchConfig: FetchConfig,
+        fetchParams: FetchParams,
         usePreviousSearch: Boolean
     ) {
         _searchState.update { SearchState.Searching }
@@ -30,11 +30,11 @@ class RepoSearchInteractorImpl(
             if (usePreviousSearch) {
                 usePreviousResult()
             } else {
-                obtainNewResult(conditions, fetchConfig)
+                obtainNewResult(conditions, fetchParams)
             }
         } else {
             previousConditions = conditions
-            obtainNewResult(conditions, fetchConfig)
+            obtainNewResult(conditions, fetchParams)
         }
     }
 
@@ -45,13 +45,13 @@ class RepoSearchInteractorImpl(
         _searchState.update { SearchState.Selecting }
     }
 
-    private suspend fun obtainNewResult(conditions: RepoSearchConditions, fetchConfig: FetchConfig) {
-        val result = getReposUseCase(conditions, fetchConfig)
+    private suspend fun obtainNewResult(conditions: RepoSearchConditions, fetchParams: FetchParams) {
+        val result = getReposUseCase(conditions, fetchParams)
         previousResult = result
         _searchState.update { SearchState.Success(result) }
     }
 
-    private fun usePreviousResult() {
+    private suspend fun usePreviousResult() {
         if (previousResult == null) {
             _searchState.update { SearchState.Error(NeverSearchedException()) }
         } else {

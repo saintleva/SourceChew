@@ -18,7 +18,9 @@
 package com.github.saintleva.sourcechew.ui.screens.found
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,8 +30,10 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -74,21 +78,31 @@ private fun ItemContent(foundRepo: FoundRepo) {
             Text("Name: ${foundRepo.name}")
             Text("Description: ${foundRepo.description}")
             Text("Language: ${foundRepo.language}")
-            Text("Start: ${foundRepo.stars}")
+            Text("Stars: ${foundRepo.stars}")
         }
     }
 }
 
 @Composable
 private fun FoundContent(screenModel: FoundScreenModel) {
-    val foundRepos = (screenModel.searchState.value as SearchState.Success).items
+    val foundRepos = screenModel.foundFlow?.collectAsLazyPagingItems()
     NavigableUpScreen(
         title = stringResource(Res.string.found_items),
         navigationUp = screenModel::navigateBack
     ) { innerPadding ->
+        if (foundRepos == null) {
+            Box(modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.Red)) {
+                Text("No results")
+            }
+            return@NavigableUpScreen
+        }
+        foundRepos.loadState.append
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            foundRepos.forEach {
-                item { ItemContent(it) }
+            items(foundRepos.itemCount) { position ->
+                val item = foundRepos[position]
+                if (item != null) {
+                    ItemContent(item)
+                }
             }
         }
     }

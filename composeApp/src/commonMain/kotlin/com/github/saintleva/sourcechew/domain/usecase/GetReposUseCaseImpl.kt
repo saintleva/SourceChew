@@ -4,15 +4,13 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.github.saintleva.sourcechew.data.paging.SearchPagingSource
-import com.github.saintleva.sourcechew.domain.models.FetchConfig
+import com.github.saintleva.sourcechew.domain.models.FetchParams
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlin.time.Duration
+import kotlinx.coroutines.flow.first
 
 class GetReposUseCaseImpl(
     private val apiService: SearchApiService,
@@ -21,7 +19,7 @@ class GetReposUseCaseImpl(
 
     override suspend fun invoke(
         conditions: RepoSearchConditions,
-        fetchConfig: FetchConfig
+        fetchParams: FetchParams
     ): Flow<PagingData<FoundRepo>> {
         return Pager(
             config = PagingConfig(

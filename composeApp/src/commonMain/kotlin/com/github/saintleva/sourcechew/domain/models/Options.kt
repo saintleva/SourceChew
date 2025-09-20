@@ -109,8 +109,10 @@ class RepoSearchConditionsStateFlows(
     )
 }
 
-data class FetchConfig(
+data class FetchParams(
     val pageSize: Int
-)
-
-val defaultPaginationPageSize = 30
+) {
+    companion object {
+        val defaultPageSize = 30
+    }
+}
