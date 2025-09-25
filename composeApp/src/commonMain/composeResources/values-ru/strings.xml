@@ -30,4 +30,13 @@
     <string name="stop_search">Остановить поиск</string>
     <string name="go_back">Нззад</string>
     <string name="found_items">Найденные элементы</string>
+    <string name="loading_error">Ошибка загрузки</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="retry_button">Повторить</string>
+    <string name="refresh_button">Обновить</string>
+    <string name="no_items_found_title">Ничего не найдено</string>
+    <string name="no_items_found_description">По вашему запросу ничего не найдено.\nПопробуйте изменить условия поиска.</string>
+    <string name="loading_more_error">Ошибка при загрузке</string>
+    <string name="end_of_list">Больше элементов нет</string>
+    <string name="found_items_title">Найденные репозитории</string> <!-- Для заголовка экрана -->
 </resources>

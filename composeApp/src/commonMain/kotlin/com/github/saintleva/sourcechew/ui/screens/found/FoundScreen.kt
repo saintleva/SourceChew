@@ -18,8 +18,10 @@
 package com.github.saintleva.sourcechew.ui.screens.found
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,13 +36,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
+import com.github.saintleva.sourcechew.ui.common.HandlePagingLoadStates
 import com.github.saintleva.sourcechew.ui.common.NavigableUpScreen
+import com.github.saintleva.sourcechew.ui.common.pagingAppendFooter
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.found_items
@@ -87,7 +92,7 @@ private fun ItemContent(foundRepo: FoundRepo) {
 private fun FoundContent(screenModel: FoundScreenModel) {
     val foundRepos = screenModel.foundFlow?.collectAsLazyPagingItems()
     NavigableUpScreen(
-        title = stringResource(Res.string.found_items),
+        title = stringResource(Res.string.found_items_title),
         navigationUp = screenModel::navigateBack
     ) { innerPadding ->
         if (foundRepos == null) {
@@ -96,13 +101,29 @@ private fun FoundContent(screenModel: FoundScreenModel) {
             }
             return@NavigableUpScreen
         }
-        foundRepos.loadState.append
-        LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(foundRepos.itemCount) { position ->
-                val item = foundRepos[position]
-                if (item != null) {
-                    ItemContent(item)
+
+        HandlePagingLoadStates(
+            lazyPagingItems = foundRepos,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            // This @Composable block will be executed when data is available
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(
+                    count = foundRepos.itemCount,
+                    key = foundRepos.itemKey { it.name }
+                ) { index ->
+                    val item = foundRepos[index]
+                    if (item != null) {
+                        ItemContent(item)
+                    }
                 }
+
+                // Use the extension function to add the pagination footer
+                pagingAppendFooter(lazyPagingItems = foundRepos)
             }
         }
     }

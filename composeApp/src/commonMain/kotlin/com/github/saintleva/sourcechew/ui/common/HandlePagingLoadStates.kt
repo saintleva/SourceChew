@@ -2,82 +2,82 @@ package com.github.saintleva.sourcechew.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 
+
+
+/**
+ * Composable function for centralized handling of Paging 3 full-screen load states (refresh).
+ * Displays full-screen states for `refresh` (loading, error, empty list)
+ * and passes control to `content` for displaying the list when data is available.
+ * `append`/`prepend` states should be handled within the `content` using extensions for LazyListScope.
+ *
+ * @param T The type of items in LazyPagingItems.
+ * @param lazyPagingItems The pagination items.
+ * @param modifier Modifier for the root Box.
+ * @param onRetryRefresh Function to call on initial load error. Defaults to `lazyPagingItems.refresh()`.
+ * @param loadingContent Composable for displaying the full-screen loading indicator.
+ * @param errorContent Composable for displaying the full-screen error message.
+ * @param emptyContent Composable for displaying a message when the list is empty after loading.
+ * @param content The main content to display when data is available (usually a LazyColumn).
+ */
 @Composable
 fun <T : Any> HandlePagingLoadStates(
     lazyPagingItems: LazyPagingItems<T>,
     modifier: Modifier = Modifier,
+    onRetryRefresh: () -> Unit = { lazyPagingItems.refresh() },
+    loadingContent: @Composable BoxScope.() -> Unit = {
+        DefaultPagingLoadingIndicator(modifier = Modifier.align(Alignment.Center))
+    },
+    errorContent: @Composable BoxScope.(error: Throwable, retryAction: () -> Unit) -> Unit = { error, retry ->
+        DefaultPagingErrorContent(
+            error = error,
+            onRetry = retry,
+            modifier = Modifier.align(Alignment.Center).padding(16.dp)
+        )
+    },
+    emptyContent: @Composable BoxScope.(retryAction: () -> Unit) -> Unit = { retry ->
+        DefaultPagingEmptyContent(
+            onRetry = retry,
+            modifier = Modifier.align(Alignment.Center).padding(16.dp)
+        )
+    },
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (val refreshState = lazyPagingItems.loadState.refresh) {
             is LoadState.Loading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                loadingContent()
             }
             is LoadState.Error -> {
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    val errorMessage = refreshState.error.localizedMessage
-                        ?: stringResource(Res.string.unknown_error)
-                    Text(
-                        text = "${stringResource(Res.string.loading_error)}: $errorMessage",
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { lazyPagingItems.refresh() }) {
-                        Text("Повторить")
-                    }
-                }
+                errorContent(refreshState.error, onRetryRefresh)
             }
             is LoadState.NotLoading -> {
                 if (lazyPagingItems.itemCount == 0) {
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            "Ничего не найдено",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                        Text(
-                            "Попробуйте изменить запрос или повторить позже.",
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(modifier = androidx.compose.ui.Modifier.height(16.dp))
-                        Button(onClick = { lazyPagingItems.refresh() }) {
-                            Text("Обновить")
-                        }
-                    }
+                    // Simplified check for "empty state" when itemCount == 0.
+                    // If refresh is complete and there are no items, consider it an "empty" state.
+                    emptyContent(onRetryRefresh)
                 } else {
-                    // Данные есть, отображаем основной контент (LazyColumn)
+                    // Data is available, display the main content (LazyColumn)
                     content()
                 }
             }
@@ -85,34 +85,62 @@ fun <T : Any> HandlePagingLoadStates(
     }
 }
 
+// Default implementations for full-screen states (can be customized or overridden)
 
-// Вспомогательные Composable для индикаторов
 @Composable
-fun LoadingIndicatorItem(modifier: Modifier = Modifier) {
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
+fun DefaultPagingLoadingIndicator(modifier: Modifier = Modifier) {
+    CircularProgressIndicator(modifier = modifier)
+}
+
+@Composable
+fun DefaultPagingErrorContent(
+    error: Throwable,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(), // To occupy all available space if passed from BoxScope
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        val errorMessage = error.localizedMessage ?: stringResource(Res.string.unknown_error)
+        Text(
+            text = "${stringResource(Res.string.loading_error)}: $errorMessage",
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = androidx.compose.ui.Modifier.height(16.dp))
+        Button(onClick = onRetry) {
+            Text(stringResource(Res.string.retry_button))
+        }
     }
 }
 
 @Composable
-fun ErrorRetryItem(
-    message: String,
+fun DefaultPagingEmptyContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+    Column(
+        modifier = modifier.fillMaxSize(), // To occupy all available space
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Column(
-            modifier = androidx.compose.ui.Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = message, color = MaterialTheme.colorScheme.onErrorContainer, textAlign = TextAlign.Center)
-            Spacer(modifier = androidx.compose.ui.Modifier.height(8.dp))
-            Button(onClick = onRetry) {
-                Text("Повторить")
-            }
+        Text(
+            stringResource(Res.string.no_items_found_title),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            stringResource(Res.string.no_items_found_description),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onRetry) {
+            Text(stringResource(Res.string.refresh_button))
         }
     }
 }
