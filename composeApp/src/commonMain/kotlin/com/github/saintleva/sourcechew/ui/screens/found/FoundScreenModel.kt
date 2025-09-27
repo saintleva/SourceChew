@@ -28,7 +28,7 @@ class FoundScreenModel(private val searchInteractor: RepoSearchInteractor) : Scr
 
     val searchState = searchInteractor.searchState
 
-    val foundFlow = (searchState as? SearchState.Success)?.flow?.cachedIn(screenModelScope)
+    val foundFlow = (searchState.value as? SearchState.Success)?.flow?.cachedIn(screenModelScope)
 
     fun navigateBack() {
         searchInteractor.switchToSelecting()

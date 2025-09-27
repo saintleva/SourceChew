@@ -31,13 +31,13 @@ import kotlinx.coroutines.launch
 
 class SearchScreenModel(
     configManager: ConfigManager,
-    private val searchRepository: RepoSearchInteractor
+    private val searchInteractor: RepoSearchInteractor
 ) : ScreenModel {
 
     val accessor = configManager.repoConditions
     val conditionsStateFlows = accessor.flows.toConditionsStateFlow(screenModelScope)
 
-    val searchState = searchRepository.searchState
+    val searchState = searchInteractor.searchState
 
     private var _searchJob: Job? = null
 
@@ -82,17 +82,17 @@ class SearchScreenModel(
     }
 
     fun canUsePreviousConditions() =
-        searchRepository.сanUsePreviousConditions(conditionsStateFlows.toConditions())
+        searchInteractor.сanUsePreviousConditions(conditionsStateFlows.toConditions())
 
     fun search() {
         _searchJob = screenModelScope.launch {
-            searchRepository.search(conditionsStateFlows.toConditions(),
+            searchInteractor.search(conditionsStateFlows.toConditions(),
                 conditionsStateFlows.usePreviousSearch.value)
         }
     }
 
     fun stop() {
         _searchJob?.cancel()
-        searchRepository.switchToSelecting()
+        searchInteractor.switchToSelecting()
     }
 }

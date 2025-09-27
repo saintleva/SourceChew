@@ -59,13 +59,16 @@ import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.additional_filters
 import sourcechew.composeapp.generated.resources.archived_only
+import sourcechew.composeapp.generated.resources.ascending
 import sourcechew.composeapp.generated.resources.best_match
+import sourcechew.composeapp.generated.resources.descending
 import sourcechew.composeapp.generated.resources.descriptions
 import sourcechew.composeapp.generated.resources.enter_search_text
 import sourcechew.composeapp.generated.resources.fork_only
 import sourcechew.composeapp.generated.resources.forks
 import sourcechew.composeapp.generated.resources.mirror_only
 import sourcechew.composeapp.generated.resources.names
+import sourcechew.composeapp.generated.resources.order
 import sourcechew.composeapp.generated.resources.private_only
 import sourcechew.composeapp.generated.resources.public_only
 import sourcechew.composeapp.generated.resources.readme

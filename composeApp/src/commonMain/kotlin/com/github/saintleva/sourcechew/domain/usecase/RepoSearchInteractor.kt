@@ -18,7 +18,6 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import androidx.paging.PagingData
-import com.github.saintleva.sourcechew.domain.models.FetchParams
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +43,7 @@ interface RepoSearchInteractor {
         get() = (previousResult != null)
 
 
-    suspend fun search(conditions: RepoSearchConditions, fetchParams: FetchParams, usePreviousSearch: Boolean)
+    suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean)
 
     fun сanUsePreviousConditions(newConditions: RepoSearchConditions): Boolean
 

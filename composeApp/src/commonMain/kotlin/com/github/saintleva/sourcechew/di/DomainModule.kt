@@ -17,15 +17,23 @@
 
 package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
+import com.github.saintleva.sourcechew.data.remote.MockSearchApiService
 import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
+import com.github.saintleva.sourcechew.domain.repository.SearchApiService
+import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCase
+import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
+import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractorImpl
 import org.koin.dsl.module
 import kotlin.time.Duration.Companion.milliseconds
 
 
 val domainModule = module {
     single<ConfigManager> { DataStoreConfigManager(get()) }
-    single<RepoSearchInteractor> { GetReposUseCaseImpl(10, 200.milliseconds) }
+    single<SearchApiService> {
+        MockSearchApiService(eachCount = 100, delayImitation = 100.milliseconds)
+    }
+    factory<GetReposUseCase> { GetReposUseCaseImpl(get(), get()) }
+    single<RepoSearchInteractor> { RepoSearchInteractorImpl(get()) }
 }

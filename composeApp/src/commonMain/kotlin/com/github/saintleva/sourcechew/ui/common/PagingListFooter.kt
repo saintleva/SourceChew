@@ -23,6 +23,10 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.end_of_list
+import sourcechew.composeapp.generated.resources.loading_more_error
+import sourcechew.composeapp.generated.resources.retry_button
+import sourcechew.composeapp.generated.resources.unknown_error
 
 
 /**

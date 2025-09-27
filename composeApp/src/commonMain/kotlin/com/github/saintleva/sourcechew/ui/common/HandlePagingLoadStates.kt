@@ -15,14 +15,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.error
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
-
+import sourcechew.composeapp.generated.resources.loading_error
+import sourcechew.composeapp.generated.resources.no_items_found_description
+import sourcechew.composeapp.generated.resources.no_items_found_title
+import sourcechew.composeapp.generated.resources.refresh_button
+import sourcechew.composeapp.generated.resources.retry_button
+import sourcechew.composeapp.generated.resources.unknown_error
 
 
 /**

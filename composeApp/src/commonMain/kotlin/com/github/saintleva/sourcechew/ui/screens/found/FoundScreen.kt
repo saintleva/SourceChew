@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -48,7 +49,7 @@ import com.github.saintleva.sourcechew.ui.common.NavigableUpScreen
 import com.github.saintleva.sourcechew.ui.common.pagingAppendFooter
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.found_items
+import sourcechew.composeapp.generated.resources.found_items_title
 
 
 class FoundScreen : Screen {
@@ -96,8 +97,12 @@ private fun FoundContent(screenModel: FoundScreenModel) {
         navigationUp = screenModel::navigateBack
     ) { innerPadding ->
         if (foundRepos == null) {
-            Box(modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.Red)) {
-                Text("No results")
+            Box(modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(Color.Red)
+            ) {
+                Text(text = "No results", modifier = Modifier.align(Alignment.Center))
             }
             return@NavigableUpScreen
         }
