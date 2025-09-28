@@ -16,29 +16,42 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class FoundRepoDto(
-    val author: String,
-    val name: String,
-    val description: String,
-    val language: String,
-    val stars: Int
+data class GithubSearchResponseDto(
+    @SerialName("total_count") val totalCount: Int,
+    @SerialName("incomplete_results") val incompleteResults: Boolean,
+    val items: List<GithubRepoItemDto>
 )
 
-fun FoundRepoDto.toDomain() = FoundRepo(
-    author = author,
+@Serializable
+data class GithubRepoItemDto(
+    val name: String,
+    @SerialName("full_name") val fullName: String,
+    val owner: GitHubOwnerDto,
+    val description: String,
+    val language: String,
+    @SerialName("stargazers_count") val stars: Int
+)
+
+// DTO for the owner of the repository
+@Serializable
+data class GitHubOwnerDto(
+    val login: String,
+    val type: String
+)
+
+fun GithubRepoItemDto.toDomain() = FoundRepo(
     name = name,
+    fullName = fullName,
+    ownerLogin = owner.login,
+    ownerType = owner.type,
     description = description,
     language = language,
     stars = stars
 )
 
-@Serializable
-data class SearchResponseDto(
-    @SerialName("total_count") val totalCount: Int,
-    val items: List<FoundRepoDto>
-)
 
-fun SearchResponseDto.toDomain() = items.map { it.toDomain() }
+fun GithubSearchResponseDto.toDomain() = items.map { it.toDomain() }
+
 
 class KtorRestApiService(
     private val httpClient: HttpClient,
@@ -66,7 +79,7 @@ class KtorRestApiService(
         page: Int,
         pageSize: Int
     ): List<FoundRepo> {
-        val dto: SearchResponseDto = httpClient.get(BASE_URL) {
+        val dto: GithubSearchResponseDto = httpClient.get(BASE_URL) {
             parameter("q", conditions.query)
             parameter("sort", sortVariants[conditions.sort]!!)
             parameter("order", orderVariants[conditions.order]!!)
