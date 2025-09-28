@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.milliseconds
 val domainModule = module {
     single<ConfigManager> { DataStoreConfigManager(get()) }
     single<SearchApiService> {
-        MockSearchApiService(eachCount = 100, delayImitation = 100.milliseconds)
+        MockSearchApiService(simulateErrorProbability = 0.0, returnEmptyListProbability = 0.5, eachCount = 100, delayImitation = 100.milliseconds)
     }
     factory<GetReposUseCase> { GetReposUseCaseImpl(get(), get()) }
     single<RepoSearchInteractor> { RepoSearchInteractorImpl(get()) }

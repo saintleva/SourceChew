@@ -37,6 +37,6 @@
     <string name="no_items_found_title">Nothing Found</string>
     <string name="no_items_found_description">No items matched your search criteria.\nTry changing your search terms.</string>
     <string name="loading_more_error">Error loading more items</string>
-    <string name="end_of_list">You\'ve reached the end of the list</string>
+    <string name="end_of_list">You have reached the end of the list</string>
     <string name="found_items_title">Found Repositories</string> <!-- For the screen title -->
 </resources>

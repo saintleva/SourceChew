@@ -3,12 +3,13 @@ package com.github.saintleva.sourcechew.data.remote
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
+import kotlinx.coroutines.delay
 import kotlin.random.Random
 import kotlin.time.Duration
 
 class MockSearchApiService(
-    private val simulateError: Boolean = false,
-    private val returnEmptyList: Boolean = false,
+    private val simulateErrorProbability: Double = 0.0,
+    private val returnEmptyListProbability: Double = 0.0,
     private val eachCount: Int,
     private val delayImitation: Duration = Duration.ZERO,
 ) : SearchApiService {
@@ -31,11 +32,12 @@ class MockSearchApiService(
         page: Int,
         pageSize: Int
     ): List<FoundRepo> {
-        if (simulateError) {
+        val randomGenerator = Random.Default
+        if (randomGenerator.nextDouble() < simulateErrorProbability) {
             //TODO: Use every condition to simulate error
             throw Exception("Mock API Error: Failed to fetch search results for query: ${conditions.query}")
         }
-        if (returnEmptyList) {
+        if (randomGenerator.nextDouble() < returnEmptyListProbability) {
             return emptyList()
         }
 
@@ -60,6 +62,7 @@ class MockSearchApiService(
                     stars = Random.nextInt(0, 5000)
                 )
             )
+            delay(delayImitation)
         }
 
         return items

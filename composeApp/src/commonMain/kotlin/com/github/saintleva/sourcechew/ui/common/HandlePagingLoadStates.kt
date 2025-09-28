@@ -45,7 +45,7 @@ import sourcechew.composeapp.generated.resources.unknown_error
  * @param content The main content to display when data is available (usually a LazyColumn).
  */
 @Composable
-fun <T : Any> HandlePagingLoadStates(
+fun <T : Any>  HandlePagingLoadStates(
     lazyPagingItems: LazyPagingItems<T>,
     modifier: Modifier = Modifier,
     onRetryRefresh: () -> Unit = { lazyPagingItems.refresh() },
