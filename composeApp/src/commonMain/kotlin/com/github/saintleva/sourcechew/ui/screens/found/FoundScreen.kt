@@ -80,8 +80,10 @@ private fun ItemContent(foundRepo: FoundRepo) {
                 .background(color = MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
-            Text("Author: ${foundRepo.author}")
             Text("Name: ${foundRepo.name}")
+            Text("Full name: ${foundRepo.fullName}")
+            Text("Owner login: ${foundRepo.ownerLogin}")
+            Text("Owner login: ${foundRepo.ownerType}")
             Text("Description: ${foundRepo.description}")
             Text("Language: ${foundRepo.language}")
             Text("Stars: ${foundRepo.stars}")

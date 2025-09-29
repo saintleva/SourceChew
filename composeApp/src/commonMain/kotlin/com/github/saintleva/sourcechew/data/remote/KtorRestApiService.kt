@@ -9,8 +9,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.http.URLProtocol
+import io.ktor.http.path
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -27,8 +30,8 @@ data class GithubRepoItemDto(
     val name: String,
     @SerialName("full_name") val fullName: String,
     val owner: GitHubOwnerDto,
-    val description: String,
-    val language: String,
+    val description: String?,
+    val language: String?,
     @SerialName("stargazers_count") val stars: Int
 )
 
@@ -59,10 +62,11 @@ class KtorRestApiService(
 ): SearchApiService {
 
     companion object {
-        const val BASE_URL = "https://api.github.com/search/repositories"
+        const val API_BASE_URL = "api.github.com"
+        const val SEARCH_REPOSITORIES_ENDPOINT = "/search/repositories"
 
         val sortVariants = mapOf(
-            RepoSearchSort.BEST_MATCH to "best match", //TODO: Is it right?
+            RepoSearchSort.BEST_MATCH to null,
             RepoSearchSort.STARS to "stars",
             RepoSearchSort.FORKS to "forks",
             RepoSearchSort.UPDATED to "updated"
@@ -79,13 +83,21 @@ class KtorRestApiService(
         page: Int,
         pageSize: Int
     ): List<FoundRepo> {
-        val dto: GithubSearchResponseDto = httpClient.get(BASE_URL) {
-            parameter("q", conditions.query)
-            parameter("sort", sortVariants[conditions.sort]!!)
-            parameter("order", orderVariants[conditions.order]!!)
-            parameter("page", page)
-            parameter("per_page", pageSize)
-        }.body()
+        val dto: GithubSearchResponseDto
+        withContext(searchDispatcher) {
+            dto = httpClient.get {
+                url {
+                    protocol = URLProtocol.HTTPS
+                    host = API_BASE_URL
+                    path(SEARCH_REPOSITORIES_ENDPOINT)
+                    parameter("q", conditions.query)
+                    sortVariants[conditions.sort]?.let { parameter("sort", it) }
+                    parameter("order", orderVariants[conditions.order]!!)
+                    parameter("page", page.toString())
+                    parameter("per_page", pageSize.toString())
+                }
+            }.body()
+        }
         return dto.toDomain()
     }
 }

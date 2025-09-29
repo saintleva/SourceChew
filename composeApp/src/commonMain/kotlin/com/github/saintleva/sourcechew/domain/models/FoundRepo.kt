@@ -6,7 +6,7 @@ data class FoundRepo(
     val fullName: String,
     val ownerLogin: String,
     val ownerType: String,
-    val description: String,
-    val language: String,
+    val description: String?,
+    val language: String?,
     val stars: Int
 )

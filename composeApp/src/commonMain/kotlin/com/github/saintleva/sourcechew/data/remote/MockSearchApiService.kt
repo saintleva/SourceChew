@@ -55,8 +55,10 @@ class MockSearchApiService(
             val uniqueId = startIndex + i + 1
             items.add(
                 FoundRepo(
-                    author = sampleAuthors.random(),
                     name = "Repo_${conditions.query.replace(" ", "_")}_${uniqueId}",
+                    fullName = "name",
+                    ownerLogin = sampleAuthors.random(),
+                    ownerType = "user",
                     description = sampleDescriptions.random() + " (Page $page, Item ${i + 1})",
                     language = sampleLanguages.random(),
                     stars = Random.nextInt(0, 5000)

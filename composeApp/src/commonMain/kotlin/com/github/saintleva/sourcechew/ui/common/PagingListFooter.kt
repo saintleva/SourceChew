@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.end_of_list
@@ -106,6 +107,7 @@ fun PagingAppendErrorItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            Napier.d(tag = "pagingAppendFooter") { error.message ?: "Unknown error" }
             val errorMessage = error.localizedMessage ?: stringResource(Res.string.unknown_error)
             Text(
                 text = "${stringResource(Res.string.loading_more_error)}: $errorMessage",

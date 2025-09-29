@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.loading_error
@@ -53,6 +54,7 @@ fun <T : Any>  HandlePagingLoadStates(
         DefaultPagingLoadingIndicator(modifier = Modifier.align(Alignment.Center))
     },
     errorContent: @Composable BoxScope.(error: Throwable, retryAction: () -> Unit) -> Unit = { error, retry ->
+        Napier.d(tag = "HandlePagingLoadStates") { error.message ?: "Unknown error" }
         DefaultPagingErrorContent(
             error = error,
             onRetry = retry,
