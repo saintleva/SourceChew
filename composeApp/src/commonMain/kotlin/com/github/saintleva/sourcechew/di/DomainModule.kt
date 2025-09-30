@@ -18,8 +18,10 @@
 package com.github.saintleva.sourcechew.di
 
 import com.github.saintleva.sourcechew.data.remote.KtorRestApiService
+import com.github.saintleva.sourcechew.data.paging.PagingSourceFactoryImpl
 import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
+import com.github.saintleva.sourcechew.domain.repository.PagingSourceFactory
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCase
 import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
@@ -44,6 +46,7 @@ private fun createHttpClient() = HttpClient {
 
 val domainModule = module {
     single<ConfigManager> { DataStoreConfigManager(get()) }
+    single<PagingSourceFactory> { PagingSourceFactoryImpl(get()) }
     single<SearchApiService> {
         KtorRestApiService(httpClient = createHttpClient())
         //TODO: Remove this
