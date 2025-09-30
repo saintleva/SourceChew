@@ -9,6 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,6 +28,7 @@ data class GithubSearchResponseDto(
 
 @Serializable
 data class GithubRepoItemDto(
+    val id: Long,
     val name: String,
     @SerialName("full_name") val fullName: String,
     val owner: GitHubOwnerDto,
@@ -43,6 +45,7 @@ data class GitHubOwnerDto(
 )
 
 fun GithubRepoItemDto.toDomain() = FoundRepo(
+    id = id,
     name = name,
     fullName = fullName,
     ownerLogin = owner.login,
@@ -83,9 +86,9 @@ class KtorRestApiService(
         page: Int,
         pageSize: Int
     ): List<FoundRepo> {
-        val dto: GithubSearchResponseDto
+        val response: HttpResponse
         withContext(searchDispatcher) {
-            dto = httpClient.get {
+            response = httpClient.get {
                 url {
                     protocol = URLProtocol.HTTPS
                     host = API_BASE_URL
@@ -96,8 +99,9 @@ class KtorRestApiService(
                     parameter("page", page.toString())
                     parameter("per_page", pageSize.toString())
                 }
-            }.body()
+            }
         }
-        return dto.toDomain()
+        if (response.status.isSuccess()) {
+        return response.body<GithubSearchResponseDto>().toDomain()
     }
 }

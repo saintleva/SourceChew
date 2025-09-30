@@ -121,7 +121,7 @@ private fun FoundContent(screenModel: FoundScreenModel) {
             ) {
                 items(
                     count = foundRepos.itemCount,
-                    key = foundRepos.itemKey { it.name }
+                    key = foundRepos.itemKey { it.id }
                 ) { index ->
                     val item = foundRepos[index]
                     if (item != null) {

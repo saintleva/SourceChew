@@ -55,6 +55,7 @@ class MockSearchApiService(
             val uniqueId = startIndex + i + 1
             items.add(
                 FoundRepo(
+                    id = uniqueId.toLong(), //TODO: Is it right?
                     name = "Repo_${conditions.query.replace(" ", "_")}_${uniqueId}",
                     fullName = "name",
                     ownerLogin = sampleAuthors.random(),
