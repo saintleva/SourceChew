@@ -5,16 +5,19 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
+import com.github.saintleva.sourcechew.domain.result.DeserializationException
+import com.github.saintleva.sourcechew.domain.result.SearchError
+import com.github.saintleva.sourcechew.domain.result.SearchResult
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLProtocol
+import io.ktor.http.isSuccess
 import io.ktor.http.path
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -60,8 +63,7 @@ fun GithubSearchResponseDto.toDomain() = items.map { it.toDomain() }
 
 
 class KtorRestApiService(
-    private val httpClient: HttpClient,
-    private val searchDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val httpClient: HttpClient
 ): SearchApiService {
 
     companion object {
@@ -85,23 +87,56 @@ class KtorRestApiService(
         conditions: RepoSearchConditions,
         page: Int,
         pageSize: Int
-    ): List<FoundRepo> {
-        val response: HttpResponse
-        withContext(searchDispatcher) {
-            response = httpClient.get {
-                url {
-                    protocol = URLProtocol.HTTPS
-                    host = API_BASE_URL
-                    path(SEARCH_REPOSITORIES_ENDPOINT)
-                    parameter("q", conditions.query)
-                    sortVariants[conditions.sort]?.let { parameter("sort", it) }
-                    parameter("order", orderVariants[conditions.order]!!)
-                    parameter("page", page.toString())
-                    parameter("per_page", pageSize.toString())
+    ): SearchResult<List<FoundRepo>> {
+        val response = httpClient.get {
+            url {
+                protocol = URLProtocol.HTTPS
+                host = API_BASE_URL
+                path(SEARCH_REPOSITORIES_ENDPOINT)
+                parameter("q", conditions.query)
+                sortVariants[conditions.sort]?.let { parameter("sort", it) }
+                parameter("order", orderVariants[conditions.order]!!)
+                parameter("page", page.toString())
+                parameter("per_page", pageSize.toString())
+            }
+            // Important: Disable the default exception throwing for 4xx and 5xx statuses
+            // so we can handle them manually.
+            expectSuccess = false
+        }
+
+        return when {
+            // Handle successful responses
+            response.status.isSuccess() -> {
+                try {
+                    // On success, parse the body and wrap it in Result.success
+                    SearchResult<List<FoundRepo>>.Success(response.body<GithubSearchResponseDto>().toDomain())
+                } catch (e: Exception) {
+                    // A parsing failure on a successful response is an infrastructure error.
+                    throw DeserializationException(e)
                 }
             }
+
+            // Handle expected API errors and map them to DomainError
+            response.status == HttpStatusCode.UnprocessableEntity -> { // 422
+                SearchResult.Failure(SearchError.Validation(response.bodyAsText()))
+            }
+
+            response.status == HttpStatusCode.Unauthorized || response.status == HttpStatusCode.Forbidden -> { // 401, 403
+                SearchResult.Failure(SearchError.ApiLimitOrAuth)
+            }
+
+            response.status == HttpStatusCode.NotFound -> { // 404
+                SearchResult.Failure(SearchError.NotFound)
+            }
+
+            response.status.value in 500..599 -> {
+                SearchResult.Failure(SearchError.ServerError)
+            }
+
+            else -> {
+                // Handle any other non-successful status codes
+                SearchResult.Failure(SearchError.UnknownApiError(response.status.value))
+            }
         }
-        if (response.status.isSuccess()) {
-        return response.body<GithubSearchResponseDto>().toDomain()
     }
 }
