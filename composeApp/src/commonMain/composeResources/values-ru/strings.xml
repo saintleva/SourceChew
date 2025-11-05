@@ -35,7 +35,8 @@
     <string name="retry_button">Повторить</string>
     <string name="refresh_button">Обновить</string>
     <string name="no_items_found_title">Ничего не найдено</string>
-    <string name="no_items_found_description">По вашему запросу ничего не найдено.\nПопробуйте изменить условия поиска.</string>
+    <string name="no_items_found_description">По вашему запросу ничего не найдено.
+Попробуйте изменить условия поиска.</string>
     <string name="loading_more_error">Ошибка при загрузке</string>
     <string name="end_of_list">Больше элементов нет</string>
     <string name="found_items_title">Найденные репозитории</string> <!-- Для заголовка экрана -->
@@ -46,4 +47,6 @@
     <string name="error_api_limit">Превышен лимит запросов к API или ошибка аутентификации. Пожалуйста, попробуйте позже.</string>
     <string name="error_validation">Некорректный поисковый запрос: %1$s</string>
     <string name="error_unknown_api">Произошла непредвиденная ошибка API (Код: %1$d).</string>
+    <string name="error_not_found">Запрошенный ресурс не найден.</string>
+    <string name="error_unknown_infrastructure">Произошла непредвиденная ошибка инфраструктуры. Пожалуйста, попробуйте позже.</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import androidx.paging.PagingData
-import com.github.saintleva.sourcechew.domain.NeverSearchedException
+import com.github.saintleva.sourcechew.domain.  NeverSearchedException
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.Flow
