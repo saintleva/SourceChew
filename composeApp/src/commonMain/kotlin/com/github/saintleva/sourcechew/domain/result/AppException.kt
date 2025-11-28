@@ -21,3 +21,5 @@ class DeserializationException(cause: Throwable) : AppException(cause)
  * An exception for any other unexpected infrastructure failures.
  */
 class UnknownInfrastructureException(cause: Throwable) : AppException(cause)
+
+class PagingSearchException(val error: SearchError): AppException(null)

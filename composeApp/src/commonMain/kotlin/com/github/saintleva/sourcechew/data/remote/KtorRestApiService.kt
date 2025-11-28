@@ -6,6 +6,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
+import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.SearchResult
 import io.ktor.client.HttpClient
@@ -109,7 +110,7 @@ class KtorRestApiService(
             response.status.isSuccess() -> {
                 try {
                     // On success, parse the body and wrap it in Result.success
-                    SearchResult<List<FoundRepo>>.Success(response.body<GithubSearchResponseDto>().toDomain())
+                    Result.Success(response.body<GithubSearchResponseDto>().toDomain())
                 } catch (e: Exception) {
                     // A parsing failure on a successful response is an infrastructure error.
                     throw DeserializationException(e)
@@ -118,24 +119,24 @@ class KtorRestApiService(
 
             // Handle expected API errors and map them to DomainError
             response.status == HttpStatusCode.UnprocessableEntity -> { // 422
-                SearchResult.Failure(SearchError.Validation(response.bodyAsText()))
+                Result.Failure(SearchError.Validation(response.bodyAsText()))
             }
 
             response.status == HttpStatusCode.Unauthorized || response.status == HttpStatusCode.Forbidden -> { // 401, 403
-                SearchResult.Failure(SearchError.ApiLimitOrAuth)
+                Result.Failure(SearchError.ApiLimitOrAuth)
             }
 
             response.status == HttpStatusCode.NotFound -> { // 404
-                SearchResult.Failure(SearchError.NotFound)
+                Result.Failure(SearchError.NotFound)
             }
 
             response.status.value in 500..599 -> {
-                SearchResult.Failure(SearchError.ServerError)
+                Result.Failure(SearchError.ServerError)
             }
 
             else -> {
                 // Handle any other non-successful status codes
-                SearchResult.Failure(SearchError.UnknownApiError(response.status.value))
+                Result.Failure(SearchError.UnknownApiError(response.status.value))
             }
         }
     }

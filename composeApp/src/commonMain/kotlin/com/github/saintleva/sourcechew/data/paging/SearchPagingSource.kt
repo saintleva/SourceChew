@@ -5,11 +5,9 @@ import androidx.paging.PagingState
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
-import com.github.saintleva.sourcechew.domain.result.RepoSearchResult
-import com.github.saintleva.sourcechew.domain.result.SearchError
+import com.github.saintleva.sourcechew.domain.result.PagingSearchException
+import com.github.saintleva.sourcechew.domain.result.Result
 
-
-class PagingSearchException(val error: SearchError)
 
 class SearchPagingSource(
     private val searchApiService: SearchApiService,
@@ -20,17 +18,18 @@ class SearchPagingSource(
         val pageIndex = params.key ?: 1
         val pageSize = params.loadSize
         return try {
-            val result = searchApiService.searchItems(conditions, pageIndex, pageSize)
-            when (result) {
-                is RepoSearchResult.Success -> {
-                    val repos = result.value
+            when (val result = searchApiService.searchItems(conditions, pageIndex, pageSize)) {
+                is Result.Success -> {
+                    LoadResult.Page(
+                        data = result.value,
+                        prevKey = if (pageIndex == 1) null else pageIndex - 1,
+                        nextKey = if (result.value.isEmpty()) null else pageIndex + 1
+                    )
+                }
+                is Result.Failure -> {
+                    LoadResult.Error(PagingSearchException(result.error))
                 }
             }
-            LoadResult.Page(
-                data = response as List<FoundRepo>,
-                prevKey = if (pageIndex == 1) null else pageIndex - 1,
-                nextKey = if (response.isEmpty()) null else pageIndex + 1
-            )
         } catch (e: Exception) {
             // This block now correctly catches all exceptions:
             //    - PagingDomainException (for business errors like API limits)

@@ -3,6 +3,8 @@ package com.github.saintleva.sourcechew.data.remote
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
+import com.github.saintleva.sourcechew.domain.result.RepoSearchResult
+import com.github.saintleva.sourcechew.domain.result.Result
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -31,14 +33,14 @@ class MockSearchApiService(
         conditions: RepoSearchConditions,
         page: Int,
         pageSize: Int
-    ): List<FoundRepo> {
+    ): RepoSearchResult {
         val randomGenerator = Random.Default
         if (randomGenerator.nextDouble() < simulateErrorProbability) {
             //TODO: Use every condition to simulate error
             throw Exception("Mock API Error: Failed to fetch search results for query: ${conditions.query}")
         }
         if (randomGenerator.nextDouble() < returnEmptyListProbability) {
-            return emptyList()
+            return Result.Success(emptyList())
         }
 
         val items = mutableListOf<FoundRepo>()
@@ -46,7 +48,7 @@ class MockSearchApiService(
         val totalCount = conditions.inScope.size * eachCount
         val startIndex = (page - 1) * pageSize
         if (startIndex >= totalCount) {
-            return emptyList()
+            return Result.Success(emptyList())
         }
 
         val itemsOnThisPageCount = minOf(pageSize, totalCount - startIndex)
@@ -68,6 +70,6 @@ class MockSearchApiService(
             delay(delayImitation)
         }
 
-        return items
+        return Result.Success(items)
     }
 }

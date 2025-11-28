@@ -19,9 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.github.saintleva.sourcechew.data.paging.PagingSearchException
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
+import com.github.saintleva.sourcechew.domain.result.PagingSearchException
 import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
 import io.github.aakira.napier.Napier
