@@ -1,16 +1,23 @@
 package com.github.saintleva.sourcechew.data.remote
 
+import com.github.saintleva.sourcechew.data.remote.utils.isNetworkException
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
+import com.github.saintleva.sourcechew.domain.result.NetworkException
 import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.SearchResult
+import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.RedirectResponseException
+import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -89,55 +96,78 @@ class KtorRestApiService(
         page: Int,
         pageSize: Int
     ): SearchResult<List<FoundRepo>> {
-        val response = httpClient.get {
-            url {
-                protocol = URLProtocol.HTTPS
-                host = API_BASE_URL
-                path(SEARCH_REPOSITORIES_ENDPOINT)
-                parameter("q", conditions.query)
-                sortVariants[conditions.sort]?.let { parameter("sort", it) }
-                parameter("order", orderVariants[conditions.order]!!)
-                parameter("page", page.toString())
-                parameter("per_page", pageSize.toString())
+        try {
+            val response = httpClient.get {
+                url {
+                    protocol = URLProtocol.HTTPS
+                    host = API_BASE_URL
+                    path(SEARCH_REPOSITORIES_ENDPOINT)
+                    parameter("q", conditions.query)
+                    sortVariants[conditions.sort]?.let { parameter("sort", it) }
+                    parameter("order", orderVariants[conditions.order]!!)
+                    parameter("page", page.toString())
+                    parameter("per_page", pageSize.toString())
+                }
+                // Important: Disable the default exception throwing for 4xx and 5xx statuses
+                // so we can handle them manually.
+                expectSuccess = false
             }
-            // Important: Disable the default exception throwing for 4xx and 5xx statuses
-            // so we can handle them manually.
-            expectSuccess = false
-        }
 
-        return when {
-            // Handle successful responses
-            response.status.isSuccess() -> {
-                try {
-                    // On success, parse the body and wrap it in Result.success
-                    Result.Success(response.body<GithubSearchResponseDto>().toDomain())
-                } catch (e: Exception) {
-                    // A parsing failure on a successful response is an infrastructure error.
-                    throw DeserializationException(e)
+            return when {
+                // Handle successful responses
+                response.status.isSuccess() -> {
+                    try {
+                        // On success, parse the body and wrap it in Result.success
+                        Result.Success(response.body<GithubSearchResponseDto>().toDomain())
+                    } catch (e: Exception) {
+                        // A parsing failure on a successful response is an infrastructure error.
+                        throw DeserializationException(e)
+                    }
+                }
+
+                // Handle expected API errors and map them to DomainError
+                response.status == HttpStatusCode.UnprocessableEntity -> { // 422
+                    Result.Failure(SearchError.Validation(response.bodyAsText()))
+                }
+
+                response.status == HttpStatusCode.Unauthorized || response.status == HttpStatusCode.Forbidden -> { // 401, 403
+                    Result.Failure(SearchError.ApiLimitOrAuth)
+                }
+
+                response.status == HttpStatusCode.NotFound -> { // 404
+                    Result.Failure(SearchError.NotFound)
+                }
+
+                response.status.value in 500..599 -> {
+                    Result.Failure(SearchError.ServerError)
+                }
+
+                else -> {
+                    // Handle any other non-successful status codes
+                    Result.Failure(SearchError.UnknownApiError(response.status.value))
                 }
             }
+        } catch (e: Exception) {
+            // This block catches exceptions that occur *before* we can inspect the HTTP response.
+            // This includes network issues (no internet), DNS problems, timeouts, etc.
+            val domainException = when {
+                // Ktor often throws IOException for connectivity problems (e.g., Airplane Mode).
+                isNetworkException(e) -> NetworkException(e)
 
-            // Handle expected API errors and map them to DomainError
-            response.status == HttpStatusCode.UnprocessableEntity -> { // 422
-                Result.Failure(SearchError.Validation(response.bodyAsText()))
-            }
+                // These are Ktor's specific exceptions for HTTP-level failures.
+                // We catch them here as a fallback, although `expectSuccess = false` should prevent most of them.
+                e is ServerResponseException ||
+                e is RedirectResponseException ||
+                e is ClientRequestException -> UnknownInfrastructureException(e)
 
-            response.status == HttpStatusCode.Unauthorized || response.status == HttpStatusCode.Forbidden -> { // 401, 403
-                Result.Failure(SearchError.ApiLimitOrAuth)
+                // For any other unexpected exception, wrap it as an unknown infrastructure error.
+                else -> {
+                    Napier.d(tag = "KtorRestApiService") { "Caught unknown exception class: ${e::class.simpleName}, message: ${e.message}" }
+                    UnknownInfrastructureException(e)
+                }
             }
-
-            response.status == HttpStatusCode.NotFound -> { // 404
-                Result.Failure(SearchError.NotFound)
-            }
-
-            response.status.value in 500..599 -> {
-                Result.Failure(SearchError.ServerError)
-            }
-
-            else -> {
-                // Handle any other non-successful status codes
-                Result.Failure(SearchError.UnknownApiError(response.status.value))
-            }
+            // Propagate our domain-specific exception to be handled by the caller (e.g., PagingSource).
+            throw domainException
         }
     }
 }

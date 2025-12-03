@@ -23,7 +23,14 @@ kotlin {
     jvm("desktop")
 
     sourceSets {
+        val jvmMain by creating {
+            dependsOn(commonMain.get())
+        }
+
         val desktopMain by getting
+
+        androidMain.get().dependsOn(jvmMain)
+        desktopMain.dependsOn(jvmMain)
         
         androidMain.dependencies {
             implementation(compose.preview)
@@ -75,6 +82,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.appdirs)
+            implementation(libs.ktor.client.cio)
         }
     }
 }
