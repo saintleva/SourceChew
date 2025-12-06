@@ -71,7 +71,8 @@ fun GithubSearchResponseDto.toDomain() = items.map { it.toDomain() }
 
 
 class KtorRestApiService(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val baseUrl: String = API_BASE_URL
 ): SearchApiService {
 
     companion object {
@@ -100,7 +101,7 @@ class KtorRestApiService(
             val response = httpClient.get {
                 url {
                     protocol = URLProtocol.HTTPS
-                    host = API_BASE_URL
+                    host = baseUrl
                     path(SEARCH_REPOSITORIES_ENDPOINT)
                     parameter("q", conditions.query)
                     sortVariants[conditions.sort]?.let { parameter("sort", it) }
@@ -156,13 +157,14 @@ class KtorRestApiService(
 
                 // These are Ktor's specific exceptions for HTTP-level failures.
                 // We catch them here as a fallback, although `expectSuccess = false` should prevent most of them.
-                e is ServerResponseException ||
-                e is RedirectResponseException ||
-                e is ClientRequestException -> UnknownInfrastructureException(e)
+                e is ServerResponseException || e is RedirectResponseException ||
+                        e is ClientRequestException -> UnknownInfrastructureException(e)
 
                 // For any other unexpected exception, wrap it as an unknown infrastructure error.
                 else -> {
-                    Napier.d(tag = "KtorRestApiService") { "Caught unknown exception class: ${e::class.simpleName}, message: ${e.message}" }
+                    Napier.d(tag = "KtorRestApiService") {
+                        "Caught unknown exception class: ${e::class.simpleName}, message: ${e.message}"
+                    }
                     UnknownInfrastructureException(e)
                 }
             }

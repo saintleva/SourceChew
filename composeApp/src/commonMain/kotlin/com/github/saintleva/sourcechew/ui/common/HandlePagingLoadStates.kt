@@ -19,28 +19,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.github.saintleva.sourcechew.domain.result.DeserializationException
-import com.github.saintleva.sourcechew.domain.result.NetworkException
-import com.github.saintleva.sourcechew.domain.result.PagingSearchException
-import com.github.saintleva.sourcechew.domain.result.SearchError
-import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
 import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.error_api_limit
-import sourcechew.composeapp.generated.resources.error_deserialization
-import sourcechew.composeapp.generated.resources.error_network
-import sourcechew.composeapp.generated.resources.error_not_found
-import sourcechew.composeapp.generated.resources.error_server
-import sourcechew.composeapp.generated.resources.error_unknown_api
-import sourcechew.composeapp.generated.resources.error_unknown_infrastructure
-import sourcechew.composeapp.generated.resources.error_validation
 import sourcechew.composeapp.generated.resources.loading_error
 import sourcechew.composeapp.generated.resources.no_items_found_description
 import sourcechew.composeapp.generated.resources.no_items_found_title
 import sourcechew.composeapp.generated.resources.refresh_button
 import sourcechew.composeapp.generated.resources.retry_button
-import sourcechew.composeapp.generated.resources.unknown_error
 
 
 /**
@@ -112,55 +98,6 @@ fun DefaultPagingLoadingIndicator(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun DefaultPagingErrorContent(
-    error: Throwable,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    // This 'when' block inspects the exception type to provide a specific, user-friendly, and localized error message.
-    val errorMessage = when (error) {
-        // Unpack our custom PagingDomainException to access the underlying business error.
-        is PagingSearchException ->
-            when (val searchError = error.error) {
-                is SearchError.ApiLimitOrAuth -> stringResource(Res.string.error_api_limit)
-                is SearchError.ServerError -> stringResource(Res.string.error_server)
-                is SearchError.Validation -> stringResource(Res.string.error_validation, searchError.reason)
-                is SearchError.UnknownApiError -> stringResource(Res.string.error_unknown_api, searchError.statusCode)
-                is SearchError.NotFound -> stringResource(Res.string.error_not_found)
-            }
-        // Handle infrastructure errors.
-        is NetworkException -> stringResource(Res.string.error_network)
-        is DeserializationException -> stringResource(Res.string.error_deserialization)
-        is UnknownInfrastructureException -> stringResource(Res.string.error_unknown_infrastructure)
-        // A final fallback for any other unexpected exceptions.
-        else -> stringResource(Res.string.unknown_error)
-    }
-
-    Column(
-        modifier = modifier, // This modifier is passed from the parent BoxScope.
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = stringResource(Res.string.loading_error), // A generic title like "An error occurred".
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = errorMessage, // The specific, localized error message.
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onRetry) {
-            Text(stringResource(Res.string.retry_button))
-        }
-    }
-}
-
-@Composable
 fun DefaultPagingEmptyContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
@@ -184,6 +121,36 @@ fun DefaultPagingEmptyContent(
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRetry) {
             Text(stringResource(Res.string.refresh_button))
+        }
+    }
+}
+
+@Composable
+fun DefaultPagingErrorContent(
+    error: Throwable,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier, // This modifier is passed from the parent BoxScope.
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = stringResource(Res.string.loading_error), // A generic title like "An error occurred".
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = getErrorMessage(error), // The specific, localized error message.
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onRetry) {
+            Text(stringResource(Res.string.retry_button))
         }
     }
 }

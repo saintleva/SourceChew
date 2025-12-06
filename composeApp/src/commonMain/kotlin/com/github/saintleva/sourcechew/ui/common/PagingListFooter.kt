@@ -27,7 +27,6 @@ import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.end_of_list
 import sourcechew.composeapp.generated.resources.loading_more_error
 import sourcechew.composeapp.generated.resources.retry_button
-import sourcechew.composeapp.generated.resources.unknown_error
 
 
 /**
@@ -108,9 +107,15 @@ fun PagingAppendErrorItem(
             verticalArrangement = Arrangement.Center
         ) {
             Napier.d(tag = "pagingAppendFooter") { error.message ?: "Unknown error" }
-            val errorMessage = error.localizedMessage ?: stringResource(Res.string.unknown_error)
             Text(
-                text = "${stringResource(Res.string.loading_more_error)}: $errorMessage",
+                text = stringResource(Res.string.loading_more_error),
+                color = MaterialTheme.colorScheme.onErrorContainer,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = getErrorMessage(error),
                 color = MaterialTheme.colorScheme.onErrorContainer,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium
