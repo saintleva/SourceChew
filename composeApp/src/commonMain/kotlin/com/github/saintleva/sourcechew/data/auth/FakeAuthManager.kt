@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
-
 /**
  * A fake implementation of [AuthManager] that stores the token in memory.
  * Useful for development and testing UI flows without needing a real secure storage.
