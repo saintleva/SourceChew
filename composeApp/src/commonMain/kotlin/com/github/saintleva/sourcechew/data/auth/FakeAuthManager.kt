@@ -17,9 +17,7 @@ import kotlinx.coroutines.flow.update
 object FakeAuthManager : AuthManager {
 
     // TODO: You can hardcode a token here for quick testing, but DO NOT commit real secrets to Git!
-    // Example: private val initialToken = "ghp_your_test_token"
-    private val initialToken: String? =
-        "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"
+    private val initialToken: String? = null
 
     private val _authToken = MutableStateFlow(initialToken)
     override val authToken: Flow<String?> = _authToken.asStateFlow()
