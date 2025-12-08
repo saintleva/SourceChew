@@ -1,6 +1,6 @@
-package com.github.saintleva.sourcechew.data.remote
+package com.github.saintleva.sourcechew.data.network
 
-import com.github.saintleva.sourcechew.data.remote.utils.isNetworkException
+import com.github.saintleva.sourcechew.data.network.utils.isNetworkException
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
@@ -23,7 +23,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.URLProtocol
 import io.ktor.http.isSuccess
 import io.ktor.http.path
 import kotlinx.serialization.SerialName
@@ -72,11 +71,9 @@ fun GithubSearchResponseDto.toDomain() = items.map { it.toDomain() }
 
 class KtorRestApiService(
     private val httpClient: HttpClient,
-    private val baseUrl: String = API_BASE_URL
 ): SearchApiService {
 
     companion object {
-        const val API_BASE_URL = "api.github.com"
         const val SEARCH_REPOSITORIES_ENDPOINT = "/search/repositories"
 
         val sortVariants = mapOf(
@@ -100,8 +97,6 @@ class KtorRestApiService(
         try {
             val response = httpClient.get {
                 url {
-                    protocol = URLProtocol.HTTPS
-                    host = baseUrl
                     path(SEARCH_REPOSITORIES_ENDPOINT)
                     parameter("q", conditions.query)
                     sortVariants[conditions.sort]?.let { parameter("sort", it) }

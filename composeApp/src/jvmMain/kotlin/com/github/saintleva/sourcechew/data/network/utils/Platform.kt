@@ -1,4 +1,4 @@
-package com.github.saintleva.sourcechew.data.remote.utils
+package com.github.saintleva.sourcechew.data.network.utils
 
 import java.io.IOException
 import java.nio.channels.UnresolvedAddressException

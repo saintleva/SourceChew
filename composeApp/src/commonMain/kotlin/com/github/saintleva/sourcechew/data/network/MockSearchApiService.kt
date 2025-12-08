@@ -1,4 +1,4 @@
-package com.github.saintleva.sourcechew.data.remote
+package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
