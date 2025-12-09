@@ -62,9 +62,13 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
 
-            implementation(libs.voyager.navigator)
-            implementation(libs.voyager.screenmodel)
-            implementation(libs.voyager.koin)
+            implementation(libs.androidx.navigation3.ui)
+            implementation(libs.androidx.navigation3.material3.adaptive)
+
+            //TOOD: remove this
+//            implementation(libs.voyager.navigator)
+//            implementation(libs.voyager.screenmodel)
+//            implementation(libs.voyager.koin)
 
             implementation(libs.androidx.paging.common)
             implementation(libs.androidx.paging.compose)
