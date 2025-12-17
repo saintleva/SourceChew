@@ -1,4 +1,6 @@
 <resources>
+    <string name="app_name">SourceChew</string>
+    <string name="menu">Меню</string>
     <string name="logo">логотип</string>
     <string name="repositories">Репозитории</string>
     <string name="users">Пользователи</string>

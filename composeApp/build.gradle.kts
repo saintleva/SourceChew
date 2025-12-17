@@ -4,7 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
- plugins {
+plugins {
      alias(libs.plugins.kotlinMultiplatform)
      alias(libs.plugins.kotlinxSerialization)
      alias(libs.plugins.androidApplication)
@@ -64,11 +64,7 @@ kotlin {
 
             implementation(libs.androidx.navigation3.ui)
             implementation(libs.androidx.navigation3.material3.adaptive)
-
-            //TOOD: remove this
-//            implementation(libs.voyager.navigator)
-//            implementation(libs.voyager.screenmodel)
-//            implementation(libs.voyager.koin)
+            implementation(libs.androidx.lifecycle.viewmodel.nav3)
 
             implementation(libs.androidx.paging.common)
             implementation(libs.androidx.paging.compose)
@@ -126,6 +122,17 @@ dependencies {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
+
+tasks.matching { it.name.startsWith("explodeCodeSource") }
+    .configureEach {
+        dependsOn(
+            tasks.matching {
+                it.name.startsWith("generate") &&
+                        it.name.contains("Resource") &&
+                        it.name.contains("AndroidMain")
+            }
+        )
+    }
 
 compose.desktop {
     application {
