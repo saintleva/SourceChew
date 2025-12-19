@@ -41,21 +41,29 @@ sealed interface Route : NavKey {
     }
 
     @Serializable
-    data object Search : Route
+    data object Work : Route {
 
-    @Serializable
-    data object Found : Route
+        @Serializable
+        data object Search : Route
+
+        @Serializable
+        data object Found : Route
+    }
 }
 
-val serializersModule = SerializersModule {
+val rootSerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
         subclass(Route.Menu::class, Route.Menu.serializer()) //TODO: Do I really need this?
         subclass(Route.Menu.Authorization::class, Route.Menu.Authorization.serializer())
         subclass(Route.Menu.Settings::class, Route.Menu.Settings.serializer())
         subclass(Route.Menu.About::class, Route.Menu.About.serializer())
-        subclass(Route.Search::class, Route.Search.serializer())
-        subclass(Route.Found::class, Route.Found.serializer())
-    }
+        subclass(Route.Work::class, Route.Work.serializer())
+
 }
 
-
+val workSerializersModule = SerializersModule {
+    polymorphic(NavKey::class) {
+        subclass(Route.Work.Search::class, Route.Work.Search.serializer())
+        subclass(Route.Work.Found::class, Route.Work.Found.serializer())
+    }
+}

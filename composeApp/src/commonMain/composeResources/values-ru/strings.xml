@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">SourceChew</string>
+    <string name="about_application">О приложении SourceChew</string>
     <string name="menu">Меню</string>
-    <string name="logo">логотип</string>
+    <string name="logo">Логотип</string>
     <string name="repositories">Репозитории</string>
     <string name="users">Пользователи</string>
     <string name="groups">Группы</string>
@@ -51,4 +52,5 @@
     <string name="error_unknown_api">Произошла непредвиденная ошибка API (Код: %1$d).</string>
     <string name="error_not_found">Запрошенный ресурс не найден.</string>
     <string name="error_unknown_infrastructure">Произошла непредвиденная ошибка инфраструктуры. Пожалуйста, попробуйте позже.</string>
+    <string name="authorization">Авторизация</string>
 </resources>

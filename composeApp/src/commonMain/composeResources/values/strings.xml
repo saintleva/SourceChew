@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">SourceChew</string>
+    <string name="about_application">About SourceChew application</string>
+    <string name="about_application_text">An open-source application for convenient reading of source code from repositories on GitHub, GitLab, BitBucket, and other hosting platforms (forges). It supports easy navigation using a tree structure and provides the ability to read offline.</string>
     <string name="menu">Menu</string>
-    <string name="logo">logo</string>
+    <string name="logo">Logo</string>
     <string name="repositories">Repositories</string>
     <string name="users">Users</string>
     <string name="groups">Groups</string>
@@ -51,4 +53,5 @@ Try changing your search terms.</string>
     <string name="error_unknown_api">An unexpected API error occurred (Code: %1$d).</string>
     <string name="error_not_found">The requested resource was not found.</string>
     <string name="error_unknown_infrastructure">An unexpected infrastructure error occurred. Please try again later.</string>
+    <string name="authorization">Authorization</string>
 </resources>

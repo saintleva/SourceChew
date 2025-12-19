@@ -26,7 +26,7 @@ import sourcechew.composeapp.generated.resources.menu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScaffold() {
+fun WorkScaffold() {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -51,8 +51,7 @@ fun AppScaffold() {
         }
     ) {
         Scaffold(
-            topBar =
-                {
+            topBar = {
                     TopAppBar(
                         title = { Text(stringResource(Res.string.app_name)) },
                         navigationIcon = {
