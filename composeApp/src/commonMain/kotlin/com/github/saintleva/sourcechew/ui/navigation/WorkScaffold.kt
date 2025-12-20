@@ -65,7 +65,7 @@ fun WorkScaffold() {
                     )
                 }
         ) { padding ->
-            NavigationRoot(Modifier.padding(padding))
+            WorkNavigation(Modifier.padding(padding))
         }
     }
 

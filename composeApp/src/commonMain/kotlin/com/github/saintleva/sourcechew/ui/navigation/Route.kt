@@ -58,7 +58,7 @@ val rootSerializersModule = SerializersModule {
         subclass(Route.Menu.Settings::class, Route.Menu.Settings.serializer())
         subclass(Route.Menu.About::class, Route.Menu.About.serializer())
         subclass(Route.Work::class, Route.Work.serializer())
-
+    }
 }
 
 val workSerializersModule = SerializersModule {

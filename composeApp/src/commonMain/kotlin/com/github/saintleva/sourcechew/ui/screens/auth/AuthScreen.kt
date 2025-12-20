@@ -30,11 +30,14 @@ import sourcechew.composeapp.generated.resources.you_are_not_authorized
 
 
 @Composable
-fun AuthScreen(viewModel: AuthViewModel) {
+fun AuthScreen(
+    modifier: Modifier,
+    viewModel: AuthViewModel
+) {
     val isAuthorized = viewModel.isAuthorized.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(32.dp),
         verticalArrangement = Arrangement.Center,

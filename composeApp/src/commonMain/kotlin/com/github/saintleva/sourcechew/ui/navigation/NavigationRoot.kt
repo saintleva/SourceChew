@@ -19,7 +19,9 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.saintleva.sourcechew.ui.screens.about.AboutApplicationScreen
+import com.github.saintleva.sourcechew.ui.screens.auth.AuthScreen
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.about_application
 import sourcechew.composeapp.generated.resources.authorization
@@ -55,7 +57,7 @@ fun NavigableUpScreen(
 
 @Composable
 fun NavigationRoot(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier //TODO: Do I really need this?
 ) {
     val rootBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -71,13 +73,25 @@ fun NavigationRoot(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
+            entry<Route.Work> {
+                WorkScaffold()
+            }
             entry<Route.Menu.Authorization> {
                 NavigableUpScreen(
                     stringResource(Res.string.authorization),
                     onBackClick = { rootBackStack.pop() }
                 ) { innerPadding ->
-                    AboutApplicationScreen(innerPadding)
+                    AuthScreen(innerPadding, koinViewModel())
                 }
+            }
+            entry<Route.Menu.Settings> {
+                //TODO: Implement settings screen and navigation
+//                NavigableUpScreen(
+//                    stringResource(Res.string.about_application),
+//                    onBackClick = { rootBackStack.pop() }
+//                ) { innerPadding ->
+//                    AboutApplicationScreen(innerPadding)
+//                }
             }
             entry<Route.Menu.About> {
                 NavigableUpScreen(
@@ -87,18 +101,6 @@ fun NavigationRoot(
                     AboutApplicationScreen(innerPadding)
                 }
             }
-            //TODO: Remove this
-//            entry<Route.Auth> {
-//                AuthNavigation(
-//                    onLogin = {
-//                        rootBackStack.remove(Route.Auth)
-//                        rootBackStack.add(Route.Todo)
-//                    }
-//                )
-//            }
-//            entry<Route.Todo> {
-//                TodoNavigation()
-//            }
         }
     )
 }
