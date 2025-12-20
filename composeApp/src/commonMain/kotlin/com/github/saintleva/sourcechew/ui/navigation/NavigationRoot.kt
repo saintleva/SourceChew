@@ -22,6 +22,7 @@ import com.github.saintleva.sourcechew.ui.screens.about.AboutApplicationScreen
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.about_application
+import sourcechew.composeapp.generated.resources.authorization
 import sourcechew.composeapp.generated.resources.go_back
 
 

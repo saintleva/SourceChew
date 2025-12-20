@@ -54,4 +54,10 @@ Try changing your search terms.</string>
     <string name="error_not_found">The requested resource was not found.</string>
     <string name="error_unknown_infrastructure">An unexpected infrastructure error occurred. Please try again later.</string>
     <string name="authorization">Authorization</string>
+    <string name="you_are_authorized">You are authorized</string>
+    <string name="you_are_not_authorized">You are not authorized</string>
+    <string name="access_token">Access Token</string>
+    <string name="enter_api_token">Enter API Token</string>
+    <string name="save">Save</string>
+    <string name="remove">Remove</string>
 </resources>
