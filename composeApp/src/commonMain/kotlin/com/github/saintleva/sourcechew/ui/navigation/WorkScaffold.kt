@@ -52,18 +52,18 @@ fun WorkScaffold() {
     ) {
         Scaffold(
             topBar = {
-                    TopAppBar(
-                        title = { Text(stringResource(Res.string.app_name)) },
-                        navigationIcon = {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(
-                                    Icons.Default.Menu,
-                                    contentDescription = stringResource(Res.string.menu)
-                                )
-                            }
+                TopAppBar(
+                    title = { Text(stringResource(Res.string.app_name)) },
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(
+                                Icons.Default.Menu,
+                                contentDescription = stringResource(Res.string.menu)
+                            )
                         }
-                    )
-                }
+                    }
+                )
+            }
         ) { padding ->
             WorkNavigation(Modifier.padding(padding))
         }
