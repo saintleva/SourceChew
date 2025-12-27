@@ -17,20 +17,16 @@
 
 package com.github.saintleva.sourcechew.ui.screens.found
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
 
 
-class FoundScreenModel(private val searchInteractor: RepoSearchInteractor) : ScreenModel {
+class FoundViewModel(private val searchInteractor: RepoSearchInteractor) : ViewModel() {
 
     val searchState = searchInteractor.searchState
 
-    val foundFlow = (searchState.value as? SearchState.Success)?.flow?.cachedIn(screenModelScope)
-
-    fun navigateBack() {
-        searchInteractor.switchToSelecting()
-    }
+    val foundFlow = (searchState.value as? SearchState.Found)?.flow?.cachedIn(viewModelScope)
 }

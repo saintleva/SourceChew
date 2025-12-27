@@ -35,16 +35,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
@@ -53,7 +50,6 @@ import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
-import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
 import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -81,37 +77,35 @@ import sourcechew.composeapp.generated.resources.template_only
 import sourcechew.composeapp.generated.resources.updated_time
 import sourcechew.composeapp.generated.resources.use_previous_search_conditions
 
+@Composable
+fun SearchScreen(
+    modifier: Modifier = Modifier,
+    viewModel: SearchViewModel,
+    onFound: () -> Unit
+) {
+    val searchState = viewModel.searchState.collectAsStateWithLifecycle()
 
-class SearchScreen : Screen {
+    LaunchedEffect(searchState.value) {
+        if (searchState.value is SearchState.Found) onFound()
+    }
 
-    @Composable
-    override fun Content() {
-        val screenModel = koinScreenModel<SearchScreenModel>()
-
-        val navigator = LocalNavigator.currentOrThrow
-        val searchState = screenModel.searchState.collectAsStateWithLifecycle()
-        if (searchState.value is SearchState.Success) {
-            navigator.push(FoundScreen())
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                //TODO: Make good top padding
-                .padding(WindowInsets.safeContent.asPaddingValues())
-                .verticalScroll(rememberScrollState())
-        ) {
-            SearchContent(screenModel, searchState.value == SearchState.Selecting)
-            if (searchState.value == SearchState.Searching) {
-                SearchProgress(screenModel)
-            }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            //TODO: Make good top padding
+            .padding(WindowInsets.safeContent.asPaddingValues())
+            .verticalScroll(rememberScrollState())
+    ) {
+        SearchContent(viewModel, searchState.value != SearchState.Searching)
+        if (searchState.value == SearchState.Searching) {
+            SearchProgress(viewModel)
         }
     }
 }
 
 
 @Composable
-private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Boolean) {
+private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean) {
 
     val scopeStrings = mapOf(
         RepoSearchScope.NAME to stringResource(Res.string.names),
@@ -137,7 +131,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         SearchOrder.DESCENDING to stringResource(Res.string.descending),
     )
 
-    val conditions = screenModel.conditionsStateFlows
+    val conditions = viewModel.conditionsStateFlows
     val query = conditions.query.collectAsStateWithLifecycle()
     val selectedSearchScope = conditions.inScope.mapValues { it.value.collectAsStateWithLifecycle() }
     val selectedOnlyFlags = conditions.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
@@ -164,7 +158,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
     ) {
         OutlinedTextField(
             value = query.value,
-            onValueChange = screenModel::onQueryChange,
+            onValueChange = viewModel::onQueryChange,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = selectingEnabled,
             textStyle = TextStyle(fontSize = 16.sp),
@@ -186,7 +180,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                     val textStyle = MaterialTheme.typography.labelLarge
                     FilterChip(
                         selected = selectedSearchScope[scope]!!.value,
-                        onClick = { screenModel.toggleScope(scope) },
+                        onClick = { viewModel.toggleScope(scope) },
                         label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
                         enabled = selectingEnabled
                     )
@@ -198,7 +192,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                 CheckBoxWithText(
                     text = onlyFlagStrings[flag]!!,
                     checked = selectedOnlyFlags[flag]!!.value,
-                    onCheckedChange = { screenModel.toggleOnlyFlag(flag) },
+                    onCheckedChange = { viewModel.toggleOnlyFlag(flag) },
                     enabled = selectingEnabled,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
@@ -209,7 +203,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                 RadioButtonWithText(
                     text = sortStrings[sort]!!,
                     selected = selectedSort.value == sort,
-                    onClick = { screenModel.onSortChange(sort) },
+                    onClick = { viewModel.onSortChange(sort) },
                     enabled = selectingEnabled,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
@@ -220,7 +214,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
                 RadioButtonWithText(
                     text = orderStrings[order]!!,
                     selected = selectedOrder.value == order,
-                    onClick = { screenModel.onOrderChange(order) },
+                    onClick = { viewModel.onOrderChange(order) },
                     enabled = selectingEnabled,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
@@ -229,12 +223,12 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
         CheckBoxWithText(
             text = stringResource(Res.string.use_previous_search_conditions),
             checked = usePreviousSearch.value,
-            onCheckedChange = screenModel::usePreviousSearchChange,
-            enabled = selectingEnabled && screenModel.canUsePreviousConditions(),
+            onCheckedChange = viewModel::usePreviousSearchChange,
+            enabled = selectingEnabled && viewModel.canUsePreviousConditions(),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
         Button(
-            onClick = screenModel::search,
+            onClick = viewModel::search,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = selectingEnabled && maySearch()
         ) {
@@ -246,7 +240,7 @@ private fun SearchContent(screenModel: SearchScreenModel, selectingEnabled: Bool
 //TODO: Force CircularProgressIndicator to occupy full residuary space of screen if scrolling
 // is not using
 @Composable
-private fun SearchProgress(screenModel: SearchScreenModel) {
+private fun SearchProgress(viewModel: SearchViewModel) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -254,7 +248,7 @@ private fun SearchProgress(screenModel: SearchScreenModel) {
     ) {
         CircularProgressIndicator(modifier = Modifier.padding(8.dp))
         Button(
-            onClick = screenModel::stop,
+            onClick = viewModel::stop,
             modifier = Modifier.padding(4.dp)
         ) {
             Text(stringResource(Res.string.stop_search))

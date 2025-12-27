@@ -17,13 +17,13 @@
 
 package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.ui.screens.search.SearchScreenModel
-import com.github.saintleva.sourcechew.ui.screens.found.FoundScreenModel
-import org.koin.core.module.dsl.factoryOf
+import com.github.saintleva.sourcechew.ui.screens.search.SearchViewModel
+import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 
 val appModule = module {
-    factoryOf(::SearchScreenModel)
-    factoryOf(::FoundScreenModel)
+    viewModelOf(::SearchViewModel)
+    viewModelOf(::FoundViewModel)
 }

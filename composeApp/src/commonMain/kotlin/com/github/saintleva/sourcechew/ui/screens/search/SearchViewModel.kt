@@ -17,8 +17,8 @@
 
 package com.github.saintleva.sourcechew.ui.screens.search
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
@@ -29,32 +29,32 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
-class SearchScreenModel(
+class SearchViewModel(
     configManager: ConfigManager,
     private val searchInteractor: RepoSearchInteractor
-) : ScreenModel {
+) : ViewModel() {
 
     val accessor = configManager.repoConditions
-    val conditionsStateFlows = accessor.flows.toConditionsStateFlow(screenModelScope)
+    val conditionsStateFlows = accessor.flows.toConditionsStateFlow(viewModelScope)
 
     val searchState = searchInteractor.searchState
 
     private var _searchJob: Job? = null
 
     fun onQueryChange(newQuery: String) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             accessor.changeQuery(newQuery)
         }
     }
 
     fun toggleScope(scope: RepoSearchScope) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             accessor.toggleScopeItem(scope)
         }
     }
 
     fun toggleOnlyFlag(flag: OnlyFlag) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             when (flag) {
                 OnlyFlag.PUBLIC -> accessor.togglePublicOnlyFlag()
                 OnlyFlag.PRIVATE -> accessor.togglePrivateOnlyFlag()
@@ -64,19 +64,19 @@ class SearchScreenModel(
     }
 
     fun onSortChange(sort: RepoSearchSort) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             accessor.changeSort(sort)
         }
     }
 
     fun onOrderChange(order: SearchOrder) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             accessor.changeOrder(order)
         }
     }
 
     fun usePreviousSearchChange(checked: Boolean) {
-        screenModelScope.launch {
+        viewModelScope.launch {
             accessor.changeUsePreviousSearch(checked)
         }
     }
@@ -85,7 +85,7 @@ class SearchScreenModel(
         searchInteractor.сanUsePreviousConditions(conditionsStateFlows.toConditions())
 
     fun search() {
-        _searchJob = screenModelScope.launch {
+        _searchJob = viewModelScope.launch {
             searchInteractor.search(conditionsStateFlows.toConditions(),
                 conditionsStateFlows.usePreviousSearch.value)
         }

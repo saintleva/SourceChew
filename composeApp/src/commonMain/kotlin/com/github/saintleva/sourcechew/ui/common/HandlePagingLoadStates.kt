@@ -46,9 +46,9 @@ import sourcechew.composeapp.generated.resources.retry_button
  */
 @Composable
 fun <T : Any> HandlePagingLoadStates(
-    lazyPagingItems: LazyPagingItems<T>,
+    lazyPagingItems: LazyPagingItems<T>?,
     modifier: Modifier = Modifier,
-    onRetryRefresh: () -> Unit = { lazyPagingItems.refresh() },
+    onRetryRefresh: () -> Unit = { lazyPagingItems?.refresh() },
     loadingContent: @Composable BoxScope.() -> Unit = {
         DefaultPagingLoadingIndicator(modifier = Modifier.align(Alignment.Center))
     },
@@ -69,21 +69,27 @@ fun <T : Any> HandlePagingLoadStates(
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        when (val refreshState = lazyPagingItems.loadState.refresh) {
-            is LoadState.Loading -> {
-                loadingContent()
-            }
-            is LoadState.Error -> {
-                errorContent(refreshState.error, onRetryRefresh)
-            }
-            is LoadState.NotLoading -> {
-                if (lazyPagingItems.itemCount == 0) {
-                    // Simplified check for "empty state" when itemCount == 0.
-                    // If refresh is complete and there are no items, consider it an "empty" state.
-                    emptyContent(onRetryRefresh)
-                } else {
-                    // Data is available, display the main content (LazyColumn)
-                    content()
+        if (lazyPagingItems == null) {
+            emptyContent(onRetryRefresh)
+        } else {
+            when (val refreshState = lazyPagingItems.loadState.refresh) {
+                is LoadState.Loading -> {
+                    loadingContent()
+                }
+
+                is LoadState.Error -> {
+                    errorContent(refreshState.error, onRetryRefresh)
+                }
+
+                is LoadState.NotLoading -> {
+                    if (lazyPagingItems.itemCount == 0) {
+                        // Simplified check for "empty state" when itemCount == 0.
+                        // If refresh is complete and there are no items, consider it an "empty" state.
+                        emptyContent(onRetryRefresh)
+                    } else {
+                        // Data is available, display the main content (LazyColumn)
+                        content()
+                    }
                 }
             }
         }

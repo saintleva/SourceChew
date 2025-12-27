@@ -8,22 +8,16 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.github.saintleva.sourcechew.ui.screens.about.AboutApplicationScreen
-import com.github.saintleva.sourcechew.ui.screens.auth.AuthScreen
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
 import com.github.saintleva.sourcechew.ui.screens.search.SearchScreen
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.about_application
-import sourcechew.composeapp.generated.resources.authorization
 
 
 @Composable
 fun WorkNavigation(
     modifier: Modifier = Modifier
 ) {
-    val rootBackStack = rememberNavBackStack(
+    val backStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = workSerializersModule
         },
@@ -31,16 +25,21 @@ fun WorkNavigation(
     )
     NavDisplay(
         modifier = modifier,
-        backStack = rootBackStack,
+        backStack = backStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
             entry<Route.Work.Search> {
-                SearchScreen(modifier, koinViewModel())
+                SearchScreen(
+                    modifier = modifier,
+                    viewModel = koinViewModel(),
+                    onFound = { backStack.add(Route.Work.Found) }
+                )
             }
             entry<Route.Work.Found> {
+                //TODO: How to implement back navigation here???
                 FoundScreen(modifier, koinViewModel())
             }
         }

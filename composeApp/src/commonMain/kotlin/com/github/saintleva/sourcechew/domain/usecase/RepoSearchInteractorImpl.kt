@@ -1,7 +1,6 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import androidx.paging.PagingData
-import com.github.saintleva.sourcechew.domain.  NeverSearchedException
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +12,7 @@ class RepoSearchInteractorImpl(
     val getReposUseCase: GetReposUseCase
 ) : RepoSearchInteractor {
 
-    private val _searchState = MutableStateFlow<SearchState>(SearchState.Selecting)
+    private val _searchState = MutableStateFlow<SearchState>(SearchState.NeverSearched)
     override val searchState = _searchState.asStateFlow()
 
     override var previousConditions: RepoSearchConditions? = null
@@ -39,21 +38,17 @@ class RepoSearchInteractorImpl(
     override fun сanUsePreviousConditions(newConditions: RepoSearchConditions) =
         everSearched && (newConditions == previousConditions)
 
-    override fun switchToSelecting() {
-        _searchState.update { SearchState.Selecting }
-    }
-
     private suspend fun obtainNewResult(conditions: RepoSearchConditions) {
         val result = getReposUseCase(conditions)
         previousResult = result
-        _searchState.update { SearchState.Success(result) }
+        _searchState.update { SearchState.Found(result) }
     }
 
     private fun usePreviousResult() {
         if (previousResult == null) {
-            _searchState.update { SearchState.Error(NeverSearchedException()) }
+            _searchState.update { SearchState.NeverSearched }
         } else {
-            _searchState.update { SearchState.Success(previousResult!!) }
+            _searchState.update { SearchState.Found(previousResult!!) }
         }
     }
 }

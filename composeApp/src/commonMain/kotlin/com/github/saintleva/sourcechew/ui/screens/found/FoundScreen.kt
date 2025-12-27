@@ -19,7 +19,6 @@ package com.github.saintleva.sourcechew.ui.screens.found
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,40 +30,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.koinScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.common.HandlePagingLoadStates
-import com.github.saintleva.sourcechew.ui.common.NavigableUpScreen
 import com.github.saintleva.sourcechew.ui.common.pagingAppendFooter
-import org.jetbrains.compose.resources.stringResource
-import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.found_items_title
 
-
-class FoundScreen : Screen {
-
-    @Composable
-    override fun Content() {
-        val screenModel = koinScreenModel<FoundScreenModel>()
-        val navigator = LocalNavigator.currentOrThrow
-        val searchState = screenModel.searchState.collectAsStateWithLifecycle()
-        if (searchState.value == SearchState.Selecting) {
-            navigator.pop()
-        }
-        FoundContent(screenModel)
-    }
-}
 
 @Composable
 private fun ItemContent(foundRepo: FoundRepo) {
@@ -92,27 +65,13 @@ private fun ItemContent(foundRepo: FoundRepo) {
 }
 
 @Composable
-private fun FoundContent(screenModel: FoundScreenModel) {
-    val foundRepos = screenModel.foundFlow?.collectAsLazyPagingItems()
-    NavigableUpScreen(
-        title = stringResource(Res.string.found_items_title),
-        navigationUp = screenModel::navigateBack
-    ) { innerPadding ->
-        if (foundRepos == null) {
-            Box(modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(Color.Red)
-            ) {
-                Text(text = "No results", modifier = Modifier.align(Alignment.Center))
-            }
-            return@NavigableUpScreen
-        }
-
-        HandlePagingLoadStates(
-            lazyPagingItems = foundRepos,
-            modifier = Modifier.padding(innerPadding)
-        ) {
+fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
+    val foundRepos = viewModel.foundFlow?.collectAsLazyPagingItems()
+    HandlePagingLoadStates(
+        lazyPagingItems = foundRepos,
+        modifier = modifier
+    ) {
+        if (foundRepos != null) {
             // This @Composable block will be executed when data is available
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
