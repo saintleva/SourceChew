@@ -20,12 +20,9 @@ package com.github.saintleva.sourcechew.ui.screens.search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -86,14 +83,17 @@ fun SearchScreen(
     val searchState = viewModel.searchState.collectAsStateWithLifecycle()
 
     LaunchedEffect(searchState.value) {
-        if (searchState.value is SearchState.Found) onFound()
+        if (searchState.value is SearchState.Found) {
+            onFound()
+            viewModel.onNavigationConsumed()
+        }
     }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             //TODO: Make good top padding
-            .padding(WindowInsets.safeContent.asPaddingValues())
+            //.padding(WindowInsets.safeContent.asPaddingValues())
             .verticalScroll(rememberScrollState())
     ) {
         SearchContent(viewModel, searchState.value != SearchState.Searching)

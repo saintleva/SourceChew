@@ -30,7 +30,7 @@ import sourcechew.composeapp.generated.resources.go_back
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigableUpScreen(
+fun NavigableBackScreen(
     title: String,
     onBackClick: () -> Unit,
     content: @Composable (Modifier) -> Unit
@@ -77,7 +77,7 @@ fun NavigationRoot(
                 WorkScaffold()
             }
             entry<Route.Menu.Authorization> {
-                NavigableUpScreen(
+                NavigableBackScreen(
                     stringResource(Res.string.authorization),
                     onBackClick = { rootBackStack.pop() }
                 ) { innerPadding ->
@@ -94,7 +94,7 @@ fun NavigationRoot(
 //                }
             }
             entry<Route.Menu.About> {
-                NavigableUpScreen(
+                NavigableBackScreen(
                     stringResource(Res.string.about_application),
                     onBackClick = { rootBackStack.pop() }
                 ) { innerPadding ->

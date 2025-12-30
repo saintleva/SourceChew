@@ -12,7 +12,7 @@ class RepoSearchInteractorImpl(
     val getReposUseCase: GetReposUseCase
 ) : RepoSearchInteractor {
 
-    private val _searchState = MutableStateFlow<SearchState>(SearchState.NeverSearched)
+    private val _searchState = MutableStateFlow<SearchState>(SearchState.Selecting)
     override val searchState = _searchState.asStateFlow()
 
     override var previousConditions: RepoSearchConditions? = null
@@ -38,6 +38,10 @@ class RepoSearchInteractorImpl(
     override fun сanUsePreviousConditions(newConditions: RepoSearchConditions) =
         everSearched && (newConditions == previousConditions)
 
+    override fun switchToSelecting() {
+        _searchState.update { SearchState.Selecting }
+    }
+
     private suspend fun obtainNewResult(conditions: RepoSearchConditions) {
         val result = getReposUseCase(conditions)
         previousResult = result
@@ -46,7 +50,7 @@ class RepoSearchInteractorImpl(
 
     private fun usePreviousResult() {
         if (previousResult == null) {
-            _searchState.update { SearchState.NeverSearched }
+            _searchState.update { SearchState.Selecting }
         } else {
             _searchState.update { SearchState.Found(previousResult!!) }
         }

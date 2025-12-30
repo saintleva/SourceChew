@@ -95,4 +95,8 @@ class SearchViewModel(
         _searchJob?.cancel()
         searchInteractor.switchToSelecting()
     }
+
+    fun onNavigationConsumed() {
+        searchInteractor.switchToSelecting()
+    }
 }
