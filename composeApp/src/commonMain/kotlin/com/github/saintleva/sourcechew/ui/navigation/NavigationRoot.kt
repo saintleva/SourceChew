@@ -28,32 +28,20 @@ import sourcechew.composeapp.generated.resources.authorization
 import sourcechew.composeapp.generated.resources.go_back
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigableBackScreen(
+fun TitledNavigableBackScreen(
     title: String,
     onBackClick: () -> Unit,
     content: @Composable (Modifier) -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(title, style = MaterialTheme.typography.headlineMedium) },
-                //modifier = appBarModifier, //TODO: Remove it
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = stringResource(Res.string.go_back)
-                        )
-                    }
-                }
-            )
-        }
+    NavigableBackScreen(
+        title = { Text(title, style = MaterialTheme.typography.headlineMedium) },
+        onBackClick = onBackClick
     ) { innerPadding ->
-        content(Modifier.padding(innerPadding))
+        content(innerPadding)
     }
 }
+
 
 @Composable
 fun NavigationRoot(
@@ -77,7 +65,7 @@ fun NavigationRoot(
                 WorkScaffold()
             }
             entry<Route.Menu.Authorization> {
-                NavigableBackScreen(
+                TitledNavigableBackScreen(
                     stringResource(Res.string.authorization),
                     onBackClick = { rootBackStack.pop() }
                 ) { innerPadding ->
@@ -86,7 +74,7 @@ fun NavigationRoot(
             }
             entry<Route.Menu.Settings> {
                 //TODO: Implement settings screen and navigation
-//                NavigableUpScreen(
+//                TitledNavigableBackScreen(
 //                    stringResource(Res.string.about_application),
 //                    onBackClick = { rootBackStack.pop() }
 //                ) { innerPadding ->
@@ -94,7 +82,7 @@ fun NavigationRoot(
 //                }
             }
             entry<Route.Menu.About> {
-                NavigableBackScreen(
+                TitledNavigableBackScreen(
                     stringResource(Res.string.about_application),
                     onBackClick = { rootBackStack.pop() }
                 ) { innerPadding ->

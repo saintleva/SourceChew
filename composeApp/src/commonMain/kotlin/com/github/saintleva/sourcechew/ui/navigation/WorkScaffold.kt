@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.ui.navigation
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -26,7 +27,11 @@ import sourcechew.composeapp.generated.resources.menu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkScaffold() {
+fun WorkNavigableBackScreen(
+    actions: @Composable RowScope.() -> Unit = {}
+    onBackClick: () -> Unit,
+    content: @Composable (Modifier) -> Unit
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -61,11 +66,14 @@ fun WorkScaffold() {
                                 contentDescription = stringResource(Res.string.menu)
                             )
                         }
+                    },
+                    actions = {
+                        BackIcon(onBackClick)
                     }
                 )
             }
         ) { padding ->
-            WorkNavigation(Modifier.padding(padding))
+            content(Modifier.padding(padding))
         }
     }
 
