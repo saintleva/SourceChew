@@ -1,15 +1,7 @@
 package com.github.saintleva.sourcechew.ui.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -25,7 +17,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.about_application
 import sourcechew.composeapp.generated.resources.authorization
-import sourcechew.composeapp.generated.resources.go_back
 
 
 @Composable
@@ -45,7 +36,7 @@ fun TitledNavigableBackScreen(
 
 @Composable
 fun NavigationRoot(
-    modifier: Modifier = Modifier //TODO: Do I really need this?
+    //modifier: Modifier = Modifier //TODO: Remove it
 ) {
     val rootBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -54,7 +45,6 @@ fun NavigationRoot(
         Route.Work
     )
     NavDisplay(
-        modifier = modifier,
         backStack = rootBackStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
@@ -62,7 +52,7 @@ fun NavigationRoot(
         ),
         entryProvider = entryProvider {
             entry<Route.Work> {
-                WorkScaffold()
+                WorkNavigation()
             }
             entry<Route.Menu.Authorization> {
                 TitledNavigableBackScreen(

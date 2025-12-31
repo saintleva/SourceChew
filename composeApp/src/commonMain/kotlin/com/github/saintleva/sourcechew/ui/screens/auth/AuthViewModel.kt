@@ -5,12 +5,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.repository.AuthManager
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
 class AuthViewModel(private val manager: AuthManager) : ViewModel() {
 
-    val isAuthorized = manager.isAuthorized
+    val isAuthorized = manager.isAuthorized.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
+
 
     private val _token = mutableStateOf("")
     val token: State<String> = _token
