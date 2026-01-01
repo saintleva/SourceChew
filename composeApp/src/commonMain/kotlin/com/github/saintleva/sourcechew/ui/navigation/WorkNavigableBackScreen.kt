@@ -31,10 +31,13 @@ import sourcechew.composeapp.generated.resources.menu
 @Composable
 fun WorkNavigableBackScreen(
     actions: @Composable RowScope.() -> Unit = {},
+    onMenuItemClick: (Route.Menu) -> Unit = {},
     content: @Composable (Modifier) -> Unit
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    //TODO: Remove this selection handling
     val selectedMenuItem = rememberSaveable { mutableIntStateOf(0) }
 
     ModalNavigationDrawer(

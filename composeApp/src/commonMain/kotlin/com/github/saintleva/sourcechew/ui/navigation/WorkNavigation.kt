@@ -31,7 +31,7 @@ fun WorkNavigation(
         ),
         entryProvider = entryProvider {
             entry<Route.Work.Search> {
-                WorkNavigableBackScreen { modifier ->
+                WorkNavigableBackScreen(onMenuItemClick = ) { modifier ->
                     SearchScreen(
                         modifier = modifier,
                         viewModel = koinViewModel(),
