@@ -35,9 +35,7 @@ fun TitledNavigableBackScreen(
 
 
 @Composable
-fun NavigationRoot(
-    //modifier: Modifier = Modifier //TODO: Remove it
-) {
+fun NavigationRoot() {
     val rootBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = rootSerializersModule
@@ -52,7 +50,7 @@ fun NavigationRoot(
         ),
         entryProvider = entryProvider {
             entry<Route.Work> {
-                WorkNavigation()
+                WorkNavigation(rootBackStack)
             }
             entry<Route.Menu.Authorization> {
                 TitledNavigableBackScreen(

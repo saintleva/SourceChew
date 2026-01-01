@@ -2,6 +2,8 @@ package com.github.saintleva.sourcechew.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -14,8 +16,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun WorkNavigation(
-    //TODO: Remove this
-    //modifier: Modifier = Modifier
+    rootBackStack: NavBackStack<NavKey>
 ) {
     val backStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -31,7 +32,10 @@ fun WorkNavigation(
         ),
         entryProvider = entryProvider {
             entry<Route.Work.Search> {
-                WorkNavigableBackScreen(onMenuItemClick = ) { modifier ->
+                WorkNavigableBackScreen(
+                    rootBackStack = rootBackStack,
+                    onMenuItemClick = { rootBackStack.add(it) }
+                ) { modifier ->
                     SearchScreen(
                         modifier = modifier,
                         viewModel = koinViewModel(),
@@ -41,6 +45,8 @@ fun WorkNavigation(
             }
             entry<Route.Work.Found> {
                 WorkNavigableBackScreen(
+                    rootBackStack = rootBackStack,
+                    onMenuItemClick = { rootBackStack.add(it) },
                     actions = { BackIcon { backStack.pop() } }
                 ) { modifier ->
                     FoundScreen(modifier, viewModel = koinViewModel())

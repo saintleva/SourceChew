@@ -20,6 +20,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -30,6 +32,7 @@ import sourcechew.composeapp.generated.resources.menu
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkNavigableBackScreen(
+    rootBackStack: NavBackStack<NavKey>,
     actions: @Composable RowScope.() -> Unit = {},
     onMenuItemClick: (Route.Menu) -> Unit = {},
     content: @Composable (Modifier) -> Unit
@@ -51,6 +54,7 @@ fun WorkNavigableBackScreen(
                         icon = { route.icon?.let {
                             Icon(it, contentDescription = route.label) } },
                         onClick = {
+                            onMenuItemClick(route)
                             scope.launch { drawerState.close() }
                             selectedMenuItem.value = Route.Menu.entries.indexOf(route)
                         }
