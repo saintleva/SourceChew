@@ -59,4 +59,6 @@
     <string name="enter_api_token">Введите токен</string>
     <string name="save">Сохранить</string>
     <string name="remove">Удалить</string>
+    <string name="settings">Настройки</string>
+    <string name="about">О приложении</string>
 </resources>

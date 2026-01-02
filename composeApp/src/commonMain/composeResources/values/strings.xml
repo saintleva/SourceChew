@@ -60,4 +60,6 @@ Try changing your search terms.</string>
     <string name="enter_api_token">Enter API Token</string>
     <string name="save">Save</string>
     <string name="remove">Remove</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
 </resources>

@@ -50,7 +50,7 @@ fun NavigationRoot() {
         ),
         entryProvider = entryProvider {
             entry<Route.Work> {
-                WorkNavigation(rootBackStack)
+                WorkNavigation(onMenuItemClick = { rootBackStack.add(it) } )
             }
             entry<Route.Menu.Authorization> {
                 TitledNavigableBackScreen(

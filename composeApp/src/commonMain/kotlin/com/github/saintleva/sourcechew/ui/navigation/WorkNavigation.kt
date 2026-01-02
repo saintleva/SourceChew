@@ -2,8 +2,6 @@ package com.github.saintleva.sourcechew.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -16,7 +14,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun WorkNavigation(
-    rootBackStack: NavBackStack<NavKey>
+    onMenuItemClick: (Route.Menu) -> Unit,
 ) {
     val backStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -32,9 +30,11 @@ fun WorkNavigation(
         ),
         entryProvider = entryProvider {
             entry<Route.Work.Search> {
-                WorkNavigableBackScreen(
-                    rootBackStack = rootBackStack,
-                    onMenuItemClick = { rootBackStack.add(it) }
+                WorkScreen(
+                    onSearchItemClick = {
+                        if (backStack.lastOrNull() != Route.Work.Search) backStack.add(Route.Work.Search)
+                                        },
+                    onMenuItemClick = onMenuItemClick
                 ) { modifier ->
                     SearchScreen(
                         modifier = modifier,
@@ -44,9 +44,11 @@ fun WorkNavigation(
                 }
             }
             entry<Route.Work.Found> {
-                WorkNavigableBackScreen(
-                    rootBackStack = rootBackStack,
-                    onMenuItemClick = { rootBackStack.add(it) },
+                WorkScreen(
+                    onSearchItemClick = {
+                        if (backStack.lastOrNull() != Route.Work.Search) backStack.add(Route.Work.Search)
+                    },
+                    onMenuItemClick = onMenuItemClick,
                     actions = { BackIcon { backStack.pop() } }
                 ) { modifier ->
                     FoundScreen(modifier, viewModel = koinViewModel())

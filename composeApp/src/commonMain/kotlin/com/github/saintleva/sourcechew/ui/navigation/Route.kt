@@ -1,9 +1,5 @@
 package com.github.saintleva.sourcechew.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
@@ -15,26 +11,14 @@ sealed interface Route : NavKey {
 
     @Serializable
     sealed interface Menu : Route {
-        val icon: ImageVector?
-        val label: String
 
         @Serializable
-        data object Authorization : Menu {
-            override val icon = Icons.Default.Face
-            override val label = "Authorization"
-        }
-
+        data object Authorization : Menu
         @Serializable
-        data object Settings : Menu {
-            override val icon = Icons.Default.Settings
-            override val label = "Settings"
-        }
-
+        data object Settings : Menu
         @Serializable
-        data object About : Menu {
-            override val icon = null
-            override val label = "About"
-        }
+        data object About : Menu
+
         companion object {
             val entries = listOf(Authorization, Settings, About)
         }
