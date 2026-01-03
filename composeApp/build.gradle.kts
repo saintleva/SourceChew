@@ -1,7 +1,5 @@
-//TODO: Remove this
-//import androidx.glance.appwidget.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -14,24 +12,45 @@ plugins {
 
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        //@OptIn(ExperimentalKotlinGradlePluginApi::class) //TODO: Remove this
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     
-    jvm("desktop")
-
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+        }
+    }
+    
+    jvm("jvmDesktop")
+    
+    js {
+        browser()
+        binaries.executable()
+    }
+    
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
+    
     sourceSets {
         val jvmMain by creating {
             dependsOn(commonMain.get())
         }
 
-        val desktopMain by getting
+        val jvmDesktopMain by getting
 
         androidMain.get().dependsOn(jvmMain)
-        desktopMain.dependsOn(jvmMain)
-        
+        jvmDesktopMain.dependsOn(jvmMain)
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -40,6 +59,9 @@ kotlin {
             implementation(libs.koin.androidx.compose)
 
             implementation(libs.ktor.client.cio)
+
+            //TODO: Remove this
+            //implementation(libs.androidx.security.crypto)
         }
         androidUnitTest.dependencies {
             implementation(libs.kotest.runner.junit5)
@@ -74,16 +96,17 @@ kotlin {
             implementation(libs.ktor.client.auth)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
+
+            implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.coroutines)
         }
         commonTest.dependencies {
             implementation(libs.kotest.framework.engine)
             implementation(libs.kotest.assertions.core)
         }
-        desktopMain.dependencies {
+        jvmDesktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.appdirs)
-            implementation(libs.ktor.client.cio)
         }
     }
 }
@@ -118,21 +141,6 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-
-tasks.withType<Test>().configureEach {
-    useJUnitPlatform()
-}
-
-tasks.matching { it.name.startsWith("explodeCodeSource") }
-    .configureEach {
-        dependsOn(
-            tasks.matching {
-                it.name.startsWith("generate") &&
-                        it.name.contains("Resource") &&
-                        it.name.contains("AndroidMain")
-            }
-        )
-    }
 
 compose.desktop {
     application {

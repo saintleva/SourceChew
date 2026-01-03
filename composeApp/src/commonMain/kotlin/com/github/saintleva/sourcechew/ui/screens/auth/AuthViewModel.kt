@@ -18,8 +18,8 @@ class AuthViewModel(private val manager: AuthManager) : ViewModel() {
         initialValue = false
     )
 
+    private val _token = mutableStateOf("") //TODO: Do I need initial value here?
 
-    private val _token = mutableStateOf("")
     val token: State<String> = _token
 
     init {
