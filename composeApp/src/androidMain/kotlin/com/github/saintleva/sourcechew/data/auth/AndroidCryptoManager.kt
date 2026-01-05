@@ -1,0 +1,56 @@
+package com.github.saintleva.sourcechew.data.auth
+
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import java.security.KeyStore
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
+
+object AndroidCryptoManager {
+
+    private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+    private const val ALIAS = "auth_tokens"
+    private const val KEY_SIZE = 256
+    private const val TRANSFORMATION = "AES/GCM/NoPadding"
+
+    private val keyStore =  KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+
+    private fun key(): SecretKey {
+        val existing = keyStore.getEntry(ALIAS, null) as? KeyStore.SecretKeyEntry
+        if (existing != null) return existing.secretKey
+
+        val generator = KeyGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_AES,
+            ANDROID_KEYSTORE
+        )
+
+        val spec = KeyGenParameterSpec.Builder(
+            ALIAS,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .setKeySize(KEY_SIZE)
+            .build()
+
+        generator.init(spec)
+        return generator.generateKey()
+    }
+
+    fun encrypt(data: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance(TRANSFORMATION)
+        cipher.init(Cipher.ENCRYPT_MODE, key())
+        return cipher.iv + cipher.doFinal(data)
+    }
+
+    fun decrypt(data: ByteArray): ByteArray {
+        val iv = data.copyOfRange(0, 12)
+        val encrypted = data.copyOfRange(12, data.size)
+
+        val cipher = Cipher.getInstance(TRANSFORMATION)
+        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, iv))
+        return cipher.doFinal(encrypted)
+    }
+}
