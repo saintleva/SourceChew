@@ -18,9 +18,11 @@
 package com.github.saintleva.sourcechew.data.storage
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
@@ -31,21 +33,23 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.models.defaultPaginationPageSize
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 
 class DataStoreConfigManager(
-    private val dataStore: DataStore<Preferences>,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO //TODO: Do I really need this?
+    private val dataStore: DataStore<Preferences>
 ) : ConfigManager {
+
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     private companion object {
 
@@ -76,36 +80,49 @@ class DataStoreConfigManager(
     }
 
     suspend fun <T> save(key: Preferences.Key<T>, value: T) {
-        //TODO: Do I really need withContext() ?
-        withContext(ioDispatcher) {
-            dataStore.edit { preferences ->
-                preferences[key] = value
-            }
+        dataStore.edit { preferences ->
+            preferences[key] = value
         }
     }
 
     fun <T> read(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
-        dataStore.data.map { preferences -> preferences[key] ?: defaultValue }
+        dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences -> preferences[key] ?: defaultValue }
 
     suspend fun toggle(key: Preferences.Key<Boolean>, defaultPrevious: Boolean) {
-        withContext(ioDispatcher) {
-            dataStore.edit { preferences ->
-                preferences[key] = !(preferences[key] ?: defaultPrevious)
-            }
+        dataStore.edit { preferences ->
+            preferences[key] = !(preferences[key] ?: defaultPrevious)
         }
     }
 
     override val repoConditions = object : ConfigManager.RepoSearchConditionsAccessor {
 
-        private fun loadQueryFirstTime(): String {
-            var loadedQuery: String = RepoSearchConditions.default.query
-            runBlocking {
-                loadedQuery = read(Repo.queryKey, RepoSearchConditions.default.query).first()
-            }
-            return loadedQuery
-        }
+        //TODO: Remove this
+//        private fun loadQueryFirstTime(): String {
+//            var loadedQuery: String = RepoSearchConditions.default.query
+//            runBlocking {
+//                loadedQuery = read(Repo.queryKey, RepoSearchConditions.default.query).first()
+//            }
+//            return loadedQuery
+//        }
 
-        private val _queryStateFlow: MutableStateFlow<String> = MutableStateFlow(loadQueryFirstTime())
+        private val _queryStateFlow = MutableStateFlow(RepoSearchConditions.default.query)
+
+        init {
+            scope.launch {
+                read(Repo.queryKey, RepoSearchConditions.default.query)
+                    .collect { savedQuery ->
+                    _queryStateFlow.value = savedQuery
+                }
+            }
+        }
 
         override val flows = RepoSearchConditionsFlows(
             query = _queryStateFlow,
@@ -123,12 +140,17 @@ class DataStoreConfigManager(
                     it in RepoSearchConditions.default.onlyFlags
                 )
             },
-            sort = dataStore.data.map { preferences ->
-                RepoSearchSort.fromCode(preferences[Repo.Conditions.sortKey] ?: RepoSearchSort.default.code)
-            },
-            order = dataStore.data.map { preferences ->
-                SearchOrder.fromCode(preferences[Repo.Conditions.orderKey] ?: SearchOrder.default.code)
-            },
+            sort = read(Repo.Conditions.sortKey, RepoSearchSort.default.code)
+                .map { code -> RepoSearchSort.fromCode(code) },
+            order = read(Repo.Conditions.orderKey, SearchOrder.default.code)
+                .map { code -> SearchOrder.fromCode(code) },
+            //TODO: Remove this
+//            sort = dataStore.data.map { preferences ->
+//                RepoSearchSort.fromCode(preferences[Repo.Conditions.sortKey] ?: RepoSearchSort.default.code)
+//            },
+//            order = dataStore.data.map { preferences ->
+//                SearchOrder.fromCode(preferences[Repo.Conditions.orderKey] ?: SearchOrder.default.code)
+//            },
             usePreviousSearch = read(Repo.usePreviousSearchKey, false)
         )
         override suspend fun changeQuery(query: String) {
@@ -149,14 +171,12 @@ class DataStoreConfigManager(
         override suspend fun togglePublicOnlyFlag() {
             val publicKey = Repo.Conditions.onlyFlagKeys[OnlyFlag.PUBLIC]!!
             val privateKey = Repo.Conditions.onlyFlagKeys[OnlyFlag.PRIVATE]!!
-            withContext(ioDispatcher) {
-                dataStore.edit { preferences ->
-                    val newPublic =
-                        !(preferences[publicKey] ?: (OnlyFlag.PUBLIC in RepoSearchConditions.default.onlyFlags))
-                    preferences[publicKey] = newPublic
-                    if (newPublic) {
-                        preferences[privateKey] = false
-                    }
+            dataStore.edit { preferences ->
+                val newPublic =
+                    !(preferences[publicKey] ?: (OnlyFlag.PUBLIC in RepoSearchConditions.default.onlyFlags))
+                preferences[publicKey] = newPublic
+                if (newPublic) {
+                    preferences[privateKey] = false
                 }
             }
         }
@@ -164,14 +184,12 @@ class DataStoreConfigManager(
         override suspend fun togglePrivateOnlyFlag() {
             val publicKey = Repo.Conditions.onlyFlagKeys[OnlyFlag.PUBLIC]!!
             val privateKey = Repo.Conditions.onlyFlagKeys[OnlyFlag.PRIVATE]!!
-            withContext(ioDispatcher) {
-                dataStore.edit { preferences ->
-                    val newPrivate =
-                        !(preferences[privateKey] ?: (OnlyFlag.PRIVATE in RepoSearchConditions.default.onlyFlags))
-                    preferences[privateKey] = newPrivate
-                    if (newPrivate) {
-                        preferences[publicKey] = false
-                    }
+            dataStore.edit { preferences ->
+                val newPrivate =
+                    !(preferences[privateKey] ?: (OnlyFlag.PRIVATE in RepoSearchConditions.default.onlyFlags))
+                preferences[privateKey] = newPrivate
+                if (newPrivate) {
+                    preferences[publicKey] = false
                 }
             }
         }

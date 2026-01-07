@@ -12,10 +12,14 @@ object AndroidCryptoManager {
 
     private const val ANDROID_KEYSTORE = "AndroidKeyStore"
     private const val ALIAS = "auth_tokens"
+    private const val ALGORITHM = "AES/GCM/NoPadding"
     private const val KEY_SIZE = 256
-    private const val TRANSFORMATION = "AES/GCM/NoPadding"
+    private const val IV_SIZE_BYTES = 12
+    private const val TAG_LENGTH_BITS = 128
 
-    private val keyStore =  KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+    private val keyStore by lazy {
+        KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+    }
 
     private fun key(): SecretKey {
         val existing = keyStore.getEntry(ALIAS, null) as? KeyStore.SecretKeyEntry
@@ -40,17 +44,17 @@ object AndroidCryptoManager {
     }
 
     fun encrypt(data: ByteArray): ByteArray {
-        val cipher = Cipher.getInstance(TRANSFORMATION)
+        val cipher = Cipher.getInstance(ALGORITHM)
         cipher.init(Cipher.ENCRYPT_MODE, key())
         return cipher.iv + cipher.doFinal(data)
     }
 
     fun decrypt(data: ByteArray): ByteArray {
-        val iv = data.copyOfRange(0, 12)
-        val encrypted = data.copyOfRange(12, data.size)
+        val iv = data.copyOfRange(0, IV_SIZE_BYTES)
+        val encrypted = data.copyOfRange(IV_SIZE_BYTES, data.size)
 
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, iv))
+        val cipher = Cipher.getInstance(ALGORITHM)
+        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(TAG_LENGTH_BITS, iv))
         return cipher.doFinal(encrypted)
     }
 }

@@ -25,11 +25,17 @@ import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCase
 import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractorImpl
+import org.koin.core.qualifier.Qualifier
+import org.koin.core.qualifier.QualifierValue
 import org.koin.dsl.module
 
 
+object ConfigDataStoreQualifier : Qualifier {
+    override val value: QualifierValue = "ConfigDataStore"
+}
+
 val domainModule = module {
-    single<ConfigManager> { DataStoreConfigManager(dataStore = get()) }
+    single<ConfigManager> { DataStoreConfigManager(dataStore = get(qualifier = ConfigDataStoreQualifier)) }
     single<PagingSourceFactory> { PagingSourceFactoryImpl(apiService = get()) }
     factory<GetReposUseCase> { GetReposUseCaseImpl(pagingSourceFactory = get(), configManager = get()) }
     single<RepoSearchInteractor> { RepoSearchInteractorImpl(getReposUseCase = get()) }

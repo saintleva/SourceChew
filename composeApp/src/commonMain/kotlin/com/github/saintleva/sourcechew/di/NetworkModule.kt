@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.di
 
+import com.github.saintleva.sourcechew.data.auth.AuthManagerImpl
 import com.github.saintleva.sourcechew.data.auth.FakeAuthManager
 import com.github.saintleva.sourcechew.data.network.KtorRestApiService
 import com.github.saintleva.sourcechew.domain.repository.AuthManager
@@ -44,7 +45,7 @@ private fun createHttpClient(authManager: AuthManager, baseUrl: String) = HttpCl
 }
 
 val networkModule = module {
-    single<AuthManager> { FakeAuthManager }
+    single<AuthManager> { AuthManagerImpl(storage = get()) }
     single<SearchApiService> {
         KtorRestApiService(httpClient = createHttpClient(get(), baseUrl = "api.github.com"))
         //TODO: Remove this
