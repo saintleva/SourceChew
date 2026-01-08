@@ -11,8 +11,11 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(17)
+
+    applyDefaultHierarchyTemplate()
+
     androidTarget {
-        //@OptIn(ExperimentalKotlinGradlePluginApi::class) //TODO: Remove this
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
@@ -27,7 +30,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     jvm("jvmDesktop")
     
     js {
@@ -44,70 +47,81 @@ kotlin {
     sourceSets {
         val jvmMain by creating {
             dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.ktor.client.cio)
+            }
         }
 
-        val jvmDesktopMain by getting
+        val androidMain by getting {
+            dependsOn(jvmMain)
+            dependencies {
+                implementation(compose.preview)
+                implementation(libs.androidx.activity.compose)
 
-        androidMain.get().dependsOn(jvmMain)
-        jvmDesktopMain.dependsOn(jvmMain)
+                implementation(libs.koin.android)
+                implementation(libs.koin.androidx.compose)
 
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-
-            implementation(libs.koin.android)
-            implementation(libs.koin.androidx.compose)
-
-            implementation(libs.ktor.client.cio)
-
-            //TODO: Remove this
-            //implementation(libs.androidx.security.crypto)
+                implementation(libs.ktor.client.cio)
+            }
         }
-        androidUnitTest.dependencies {
-            implementation(libs.kotest.runner.junit5)
+
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.kotest.runner.junit5)
+            }
         }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(libs.compose.material.icons.core)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
 
-            implementation(libs.datastore.preferences.core)
-            implementation(libs.napier)
+        val commonMain by getting {
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(libs.compose.material.icons.core)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtime.compose)
 
-            api(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
+                implementation(libs.datastore.preferences.core)
+                implementation(libs.napier)
 
-            implementation(libs.androidx.navigation3.ui)
-            implementation(libs.androidx.navigation3.material3.adaptive)
-            implementation(libs.androidx.lifecycle.viewmodel.nav3)
+                api(libs.koin.core)
+                implementation(libs.koin.compose)
+                implementation(libs.koin.compose.viewmodel)
 
-            implementation(libs.androidx.paging.common)
-            implementation(libs.androidx.paging.compose)
+                implementation(libs.androidx.navigation3.ui)
+                implementation(libs.androidx.navigation3.material3.adaptive)
+                implementation(libs.androidx.lifecycle.viewmodel.nav3)
 
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.client.auth)
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.client.logging)
+                implementation(libs.androidx.paging.common)
+                implementation(libs.androidx.paging.compose)
 
-            implementation(libs.multiplatform.settings)
-            implementation(libs.multiplatform.settings.coroutines)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.client.auth)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.ktor.client.logging)
+
+                implementation(libs.multiplatform.settings)
+                implementation(libs.multiplatform.settings.coroutines)
+            }
         }
-        commonTest.dependencies {
-            implementation(libs.kotest.framework.engine)
-            implementation(libs.kotest.assertions.core)
+
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotest.framework.engine)
+                implementation(libs.kotest.assertions.core)
+            }
         }
-        jvmDesktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.appdirs)
+
+        val jvmDesktopMain by getting {
+            dependsOn(jvmMain)
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutines.swing)
+                implementation(libs.appdirs)
+            }
         }
     }
 }

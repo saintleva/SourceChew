@@ -8,7 +8,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-object AndroidCryptoManager {
+object AndroidCryptoManager : AesGcmCryptoEngine {
 
     private const val ANDROID_KEYSTORE = "AndroidKeyStore"
     private const val ALIAS = "auth_tokens"
@@ -43,18 +43,9 @@ object AndroidCryptoManager {
         return generator.generateKey()
     }
 
-    fun encrypt(data: ByteArray): ByteArray {
-        val cipher = Cipher.getInstance(ALGORITHM)
-        cipher.init(Cipher.ENCRYPT_MODE, key())
-        return cipher.iv + cipher.doFinal(data)
-    }
-
-    fun decrypt(data: ByteArray): ByteArray {
-        val iv = data.copyOfRange(0, IV_SIZE_BYTES)
-        val encrypted = data.copyOfRange(IV_SIZE_BYTES, data.size)
-
-        val cipher = Cipher.getInstance(ALGORITHM)
-        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(TAG_LENGTH_BITS, iv))
-        return cipher.doFinal(encrypted)
+    override fun generateIv(): ByteArray {
+        return ByteArray(IV_SIZE_BYTES).also {
+            java.security.SecureRandom().nextBytes(it)
+        }
     }
 }
