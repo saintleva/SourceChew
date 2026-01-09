@@ -1,11 +1,10 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
      alias(libs.plugins.kotlinMultiplatform)
      alias(libs.plugins.kotlinxSerialization)
-     alias(libs.plugins.androidApplication)
+     alias(libs.plugins.androidLibrary)
      alias(libs.plugins.composeMultiplatform)
      alias(libs.plugins.composeCompiler)
 }
@@ -13,14 +12,23 @@ plugins {
 kotlin {
     jvmToolchain(17)
 
-    applyDefaultHierarchyTemplate()
+    androidLibrary {
+        androidResources {
+            enable = true
+        }
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+        namespace = "com.github.saintleva.sourcechew"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+        packaging {
+            resources {
+                excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            }
         }
     }
-    
+
+    applyDefaultHierarchyTemplate()
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -52,7 +60,7 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
+        getByName("androidMain") {
             dependsOn(jvmMain)
             dependencies {
                 implementation(compose.preview)
@@ -60,18 +68,10 @@ kotlin {
 
                 implementation(libs.koin.android)
                 implementation(libs.koin.androidx.compose)
-
-                implementation(libs.ktor.client.cio)
             }
         }
 
-        val androidUnitTest by getting {
-            dependencies {
-                implementation(libs.kotest.runner.junit5)
-            }
-        }
-
-        val commonMain by getting {
+        getByName("commonMain") {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
@@ -102,20 +102,17 @@ kotlin {
                 implementation(libs.ktor.client.auth)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.ktor.client.logging)
-
-                implementation(libs.multiplatform.settings)
-                implementation(libs.multiplatform.settings.coroutines)
             }
         }
 
-        val commonTest by getting {
+        getByName("commonTest") {
             dependencies {
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
             }
         }
 
-        val jvmDesktopMain by getting {
+        getByName("jvmDesktopMain") {
             dependsOn(jvmMain)
             dependencies {
                 implementation(compose.desktop.currentOs)
@@ -124,37 +121,6 @@ kotlin {
             }
         }
     }
-}
-
-android {
-    namespace = "com.github.saintleva.sourcechew"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        applicationId = "com.github.saintleva.sourcechew"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-
-dependencies {
-    debugImplementation(compose.uiTooling)
 }
 
 compose.desktop {

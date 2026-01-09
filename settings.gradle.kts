@@ -25,6 +25,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        maven("https://jitpack.io")
     }
 }
 
@@ -34,3 +35,4 @@ plugins {
 }
 
 include(":composeApp")
+include(":androidApp")
