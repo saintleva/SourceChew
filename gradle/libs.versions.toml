@@ -55,7 +55,6 @@ androidx-navigation3-material3-adaptive = { group = "org.jetbrains.compose.mater
 androidx-lifecycle-viewmodel-nav3 = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle" }
 
 datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
-datestore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
 

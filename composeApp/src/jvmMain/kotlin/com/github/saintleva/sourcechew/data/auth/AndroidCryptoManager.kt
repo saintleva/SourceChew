@@ -1,14 +1,11 @@
 package com.github.saintleva.sourcechew.data.auth
 
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
-import java.security.KeyStore
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.GCMParameterSpec
+import java.security.SecureRandom
 
-object AndroidCryptoManager : AesGcmCryptoEngine {
+class CryptoManager(
+    key: SecretKey,
+    private val engine: AesCryptoEngine
+) : AesGcmCryptoEngine(key) {
 
     private const val ANDROID_KEYSTORE = "AndroidKeyStore"
     private const val ALIAS = "auth_tokens"
@@ -45,7 +42,7 @@ object AndroidCryptoManager : AesGcmCryptoEngine {
 
     override fun generateIv(): ByteArray {
         return ByteArray(IV_SIZE_BYTES).also {
-            java.security.SecureRandom().nextBytes(it)
+            SecureRandom().nextBytes(it)
         }
     }
 }
