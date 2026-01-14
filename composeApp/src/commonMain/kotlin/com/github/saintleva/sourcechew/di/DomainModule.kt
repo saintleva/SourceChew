@@ -31,7 +31,11 @@ import org.koin.dsl.module
 
 
 object ConfigDataStoreQualifier : Qualifier {
-    override val value: QualifierValue = "ConfigDataStore"
+    override val value: QualifierValue = this::class.qualifiedName!!
+}
+
+object DataStoreFileQualifier : Qualifier {
+    override val value: QualifierValue = this::class.qualifiedName!!
 }
 
 val domainModule = module {
