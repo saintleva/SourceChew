@@ -1,10 +1,11 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
      alias(libs.plugins.kotlinMultiplatform)
      alias(libs.plugins.kotlinxSerialization)
-     alias(libs.plugins.androidLibrary)
+     alias(libs.plugins.androidKmpLibrary)
      alias(libs.plugins.composeMultiplatform)
      alias(libs.plugins.composeCompiler)
 }
@@ -17,7 +18,7 @@ kotlin {
             enable = true
         }
 
-        namespace = "com.github.saintleva.sourcechew"
+        namespace = "com.github.saintleva.sourcechew.composeapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -64,7 +65,7 @@ kotlin {
         getByName("androidMain") {
             dependsOn(jvmMain)
             dependencies {
-                implementation(compose.preview)
+                implementation(libs.androidx.compose.ui.tooling.preview)
                 implementation(libs.androidx.activity.compose)
 
                 implementation(libs.koin.android)
@@ -74,15 +75,16 @@ kotlin {
 
         getByName("commonMain") {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(libs.compose.material.icons.core)
-                implementation(compose.ui)
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.compose.runtime)
+                implementation(libs.androidx.compose.foundation)
+                implementation(libs.androidx.compose.material3)
+                implementation(libs.androidx.compose.ui)
+                implementation(libs.androidx.compose.components.resources)
+                //TODO: remove this
+                //implementation("org.jetbrains.compose.ui:ui-tooling-preview:1.10.0")
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.compose.material.icons.core)
 
                 implementation(libs.datastore.preferences.core)
                 implementation(libs.napier)

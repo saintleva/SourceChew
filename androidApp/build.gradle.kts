@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.android.junit5)
 }
 
 android {
-    namespace = "com.github.saintleva.sourcechew.android"
+    namespace = "com.github.saintleva.sourcechew.androidapp"
 
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -48,8 +47,13 @@ android {
 dependencies {
     implementation(projects.composeApp)
 
+    //TODO: Remove this
+    //implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
@@ -60,6 +64,6 @@ dependencies {
     androidTestImplementation(libs.kotest.runner.junit5)
     androidTestImplementation(libs.kotest.assertions.core)
 
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    //androidTestImplementation(platform(libs.androidx.compose.bom)) //TODO: Remove this
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }
