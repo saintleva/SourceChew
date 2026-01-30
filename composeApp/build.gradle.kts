@@ -75,13 +75,19 @@ kotlin {
 
         getByName("commonMain") {
             dependencies {
-                implementation(libs.androidx.compose.runtime)
-                implementation(libs.androidx.compose.foundation)
-                implementation(libs.androidx.compose.material3)
-                implementation(libs.androidx.compose.ui)
-                implementation(libs.androidx.compose.components.resources)
-                //TODO: remove this
-                //implementation("org.jetbrains.compose.ui:ui-tooling-preview:1.10.0")
+                //TODO: Use this implementations
+//                implementation(libs.androidx.compose.runtime)
+//                implementation(libs.androidx.compose.foundation)
+//                implementation(libs.androidx.compose.material3)
+//                implementation(libs.androidx.compose.ui)
+//                implementation(libs.androidx.compose.components.resources)
+
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
                 implementation(libs.compose.material.icons.core)

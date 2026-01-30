@@ -43,7 +43,7 @@ actual val platformModule = module {
         val appDirs = AppDirs {
             appName = appName
             appAuthor = appAuthor
-            version = "1.0"
+            //version = "1.0" //TODO: remove this
         }
         val dataDir = appDirs.getUserDataDir()
         val keyStorePath = Paths.get(dataDir, "keystore.jceks")
@@ -69,7 +69,7 @@ actual val platformModule = module {
         val appDirs = AppDirs {
             appName = appName
             appAuthor = appAuthor
-            version = "1.0"
+            //version = "1.0" //TODO: remove this
         }
         val dataDir = appDirs.getUserDataDir()
 
