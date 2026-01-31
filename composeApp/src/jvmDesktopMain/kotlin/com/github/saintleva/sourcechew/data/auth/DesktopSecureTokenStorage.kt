@@ -1,45 +1,28 @@
 package com.github.saintleva.sourcechew.data.auth
 
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.div
-import kotlin.io.path.exists
-import kotlin.io.path.readBytes
-import kotlin.io.path.writeBytes
+import com.github.javakeyring.Keyring
+import com.github.javakeyring.PasswordAccessException
+import com.github.saintleva.sourcechew.BuildConfig
 
 
-class DesktopSecureTokenStorage(
-    private val storageDir: Path,
-    private val crypto: CryptoEngine
-) : SecureTokenStorage {
+object DesktopSecureTokenStorage : SecureTokenStorage {
 
-    private val tokenPath = storageDir / "auth_token.enc"
+    private val keyring = Keyring.create()
+    private const val ACCOUNT = "auth_token"
 
     override suspend fun read(): String? {
-        if (!tokenPath.exists()) return null
-
         return try {
-            val encrypted = tokenPath.readBytes()
-            crypto.decrypt(encrypted).decodeToString()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            tokenPath.deleteIfExists()
+            keyring.getPassword(BuildConfig.APPLICATION_NAME, ACCOUNT)
+        } catch (e: PasswordAccessException) {
             null
         }
     }
 
     override suspend fun write(token: String) {
-        try {
-            if (!storageDir.exists()) storageDir.createDirectories()
-            val encrypted = crypto.encrypt(token.encodeToByteArray())
-            tokenPath.writeBytes(encrypted)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        keyring.setPassword(BuildConfig.APPLICATION_NAME, ACCOUNT, token)
     }
 
     override suspend fun clear() {
-        tokenPath.deleteIfExists()
+        keyring.deletePassword(BuildConfig.APPLICATION_NAME, ACCOUNT)
     }
 }

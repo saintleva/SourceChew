@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import ca.gosyer.appdirs.AppDirs
 import com.github.saintleva.sourcechew.BuildConfig
 import com.github.saintleva.sourcechew.data.auth.CryptoEngine
-import com.github.saintleva.sourcechew.data.auth.DesktopCryptoEngine
 import com.github.saintleva.sourcechew.data.auth.DesktopSecretKeyProvider
 import com.github.saintleva.sourcechew.data.auth.DesktopSecureTokenStorage
 import com.github.saintleva.sourcechew.data.auth.JceksSecretKeyProvider
