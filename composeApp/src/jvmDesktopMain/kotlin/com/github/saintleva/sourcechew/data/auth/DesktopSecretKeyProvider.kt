@@ -8,7 +8,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
 
-class DesktopSecretKeyProvider(
+class JceksSecretKeyProvider(
     private val keyStorePath: Path,
     private val keyAlias: String,
     private val password: CharArray

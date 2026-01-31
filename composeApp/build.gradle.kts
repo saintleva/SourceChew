@@ -3,11 +3,12 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-     alias(libs.plugins.kotlinMultiplatform)
-     alias(libs.plugins.kotlinxSerialization)
-     alias(libs.plugins.androidKmpLibrary)
-     alias(libs.plugins.composeMultiplatform)
-     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.androidKmpLibrary)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.gmazzoBuildconfig)
 }
 
 kotlin {
@@ -142,4 +143,10 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+buildConfig {
+    packageName.set("com.github.saintleva.sourcechew")
+    buildConfigField("APPLICATION_NAME", "SourceChew")
+    buildConfigField("APPLICATION_AUTHOR", "saintleva")
 }

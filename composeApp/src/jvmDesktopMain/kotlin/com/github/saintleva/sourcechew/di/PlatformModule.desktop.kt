@@ -4,10 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import ca.gosyer.appdirs.AppDirs
+import com.github.saintleva.sourcechew.BuildConfig
 import com.github.saintleva.sourcechew.data.auth.CryptoEngine
 import com.github.saintleva.sourcechew.data.auth.DesktopCryptoEngine
 import com.github.saintleva.sourcechew.data.auth.DesktopSecretKeyProvider
 import com.github.saintleva.sourcechew.data.auth.DesktopSecureTokenStorage
+import com.github.saintleva.sourcechew.data.auth.JceksSecretKeyProvider
 import com.github.saintleva.sourcechew.data.auth.SecretKeyProvider
 import com.github.saintleva.sourcechew.data.auth.SecureTokenStorage
 import org.koin.dsl.module
@@ -15,17 +17,20 @@ import java.io.File
 import java.nio.file.Paths
 
 
-const val appName = "SourceChew"
-const val appAuthor = "saintleva"
+const val keyStoreFileName = "keystore.jceks"
+const val keyAlias = "auth-key"
 
 actual val platformModule = module {
 
-    single<File>(qualifier = DataStoreFileQualifier) {
-        val appDirs = AppDirs {
-            appName = appName
-            appAuthor = appAuthor
+    single<AppDirs> {
+        AppDirs {
+            appName = BuildConfig.APPLICATION_NAME
+            appAuthor = BuildConfig.APPLICATION_AUTHOR
         }
-        val configDir = appDirs.getUserConfigDir()
+    }
+
+    single<File>(qualifier = DataStoreFileQualifier) {
+        val configDir = get<AppDirs>().getUserConfigDir()
         val dataStoreFile = File(configDir, dataStoreFileName)
         if (!dataStoreFile.parentFile.exists()) {
             dataStoreFile.parentFile.mkdirs()
@@ -40,21 +45,16 @@ actual val platformModule = module {
     }
 
     single<SecretKeyProvider> {
-        val appDirs = AppDirs {
-            appName = appName
-            appAuthor = appAuthor
-            //version = "1.0" //TODO: remove this
-        }
-        val dataDir = appDirs.getUserDataDir()
-        val keyStorePath = Paths.get(dataDir, "keystore.jceks")
-        val keyAlias = "auth-key"
+        val dataDir = get<AppDirs>().getUserDataDir()
+        val keyStorePath = Paths.get(dataDir, keyStoreFileName)
+        val keyAlias = keyAlias
         val password = "password".toCharArray()
 
         if (!keyStorePath.parent.toFile().exists()) {
             keyStorePath.parent.toFile().mkdirs()
         }
 
-        DesktopSecretKeyProvider(
+        JceksSecretKeyProvider(
             keyStorePath = keyStorePath,
             keyAlias = keyAlias,
             password = password
@@ -66,13 +66,7 @@ actual val platformModule = module {
     }
 
     single<SecureTokenStorage> {
-        val appDirs = AppDirs {
-            appName = appName
-            appAuthor = appAuthor
-            //version = "1.0" //TODO: remove this
-        }
-        val dataDir = appDirs.getUserDataDir()
-
+        val dataDir = get<AppDirs>().getUserDataDir()
         DesktopSecureTokenStorage(
             storageDir = Paths.get(dataDir),
             crypto = get()

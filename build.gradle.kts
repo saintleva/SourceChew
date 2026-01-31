@@ -1,5 +1,6 @@
 plugins {
-    id("com.autonomousapps.dependency-analysis") version "3.5.1"
+    //TODO: Remove it or update to a newer version
+//    id("com.autonomousapps.dependency-analysis") version "3.5.1"
 
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
@@ -9,8 +10,10 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
-  }
-
-subprojects {
-    apply(plugin = "com.autonomousapps.dependency-analysis")
+    alias(libs.plugins.gmazzoBuildconfig) apply false
 }
+
+//TODO: Remove it or update to a newer version
+//subprojects {
+//    apply(plugin = "com.autonomousapps.dependency-analysis")
+//}

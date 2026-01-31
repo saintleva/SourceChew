@@ -10,6 +10,7 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "androidJunit5" }
+gmazzoBuildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "gmazzoBuildconfig" }
 
 [versions]
 
@@ -36,6 +37,7 @@ ktor = "3.4.0"
 #composeBom = "2026.01.00" //TODO: Remove this
 compose = "1.10.0"
 androidJunit5 = "2.0.1"
+gmazzoBuildconfig = "6.0.7"
 
 [libraries]
 
