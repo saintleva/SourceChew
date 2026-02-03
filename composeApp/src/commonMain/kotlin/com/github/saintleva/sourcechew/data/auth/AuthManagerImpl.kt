@@ -1,8 +1,6 @@
 package com.github.saintleva.sourcechew.data.auth
 
 import com.github.saintleva.sourcechew.domain.repository.AuthManager
-import com.russhwolf.settings.ObservableSettings
-import com.russhwolf.settings.coroutines.getStringOrNullFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,11 +13,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
-private val Dispatchers.IO: CoroutineDispatcher
-
 class AuthManagerImpl(
     private val storage: SecureTokenStorage,
-    ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    ioDispatcher: CoroutineDispatcher = com.github.saintleva.sourcechew.di.ioDispatcher
 ) : AuthManager {
 
     private val scope = CoroutineScope(ioDispatcher + SupervisorJob())

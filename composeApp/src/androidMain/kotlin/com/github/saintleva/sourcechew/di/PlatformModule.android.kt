@@ -4,11 +4,14 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import com.github.saintleva.sourcechew.data.auth.AndroidSecureTokenStorage
+import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKeys
+import com.github.saintleva.sourcechew.data.auth.DataStoreTokenStorage
 import com.github.saintleva.sourcechew.data.auth.SecureTokenStorage
+import io.github.osipxd.security.crypto.createEncrypted
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.QualifierValue
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.io.File
 
@@ -28,12 +31,17 @@ actual val platformModule = module {
     }
 
     single<DataStore<Preferences>>(qualifier = SecureDataStoreQualifier) {
-        PreferenceDataStoreFactory.create {
-            File(get<Context>().filesDir.resolve(secureDataStoreFileName).absolutePath)
+        PreferenceDataStoreFactory.createEncrypted {
+            EncryptedFile.Builder(
+                get<Context>().preferencesDataStoreFile(secureDataStoreFileName),
+                get<Context>(),
+                MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+            ).build()
         }
     }
 
     single<SecureTokenStorage> {
-        AndroidSecureTokenStorage(dataStore = get(qualifier = SecureDataStoreQualifier))
+        DataStoreTokenStorage(dataStore = get(qualifier = SecureDataStoreQualifier))
     }
 }
