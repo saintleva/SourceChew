@@ -56,26 +56,6 @@ kotlin {
     }
     
     sourceSets {
-        val jvmMain by creating {
-            dependsOn(commonMain.get())
-            dependencies {
-                implementation(libs.ktor.client.cio)
-            }
-        }
-
-        getByName("androidMain") {
-            dependsOn(jvmMain)
-            dependencies {
-                implementation(libs.androidx.compose.ui.tooling.preview)
-                implementation(libs.androidx.activity.compose)
-
-                implementation(libs.koin.android)
-                implementation(libs.koin.androidx.compose)
-
-                implementation(libs.security.crypto.datastore.preferences)
-            }
-        }
-
         getByName("commonMain") {
             dependencies {
                 //TODO: Use this implementations
@@ -124,6 +104,26 @@ kotlin {
             }
         }
 
+        val jvmMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.ktor.client.cio)
+            }
+        }
+
+        getByName("androidMain") {
+            dependsOn(jvmMain)
+            dependencies {
+                implementation(libs.androidx.compose.ui.tooling.preview)
+                implementation(libs.androidx.activity.compose)
+
+                implementation(libs.koin.android)
+                implementation(libs.koin.androidx.compose)
+
+                implementation(libs.security.crypto.datastore.preferences)
+            }
+        }
+
         getByName("jvmDesktopMain") {
             dependsOn(jvmMain)
             dependencies {
@@ -131,6 +131,12 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.swing)
                 implementation(libs.appdirs)
                 implementation(libs.java.keyring)
+            }
+        }
+
+        getByName("iosMain") {
+            dependencies {
+                implementation(libs.multiplatform.settings)
             }
         }
     }

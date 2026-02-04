@@ -1,4 +1,4 @@
-package com.github.saintleva.sourcechew.data.auth
+package com.github.saintleva.sourcechew.data.secure
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
@@ -6,19 +6,16 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 
-
-class DataStoreTokenStorage(
+class DataStoreKeyValueStorage(
     private val dataStore: DataStore<Preferences>
-) : SecureTokenStorage {
+) : SecureKeyValueStorage {
 
-    companion object {
-        private val TOKEN_KEY = stringPreferencesKey("auth_token")
-    }
-
-    override suspend fun read(): String? {
+    override suspend fun read(key: String): String? {
+        val preferencesKey = stringPreferencesKey(key)
         return dataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -27,16 +24,18 @@ class DataStoreTokenStorage(
                     throw exception
                 }
             }
-            .first()[TOKEN_KEY]
+            .first()[preferencesKey]
     }
 
-    override suspend fun write(token: String) {
+    override suspend fun write(key: String, value: String) {
+        val preferencesKey = stringPreferencesKey(key)
         dataStore.edit { preferences ->
-            preferences[TOKEN_KEY] = token
+            preferences[preferencesKey] = value
         }
     }
 
-    override suspend fun clear() {
-        dataStore.edit { it.remove(TOKEN_KEY) }
+    override suspend fun remove(key: String) {
+        val preferencesKey = stringPreferencesKey(key)
+        dataStore.edit { it.remove(preferencesKey) }
     }
 }

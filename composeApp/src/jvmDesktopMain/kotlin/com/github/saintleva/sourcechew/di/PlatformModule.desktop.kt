@@ -5,8 +5,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import ca.gosyer.appdirs.AppDirs
 import com.github.saintleva.sourcechew.BuildConfig
-import com.github.saintleva.sourcechew.data.auth.DesktopSecureTokenStorage
-import com.github.saintleva.sourcechew.data.auth.SecureTokenStorage
+import com.github.saintleva.sourcechew.data.secure.DesktopSecureKeyValueStorage
+import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
+import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
 import org.koin.dsl.module
 import java.io.File
 
@@ -35,5 +36,5 @@ actual val platformModule = module {
         }
     }
 
-    single<SecureTokenStorage> { DesktopSecureTokenStorage() }
+    single<SecureKeyValueStorage> { DesktopSecureKeyValueStorage() }
 }

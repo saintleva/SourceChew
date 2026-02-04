@@ -1,9 +1,10 @@
 package com.github.saintleva.sourcechew.data.auth
 
+import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
+import com.github.saintleva.sourcechew.di.ioDispatcher
 import com.github.saintleva.sourcechew.domain.repository.AuthManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,10 +16,10 @@ import kotlinx.coroutines.launch
 
 class AuthManagerImpl(
     private val storage: SecureTokenStorage,
-    ioDispatcher: CoroutineDispatcher = com.github.saintleva.sourcechew.di.ioDispatcher
+    coroutineDispatcher: CoroutineDispatcher = ioDispatcher
 ) : AuthManager {
 
-    private val scope = CoroutineScope(ioDispatcher + SupervisorJob())
+    private val scope = CoroutineScope(coroutineDispatcher + SupervisorJob())
 
     private val _authToken = MutableStateFlow<String?>(null)
     override val authToken = _authToken.asStateFlow()
