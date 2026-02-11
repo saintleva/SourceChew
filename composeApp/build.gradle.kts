@@ -158,4 +158,5 @@ buildConfig {
     packageName.set("com.github.saintleva.sourcechew")
     buildConfigField("APPLICATION_NAME", "SourceChew")
     buildConfigField("APPLICATION_AUTHOR", "saintleva")
+    buildConfigField("PACKAGE_NAME", "com.github.saintleva.sourcechew")
 }

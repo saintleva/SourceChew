@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import com.petersamokhin.kmm.security.SecurityStorage
 
+
+val secureStorage = SecurityStorage(context)
 
 class AuthManagerImpl(
     private val storage: SecureTokenStorage,

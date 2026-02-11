@@ -3,7 +3,6 @@ package com.github.saintleva.sourcechew.data.secure
 import com.github.javakeyring.Keyring
 import com.github.javakeyring.PasswordAccessException
 import com.github.saintleva.sourcechew.BuildConfig
-import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
