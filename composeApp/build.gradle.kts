@@ -139,6 +139,13 @@ kotlin {
                 implementation(libs.multiplatform.settings)
             }
         }
+
+        getByName("webMain") {
+            dependencies {
+                implementation(libs.kotlin.web)
+                implementation(libs.multiplatform.settings)
+            }
+        }
     }
 }
 

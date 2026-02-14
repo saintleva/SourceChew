@@ -40,6 +40,7 @@ ktor = "3.4.0"
 androidJunit5 = "2.0.1"
 gmazzoBuildconfig = "6.0.7"
 java-keyring = "1.0.4"
+kotlin-wrappers = "2026.2.11"
 
 [libraries]
 
@@ -101,3 +102,4 @@ ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version
 java-keyring = { group = "com.github.javakeyring", name = "java-keyring", version.ref = "java-keyring" }
 
 security-crypto-datastore-preferences = { group = "io.github.osipxd", name = "security-crypto-datastore-preferences", version.ref = "encrypted-datastore" }
+kotlin-web = { group = "org.jetbrains.kotlin-wrappers", name = "kotlin-web", version.ref = "kotlin-wrappers" }
