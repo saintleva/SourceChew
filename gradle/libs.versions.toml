@@ -40,7 +40,7 @@ ktor = "3.4.0"
 androidJunit5 = "2.0.1"
 gmazzoBuildconfig = "6.0.7"
 java-keyring = "1.0.4"
-kotlin-wrappers = "2026.2.11"
+#kotlin-wrappers = "2026.2.11" //TODO: Remove this
 
 [libraries]
 
@@ -55,6 +55,7 @@ androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", nam
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
 #TODO: Remove this bom
 #androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
@@ -63,7 +64,11 @@ androidx-compose-runtime = { group = "org.jetbrains.compose.runtime", name = "ru
 androidx-compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose" }
 androidx-compose-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "compose" }
 androidx-compose-components-resources  = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose" }
-androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+
+#TODO: Migrate to "androidx.compose.ui"
+androidx-compose-ui-tooling-preview = { group = "org.jetbrains.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+#androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+
 androidx-compose-ui-tooling = { group = "org.jetbrains.compose.ui", name = "ui-tooling", version.ref = "compose" }
 androidx-compose-ui-graphics = { group = "org.jetbrains.compose.ui", name = "ui-graphics", version.ref = "compose" }
 
@@ -86,6 +91,7 @@ koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compos
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel", version.ref = "koin" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
 
 appdirs = { group = "ca.gosyer", name = "kotlin-multiplatform-appdirs", version.ref = "appdirs" }
 
@@ -102,4 +108,6 @@ ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version
 java-keyring = { group = "com.github.javakeyring", name = "java-keyring", version.ref = "java-keyring" }
 
 security-crypto-datastore-preferences = { group = "io.github.osipxd", name = "security-crypto-datastore-preferences", version.ref = "encrypted-datastore" }
-kotlin-web = { group = "org.jetbrains.kotlin-wrappers", name = "kotlin-web", version.ref = "kotlin-wrappers" }
+
+#TODO: Remove this
+#kotlin-web = { group = "org.jetbrains.kotlin-wrappers", name = "kotlin-web", version.ref = "kotlin-wrappers" }

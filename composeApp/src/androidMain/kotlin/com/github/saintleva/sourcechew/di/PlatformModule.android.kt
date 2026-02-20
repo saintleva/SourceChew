@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
-import com.github.saintleva.sourcechew.data.secure.DataStoreKeyValueStorage
+import com.github.saintleva.sourcechew.data.storage.DataStoreKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import io.github.osipxd.security.crypto.createEncrypted
 import org.koin.core.qualifier.Qualifier

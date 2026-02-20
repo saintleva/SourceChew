@@ -3,7 +3,7 @@ package com.github.saintleva.sourcechew
 import androidx.compose.runtime.Composable
 import com.github.saintleva.sourcechew.ui.navigation.NavigationRoot
 import com.github.saintleva.sourcechew.ui.theme.AppTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 
 
 @Composable

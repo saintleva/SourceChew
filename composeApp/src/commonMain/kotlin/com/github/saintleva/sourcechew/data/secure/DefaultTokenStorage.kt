@@ -12,9 +12,11 @@ class DefaultTokenStorage(
     override suspend fun read(): String? =
         storage.read(key)
 
-    override suspend fun write(token: String) =
+    override suspend fun write(token: String) {
         storage.write(key, token)
+    }
 
-    override suspend fun clear() =
+    override suspend fun clear() {
         storage.remove(key)
+    }
 }

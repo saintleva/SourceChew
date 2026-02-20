@@ -94,6 +94,8 @@ kotlin {
                 implementation(libs.ktor.client.auth)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.ktor.client.logging)
+
+                implementation(libs.multiplatform.settings)
             }
         }
 
@@ -101,6 +103,8 @@ kotlin {
             dependencies {
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
+                implementation(libs.koin.test)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
 
@@ -134,18 +138,18 @@ kotlin {
             }
         }
 
-        getByName("iosMain") {
-            dependencies {
-                implementation(libs.multiplatform.settings)
-            }
-        }
-
-        getByName("webMain") {
-            dependencies {
-                implementation(libs.kotlin.web)
-                implementation(libs.multiplatform.settings)
-            }
-        }
+        //TODO: Remove this
+//        getByName("iosMain") {
+//            dependencies {
+//                implementation(libs.multiplatform.settings)
+//            }
+//        }
+//
+//        getByName("webMain") {
+//            dependencies {
+//                implementation(libs.multiplatform.settings)
+//            }
+//        }
     }
 }
 
