@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
@@ -9,6 +8,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.gmazzoBuildconfig)
+    alias(libs.plugins.kotest)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -17,6 +18,10 @@ kotlin {
     androidLibrary {
         androidResources {
             enable = true
+        }
+
+        tasks.withType<Test>().configureEach {
+            useJUnitPlatform()
         }
 
         namespace = "com.github.saintleva.sourcechew.composeapp"
@@ -115,6 +120,13 @@ kotlin {
             }
         }
 
+//        val jvmTest by creating {
+//            dependsOn(commonTest.get())
+//            dependencies {
+//                implementation(libs.kotest.runner.junit5)
+//            }
+//        }
+
         getByName("androidMain") {
             dependsOn(jvmMain)
             dependencies {
@@ -128,6 +140,11 @@ kotlin {
             }
         }
 
+//        getByName("androidUnitTest") {
+//            dependsOn(jvmTest)
+//            implementation(libs.kotest.runner.junit5)
+//        }
+
         getByName("jvmDesktopMain") {
             dependsOn(jvmMain)
             dependencies {
@@ -138,18 +155,25 @@ kotlin {
             }
         }
 
-        //TODO: Remove this
-//        getByName("iosMain") {
-//            dependencies {
-//                implementation(libs.multiplatform.settings)
-//            }
+        getByName("jvmDesktopTest") {
+            dependencies {
+                implementation(libs.kotest.runner.junit5)
+                runtimeOnly(libs.junit.platform.launcher)
+            }
+        }
+
+//        getByName("jvmDesktopTest") {
+////            dependsOn(jvmTest)
+////            implementation(libs.kotest.runner.junit5)
 //        }
-//
-//        getByName("webMain") {
-//            dependencies {
-//                implementation(libs.multiplatform.settings)
-//            }
-//        }
+//    }
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+    filter {
+        isFailOnNoMatchingTests = false
     }
 }
 
@@ -171,3 +195,8 @@ buildConfig {
     buildConfigField("APPLICATION_AUTHOR", "saintleva")
     buildConfigField("PACKAGE_NAME", "com.github.saintleva.sourcechew")
 }
+
+    //TODO: Remove this
+//kotlin.sourceSets.all {
+//    println("KMP sourceSet: $name")
+//}

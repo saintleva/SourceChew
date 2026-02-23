@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.android.junit5)
 }
 
 android {
