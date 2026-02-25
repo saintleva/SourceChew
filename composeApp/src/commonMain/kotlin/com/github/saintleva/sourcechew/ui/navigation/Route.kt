@@ -20,18 +20,18 @@ sealed interface Route : NavKey {
         data object About : Menu
 
         companion object {
-            val entries = listOf(Authorization, Settings, About)
+            val entries = listOf<Menu>(Authorization, Settings, About)
         }
     }
 
     @Serializable
-    data object Work : Route {
+    sealed interface Work : Route {
 
         @Serializable
-        data object Search : Route
+        data object Search : Work
 
         @Serializable
-        data object Found : Route
+        data object Found : Work
     }
 }
 
@@ -41,7 +41,8 @@ val rootSerializersModule = SerializersModule {
         subclass(Route.Menu.Authorization::class, Route.Menu.Authorization.serializer())
         subclass(Route.Menu.Settings::class, Route.Menu.Settings.serializer())
         subclass(Route.Menu.About::class, Route.Menu.About.serializer())
-        subclass(Route.Work::class, Route.Work.serializer())
+        subclass(Route.Work.Search::class, Route.Work.Search.serializer())
+        subclass(Route.Work.Found::class, Route.Work.Found.serializer())
     }
 }
 

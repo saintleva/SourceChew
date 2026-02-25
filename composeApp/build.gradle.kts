@@ -20,10 +20,6 @@ kotlin {
             enable = true
         }
 
-        tasks.withType<Test>().configureEach {
-            useJUnitPlatform()
-        }
-
         namespace = "com.github.saintleva.sourcechew.composeapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -34,8 +30,6 @@ kotlin {
             }
         }
     }
-
-    applyDefaultHierarchyTemplate()
 
     listOf(
         iosArm64(),
@@ -110,6 +104,7 @@ kotlin {
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.koin.test)
                 implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.kotest.extensions.koin)
             }
         }
 
@@ -119,13 +114,6 @@ kotlin {
                 implementation(libs.ktor.client.cio)
             }
         }
-
-//        val jvmTest by creating {
-//            dependsOn(commonTest.get())
-//            dependencies {
-//                implementation(libs.kotest.runner.junit5)
-//            }
-//        }
 
         getByName("androidMain") {
             dependsOn(jvmMain)
@@ -140,11 +128,6 @@ kotlin {
             }
         }
 
-//        getByName("androidUnitTest") {
-//            dependsOn(jvmTest)
-//            implementation(libs.kotest.runner.junit5)
-//        }
-
         getByName("jvmDesktopMain") {
             dependsOn(jvmMain)
             dependencies {
@@ -158,15 +141,9 @@ kotlin {
         getByName("jvmDesktopTest") {
             dependencies {
                 implementation(libs.kotest.runner.junit5)
-                runtimeOnly(libs.junit.platform.launcher)
+                implementation(libs.junit.platform.launcher)
             }
         }
-
-//        getByName("jvmDesktopTest") {
-////            dependsOn(jvmTest)
-////            implementation(libs.kotest.runner.junit5)
-//        }
-//    }
     }
 }
 

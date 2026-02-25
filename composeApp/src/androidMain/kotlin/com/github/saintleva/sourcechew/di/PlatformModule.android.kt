@@ -17,10 +17,10 @@ import java.io.File
 
 
 object SecureDataStoreQualifier : Qualifier {
-    override val value: QualifierValue = "SecureDataStore"
+    override val value: QualifierValue = this::class.qualifiedName!!
 }
 
-private const val secureDataStoreFileName = "prefs.preferences_pb"
+private const val secureDataStoreFileName = "secure.preferences_pb"
 
 actual val platformModule = module {
 

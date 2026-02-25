@@ -21,8 +21,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.launch
@@ -37,7 +37,7 @@ import sourcechew.composeapp.generated.resources.search
 import sourcechew.composeapp.generated.resources.settings
 
 
-data class MenuItemUi(
+class MenuItemUi(
     val route: Route,
     val label: StringResource,
     val icon: ImageVector?
@@ -75,7 +75,7 @@ fun WorkScreen(
     val scope = rememberCoroutineScope()
 
     //TODO: Remove this selection handling
-    val selectedMenuItem = retain { mutableStateOf<Route>(Route.Work.Search) }
+    val selectedMenuItem = remember { mutableStateOf<Route>(Route.Work.Search) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,

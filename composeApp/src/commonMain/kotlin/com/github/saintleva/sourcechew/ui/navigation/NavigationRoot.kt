@@ -40,7 +40,7 @@ fun NavigationRoot() {
         configuration = SavedStateConfiguration {
             serializersModule = rootSerializersModule
         },
-        Route.Work
+        Route.Work.Search
     )
     NavDisplay(
         backStack = rootBackStack,

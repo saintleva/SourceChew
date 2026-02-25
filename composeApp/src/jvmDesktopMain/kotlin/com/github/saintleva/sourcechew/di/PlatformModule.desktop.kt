@@ -21,7 +21,7 @@ actual val platformModule = module {
         }
     }
 
-    single<File>(qualifier = DataStoreFileQualifier) {
+    single<File>(qualifier = ConfigDataStoreQualifier) {
         val configDir = get<AppDirs>().getUserConfigDir()
         val dataStoreFile = File(configDir, dataStoreFileName)
         if (!dataStoreFile.parentFile.exists()) {
@@ -32,7 +32,7 @@ actual val platformModule = module {
 
     single<DataStore<Preferences>> {
         PreferenceDataStoreFactory.create {
-            get<File>(qualifier = DataStoreFileQualifier)
+            get<File>(qualifier = ConfigDataStoreQualifier)
         }
     }
 
