@@ -9,5 +9,7 @@ import java.nio.channels.UnresolvedAddressException
  * Checks for exceptions common during network failures on the JVM.
  */
 actual fun isNetworkException(e: Throwable): Boolean {
-    return e is IOException || e is UnresolvedAddressException
+    return isBaseNetworkException(e) ||
+            e is java.net.UnknownHostException ||
+            e is java.net.ConnectException
 }

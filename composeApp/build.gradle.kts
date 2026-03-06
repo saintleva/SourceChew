@@ -15,7 +15,7 @@ plugins {
 kotlin {
     jvmToolchain(17)
 
-    androidLibrary {
+    android {
         androidResources {
             enable = true
         }
@@ -143,6 +143,18 @@ kotlin {
                 implementation(libs.kotest.runner.junit5)
                 implementation(libs.junit.platform.launcher)
             }
+        }
+
+        val webMain by creating {
+            dependsOn(commonMain.get())
+        }
+
+        getByName("jsMain") {
+            dependsOn(webMain)
+        }
+
+        getByName("wasmJsMain") {
+            dependsOn(webMain)
         }
     }
 }
