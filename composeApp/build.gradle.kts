@@ -100,6 +100,7 @@ kotlin {
 
         getByName("commonTest") {
             dependencies {
+                implementation(kotlin("test"))
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.koin.test)
@@ -128,6 +129,8 @@ kotlin {
             }
         }
 
+        val androidUnitTest by creating { dependsOn(commonTest.get()) }
+
         getByName("jvmDesktopMain") {
             dependsOn(jvmMain)
             dependencies {
@@ -144,6 +147,17 @@ kotlin {
                 implementation(libs.junit.platform.launcher)
             }
         }
+
+        val iosMain by creating {
+            dependsOn(commonMain.get())
+        }
+        getByName("iosArm64Main") { dependsOn(iosMain) }
+        getByName("iosSimulatorArm64Main") { dependsOn(iosMain) }
+
+        val iosTest by creating {
+            dependsOn(getByName("commonTest"))}
+        getByName("iosArm64Test") { dependsOn(iosTest) }
+        getByName("iosSimulatorArm64Test") { dependsOn(iosTest) }
 
         val webMain by creating {
             dependsOn(commonMain.get())
@@ -185,7 +199,6 @@ buildConfig {
     buildConfigField("PACKAGE_NAME", "com.github.saintleva.sourcechew")
 }
 
-    //TODO: Remove this
-//kotlin.sourceSets.all {
-//    println("KMP sourceSet: $name")
-//}
+kotlin.sourceSets.all {
+    println("KMP sourceSet: $name")
+}

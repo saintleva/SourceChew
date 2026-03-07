@@ -1,8 +1,5 @@
 package com.github.saintleva.sourcechew.data.network.utils
 
-import java.io.IOException
-import java.nio.channels.UnresolvedAddressException
-
 
 /**
  * JVM-specific implementation for both Android and Desktop.

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 @Composable
 actual fun AppTheme(
     darkTheme: Boolean,
-    // Dynamic color is ignored on desktop
+    // Dynamic color is ignored on web
     dynamicColor: Boolean,
     content: @Composable () -> Unit
 ) {
