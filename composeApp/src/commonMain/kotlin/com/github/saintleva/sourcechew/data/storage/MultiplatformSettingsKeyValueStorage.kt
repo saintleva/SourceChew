@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.data.storage
 
+import com.github.saintleva.sourcechew.data.secure.ClearableSecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import com.github.saintleva.sourcechew.di.ioDispatcher
 import com.russhwolf.settings.Settings
@@ -10,7 +11,7 @@ import kotlinx.coroutines.withContext
 class MultiplatformSettingsKeyValueStorage(
     private val settings: Settings,
     private val dispatcher: CoroutineDispatcher = ioDispatcher
-) : SecureKeyValueStorage {
+) : ClearableSecureKeyValueStorage {
 
     override suspend fun read(key: String): String? {
         return withContext(dispatcher) {
@@ -27,6 +28,12 @@ class MultiplatformSettingsKeyValueStorage(
     override suspend fun remove(key: String) {
         withContext(dispatcher) {
             settings.remove(key)
+        }
+    }
+
+    override suspend fun clearAll() {
+        withContext(dispatcher) {
+            settings.clear()
         }
     }
 }

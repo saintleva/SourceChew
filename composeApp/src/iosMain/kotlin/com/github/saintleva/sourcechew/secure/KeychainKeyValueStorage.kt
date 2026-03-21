@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.secure
 
+import com.github.saintleva.sourcechew.data.secure.ClearableSecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import com.github.saintleva.sourcechew.di.ioDispatcher
 import com.russhwolf.settings.ExperimentalSettingsApi
@@ -13,7 +14,7 @@ import platform.Foundation.NSBundle
 @OptIn(ExperimentalSettingsApi::class)
 class KeychainKeyValueStorage(
     private val dispatcher: CoroutineDispatcher = ioDispatcher
-) : SecureKeyValueStorage {
+) : ClearableSecureKeyValueStorage {
 
     private val settings: Settings
 
@@ -37,6 +38,12 @@ class KeychainKeyValueStorage(
     override suspend fun remove(key: String) {
         withContext(dispatcher) {
             settings.remove(key)
+        }
+    }
+
+    override suspend fun clearAll() {
+        withContext(dispatcher) {
+            settings.clear()
         }
     }
 }

@@ -29,7 +29,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
-class SearchViewModel(
+class
+SearchViewModel(
     configManager: ConfigManager,
     private val searchInteractor: RepoSearchInteractor
 ) : ViewModel() {

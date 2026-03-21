@@ -6,13 +6,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.github.saintleva.sourcechew.data.secure.ClearableSecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 
 class DataStoreKeyValueStorage(
     private val dataStore: DataStore<Preferences>
-) : SecureKeyValueStorage {
+) : ClearableSecureKeyValueStorage {
 
     override suspend fun read(key: String): String? {
         val preferencesKey = stringPreferencesKey(key)
@@ -37,5 +38,9 @@ class DataStoreKeyValueStorage(
     override suspend fun remove(key: String) {
         val preferencesKey = stringPreferencesKey(key)
         dataStore.edit { it.remove(preferencesKey) }
+    }
+
+    override suspend fun clearAll() {
+        dataStore.edit { it.clear() }
     }
 }

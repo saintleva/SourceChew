@@ -5,3 +5,7 @@ interface SecureKeyValueStorage {
     suspend fun write(key: String, value: String)
     suspend fun remove(key: String)
 }
+
+interface ClearableSecureKeyValueStorage : SecureKeyValueStorage {
+    suspend fun clearAll()
+}
