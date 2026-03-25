@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -42,7 +43,9 @@ kotlin {
     }
 
     jvm("jvmDesktop")
-    
+
+    jvm("fakejvm")
+
     js {
         browser()
         binaries.executable()
@@ -129,7 +132,13 @@ kotlin {
             }
         }
 
-        val androidUnitTest by creating { dependsOn(commonTest.get()) }
+        getByName("fakejvmTest") {
+            dependencies {
+                implementation(libs.kotest.runner.junit5)
+                implementation(libs.robolectric)
+                implementation(libs.junit.platform.launcher)
+            }
+        }
 
         getByName("jvmDesktopMain") {
             dependsOn(jvmMain)
@@ -155,7 +164,8 @@ kotlin {
         getByName("iosSimulatorArm64Main") { dependsOn(iosMain) }
 
         val iosTest by creating {
-            dependsOn(getByName("commonTest"))}
+            dependsOn(getByName("commonTest"))
+        }
         getByName("iosArm64Test") { dependsOn(iosTest) }
         getByName("iosSimulatorArm64Test") { dependsOn(iosTest) }
 
@@ -172,6 +182,13 @@ kotlin {
         }
     }
 }
+
+//TODO: Remove it
+//dependencies {
+//    add("androidUnitTestImplementation", libs.robolectric)
+//    add("androidUnitTestImplementation", libs.kotest.runner.junit5)
+//    add("androidUnitTestImplementation", libs.kotest.extensions.robolectric)
+//}
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
