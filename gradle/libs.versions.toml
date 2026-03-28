@@ -21,7 +21,7 @@ agp = "9.1.0"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activityCompose = "1.12.4"
+androidx-activityCompose = "1.13.0"
 androidx-lifecycle = "2.10.0"
 compose = "1.10.3"
 androidx-navigation3UI = "1.1.0-alpha04"
@@ -47,6 +47,7 @@ ktor = "3.4.1"
 #androidJunit5 = "2.0.1" //TODO: Remove this
 gmazzoBuildconfig = "6.0.9"
 java-keyring = "1.0.4"
+monitor = "1.8.0"
 
 [libraries]
 
@@ -54,6 +55,7 @@ kotest-framework-engine = { group = "io.kotest", name="kotest-framework-engine",
 kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 kotest-extensions-koin = { group = "io.kotest", name = "kotest-extensions-koin", version.ref = "kotest" }
 kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-runner-junit4 = { group = "io.kotest", name = "kotest-runner-junit4", version.ref = "kotest" }
 
 junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit-platform"}
 
@@ -85,8 +87,11 @@ androidx-compose-ui-tooling-preview = { group = "org.jetbrains.compose.ui", name
 androidx-compose-ui-tooling = { group = "org.jetbrains.compose.ui", name = "ui-tooling", version.ref = "compose" }
 androidx-compose-ui-graphics = { group = "org.jetbrains.compose.ui", name = "ui-graphics", version.ref = "compose" }
 
-androidx-compose-ui-test-manifest = { group = "org.jetbrains.compose.ui", name = "ui-test-manifest", version.ref = "compose" }
-androidx-compose-ui-test-junit4 = { group = "org.jetbrains.compose.ui", name = "ui-test-junit4", version.ref = "compose" }
+#TODO: Migrate to "androidx.compose.ui"
+#androidx-compose-ui-test-manifest = { group = "org.jetbrains.compose.ui", name = "ui-test-manifest", version.ref = "compose" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version = "compose" }
+androidx-compose-ui-test-junit5 = { group = "androidx.compose.ui", name = "ui-test-junit5", version = "compose" }
 
 compose-material-icons-core = { group = "org.jetbrains.compose.material", name = "material-icons-core", version.ref = "androidx-materialIcons" }
 
@@ -121,3 +126,4 @@ ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version
 java-keyring = { group = "com.github.javakeyring", name = "java-keyring", version.ref = "java-keyring" }
 
 security-crypto-datastore-preferences = { group = "io.github.osipxd", name = "security-crypto-datastore-preferences", version.ref = "encrypted-datastore" }
+androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }

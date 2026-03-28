@@ -44,8 +44,6 @@ kotlin {
 
     jvm("jvmDesktop")
 
-    jvm("fakejvm")
-
     js {
         browser()
         binaries.executable()
@@ -132,14 +130,6 @@ kotlin {
             }
         }
 
-        getByName("fakejvmTest") {
-            dependencies {
-                implementation(libs.kotest.runner.junit5)
-                implementation(libs.robolectric)
-                implementation(libs.junit.platform.launcher)
-            }
-        }
-
         getByName("jvmDesktopMain") {
             dependsOn(jvmMain)
             dependencies {
@@ -182,13 +172,6 @@ kotlin {
         }
     }
 }
-
-//TODO: Remove it
-//dependencies {
-//    add("androidUnitTestImplementation", libs.robolectric)
-//    add("androidUnitTestImplementation", libs.kotest.runner.junit5)
-//    add("androidUnitTestImplementation", libs.kotest.extensions.robolectric)
-//}
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
