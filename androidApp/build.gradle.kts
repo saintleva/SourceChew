@@ -47,9 +47,23 @@ android {
         }
     }
 
+    sourceSets {
+        getByName("androidTest") {
+            kotlin.directories.add("../composeApp/src/commonTest/kotlin")
+            resources.directories.add("../composeApp/src/commonTest/resources")
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/LICENSE-notice.md"
+            excludes += "META-INF/junit-platform-uniqueid"
+
+            pickFirsts += "META-INF/LICENSE.md"
+            pickFirsts += "META-INF/LICENSE-notice.md"
         }
     }
 }
@@ -77,16 +91,10 @@ dependencies {
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
 
+    androidTestImplementation(projects.composeApp)
+    androidTestImplementation(libs.koin.test)
+    androidTestImplementation(libs.kotest.extensions.koin)
     androidTestImplementation(libs.kotest.runner.junit4)
     androidTestImplementation(libs.kotest.assertions.core)
-
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.10.5")
-    //androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-}
-
-tasks.withType<Test>().matching { !it.name.contains("AndroidTest") }.configureEach {
-    useJUnitPlatform()
-    filter {
-        isFailOnNoMatchingTests = false
-    }
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }

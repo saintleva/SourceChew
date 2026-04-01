@@ -6,9 +6,9 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.MasterKeys
-import com.github.saintleva.sourcechew.data.storage.DataStoreKeyValueStorage
+import androidx.security.crypto.MasterKey
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
+import com.github.saintleva.sourcechew.data.storage.DataStoreKeyValueStorage
 import io.github.osipxd.security.crypto.createEncrypted
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.QualifierValue
@@ -22,20 +22,33 @@ object SecureDataStoreQualifier : Qualifier {
 
 private const val secureDataStoreFileName = "secure.preferences_pb"
 
-actual val platformModule = module {
+fun createPlatformModule(externalContext: Context? = null) = module {
+
+    single<Context> { externalContext ?: get() }
 
     single<DataStore<Preferences>>(qualifier = ConfigDataStoreQualifier) {
         PreferenceDataStoreFactory.create {
-            File(get<Context>().filesDir.resolve(dataStoreFileName).absolutePath)
+            get<Context>().preferencesDataStoreFile(dataStoreFileName)
+            //TODO: Remove this
+            //File(get<Context>().filesDir.resolve(dataStoreFileName).absolutePath)
         }
     }
 
     single<DataStore<Preferences>>(qualifier = SecureDataStoreQualifier) {
+
+        val context = get<Context>()
+
+        @Suppress("DEPRECATION")
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        @Suppress("DEPRECATION")
         PreferenceDataStoreFactory.createEncrypted {
             EncryptedFile.Builder(
-                get<Context>().preferencesDataStoreFile(secureDataStoreFileName),
-                get<Context>(),
-                MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                context.preferencesDataStoreFile(secureDataStoreFileName),
+                context,
+                masterKey.toString(),
                 EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
             ).build()
         }
@@ -45,3 +58,5 @@ actual val platformModule = module {
         DataStoreKeyValueStorage(dataStore = get(qualifier = SecureDataStoreQualifier))
     }
 }
+
+actual val platformModule = createPlatformModule()

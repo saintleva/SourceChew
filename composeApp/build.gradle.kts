@@ -126,6 +126,7 @@ kotlin {
                 implementation(libs.koin.android)
                 implementation(libs.koin.androidx.compose)
 
+                implementation(libs.androidx.security.crypto.ktx)
                 implementation(libs.security.crypto.datastore.preferences)
             }
         }

@@ -12,13 +12,13 @@ class DesktopSecureKeyValueStorage(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : SecureKeyValueStorage {
 
-    private val keyring = Keyring.create()
+    private val keyring by lazy { Keyring.create() }
 
     override suspend fun read(key: String): String? {
         return withContext(ioDispatcher) {
             try {
                 keyring.getPassword(BuildConfig.APPLICATION_NAME, key)
-            } catch (e: PasswordAccessException) {
+            } catch (e: Exception) {
                 null
             }
         }
@@ -32,7 +32,9 @@ class DesktopSecureKeyValueStorage(
 
     override suspend fun remove(key: String) {
         withContext(ioDispatcher) {
-            keyring.deletePassword(BuildConfig.APPLICATION_NAME, key)
+            try {
+                keyring.deletePassword(BuildConfig.APPLICATION_NAME, key)
+            } catch (e: Exception) {} // Ignore if key is absent
         }
     }
 } 

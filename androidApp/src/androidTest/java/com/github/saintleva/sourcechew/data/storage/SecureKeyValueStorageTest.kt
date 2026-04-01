@@ -1,18 +1,16 @@
-package com.github.saintleva.sourcechew
+package com.github.saintleva.sourcechew.data.storage
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.github.saintleva.sourcechew.di.createPlatformModule
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.shouldBe
 import io.kotest.runner.junit4.KotestTestRunner
 import org.junit.runner.RunWith
 
 
 @RunWith(KotestTestRunner::class)
-class ExampleInstrumentedTest : FunSpec({
-
-    test("Use application context") {
-        // Context of the app under test.
+class AndroidSecureKeyValueStorageTest : FunSpec(), SecureKeyValueStorageTestShared {
+    init {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        appContext.packageName shouldBe "com.github.saintleva.sourcechew.android"
+        setupStorageTests(createPlatformModule(appContext))
     }
-})
+}
