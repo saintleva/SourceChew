@@ -117,8 +117,16 @@ kotlin {
             }
         }
 
+        val ksafeMain by creating {
+            dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.ksafe)
+            }
+        }
+
         getByName("androidMain") {
             dependsOn(jvmMain)
+            dependsOn(ksafeMain)
             dependencies {
                 implementation(libs.androidx.compose.ui.tooling.preview)
                 implementation(libs.androidx.activity.compose)
@@ -170,6 +178,7 @@ kotlin {
 
         getByName("wasmJsMain") {
             dependsOn(webMain)
+            dependsOn(ksafeMain)
         }
     }
 }

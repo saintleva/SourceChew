@@ -32,9 +32,9 @@ class DesktopSecureKeyValueStorage(
 
     override suspend fun remove(key: String) {
         withContext(ioDispatcher) {
-            try {
+            runCatching {
                 keyring.deletePassword(BuildConfig.APPLICATION_NAME, key)
-            } catch (e: Exception) {} // Ignore if key is absent
+            }
         }
     }
 } 

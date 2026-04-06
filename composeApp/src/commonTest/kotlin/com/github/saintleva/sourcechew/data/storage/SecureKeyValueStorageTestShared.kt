@@ -15,8 +15,7 @@ interface SecureKeyValueStorageTestShared : KoinTest {
         val storage: SecureKeyValueStorage by inject()
 
         suspend fun clearStorage() {
-            val s = storage
-            if (s is ClearableSecureKeyValueStorage) s.clearAll()
+            (storage as? ClearableSecureKeyValueStorage)?.clearAll()
         }
 
         afterTest {
@@ -72,6 +71,10 @@ interface SecureKeyValueStorageTestShared : KoinTest {
             val largeValue = "a".repeat(10_000)
             storage.write("large_key", largeValue)
             storage.read("large_key") shouldBe largeValue
+        }
+
+        test("May fail on some platforms") {
+            storage.remove("unexisting_key")
         }
 
         test("test clearAll if supported") {

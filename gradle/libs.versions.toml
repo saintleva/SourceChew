@@ -48,6 +48,7 @@ ktor = "3.4.2"
 #androidJunit5 = "2.0.1" //TODO: Remove this
 gmazzoBuildconfig = "6.0.9"
 java-keyring = "1.0.4"
+ksafe = "1.7.1"
 monitor = "1.8.0"
 
 [libraries]
@@ -122,6 +123,8 @@ ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-conte
 ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+
+ksafe = { group = "eu.anifantakis", name = "ksafe", version.ref = "ksafe" }
 
 java-keyring = { group = "com.github.javakeyring", name = "java-keyring", version.ref = "java-keyring" }
 
