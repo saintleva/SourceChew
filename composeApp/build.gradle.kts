@@ -76,6 +76,8 @@ kotlin {
                 implementation(libs.compose.material.icons.core)
 
                 implementation(libs.datastore.preferences.core)
+                implementation(libs.okio)
+
                 implementation(libs.napier)
 
                 api(libs.koin.core)
