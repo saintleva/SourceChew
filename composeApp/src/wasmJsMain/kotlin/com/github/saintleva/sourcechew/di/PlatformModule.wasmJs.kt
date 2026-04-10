@@ -9,6 +9,8 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
 
+    includes(webCommonModule)
+
     single<KSafe> { KSafe() }
 
     single<SecureKeyValueStorage> { KSafeKeyValueStorage(ksafe = get()) }

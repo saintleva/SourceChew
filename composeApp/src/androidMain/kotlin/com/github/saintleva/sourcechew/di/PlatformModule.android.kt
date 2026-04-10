@@ -13,11 +13,12 @@ import org.koin.core.qualifier.QualifierValue
 import org.koin.dsl.module
 
 
-object SecureDataStoreQualifier : Qualifier {
-    override val value: QualifierValue = this::class.qualifiedName!!
-}
-
-private const val secureDataStoreFileName = "secure.preferences_pb"
+//TODO: Use or remove this
+//object SecureDataStoreQualifier : Qualifier {
+//    override val value: QualifierValue = this::class.qualifiedName!!
+//}
+//
+//private const val secureDataStoreFileName = "secure.preferences_pb"
 
 fun createPlatformModule(externalContext: Context? = null) = module {
 
@@ -26,8 +27,6 @@ fun createPlatformModule(externalContext: Context? = null) = module {
     single<DataStore<Preferences>>(qualifier = ConfigDataStoreQualifier) {
         PreferenceDataStoreFactory.create {
             get<Context>().preferencesDataStoreFile(dataStoreFileName)
-            //TODO: Remove this
-            //File(get<Context>().filesDir.resolve(dataStoreFileName).absolutePath)
         }
     }
 

@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import org.koin.core.module.Module
 
 
-const val dataStoreFileName = "prefs.preferences_pb"
+const val dataStoreFileName = "prefs"
 
 expect val platformModule: Module
 
