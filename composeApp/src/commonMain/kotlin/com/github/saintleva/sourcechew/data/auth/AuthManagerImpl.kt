@@ -39,8 +39,6 @@ class AuthManagerImpl(
         _authToken.value = token
     }
 
-    override fun isTheSameToken(newToken: String) = newToken == authToken.value
-
     override suspend fun clearToken() {
         storage.clear()
         _authToken.value = null

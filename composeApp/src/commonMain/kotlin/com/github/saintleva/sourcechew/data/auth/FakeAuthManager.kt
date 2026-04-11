@@ -30,8 +30,6 @@ object FakeAuthManager : AuthManager {
         _authToken.update { token }
     }
 
-    override fun isTheSameToken(newToken: String): Boolean = false
-
     override suspend fun clearToken() {
         _authToken.update { null }
     }

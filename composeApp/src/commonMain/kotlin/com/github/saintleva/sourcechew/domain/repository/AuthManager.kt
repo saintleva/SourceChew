@@ -8,6 +8,5 @@ interface AuthManager {
     val isAuthorized: Flow<Boolean>
 
     suspend fun saveToken(token: String)
-    fun isTheSameToken(newToken: String): Boolean
     suspend fun clearToken()
 }
