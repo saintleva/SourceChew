@@ -22,7 +22,10 @@ import org.koin.dsl.module
 
 fun createPlatformModule(externalContext: Context? = null) = module {
 
-    single<Context> { externalContext ?: get() }
+    //TODO: Is it right?
+    externalContext?.let { context ->
+        single<Context> { context }
+    }
 
     single<DataStore<Preferences>>(qualifier = ConfigDataStoreQualifier) {
         PreferenceDataStoreFactory.create {

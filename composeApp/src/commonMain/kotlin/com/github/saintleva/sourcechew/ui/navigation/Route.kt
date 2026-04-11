@@ -28,6 +28,9 @@ sealed interface Route : NavKey {
     sealed interface Work : Route {
 
         @Serializable
+        data object WorkRoot : Work
+
+        @Serializable
         data object Search : Work
 
         @Serializable
@@ -41,13 +44,13 @@ val rootSerializersModule = SerializersModule {
         subclass(Route.Menu.Authorization::class, Route.Menu.Authorization.serializer())
         subclass(Route.Menu.Settings::class, Route.Menu.Settings.serializer())
         subclass(Route.Menu.About::class, Route.Menu.About.serializer())
-        subclass(Route.Work.Search::class, Route.Work.Search.serializer())
-        subclass(Route.Work.Found::class, Route.Work.Found.serializer())
+        subclass(Route.Work.WorkRoot::class, Route.Work.WorkRoot.serializer())
     }
 }
 
 val workSerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
+        subclass(Route.Work.WorkRoot::class, Route.Work.WorkRoot.serializer())
         subclass(Route.Work.Search::class, Route.Work.Search.serializer())
         subclass(Route.Work.Found::class, Route.Work.Found.serializer())
     }

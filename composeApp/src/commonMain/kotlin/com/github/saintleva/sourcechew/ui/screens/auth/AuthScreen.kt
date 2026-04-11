@@ -19,9 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.access_token
+import sourcechew.composeapp.generated.resources.change
 import sourcechew.composeapp.generated.resources.enter_api_token
 import sourcechew.composeapp.generated.resources.save
 import sourcechew.composeapp.generated.resources.remove
@@ -66,12 +68,17 @@ fun AuthScreen(
             singleLine = true
         )
         Spacer(modifier = Modifier.height(24.dp))
+        Napier.d(tag = "AuthScreen") { "Token: ${viewModel.token.value}" }
         Button(
             onClick = viewModel::onTokenSave,
-            enabled = viewModel.canSave(),
+            enabled = viewModel.canSaveState.value,
             modifier = Modifier.padding(top = 16.dp)
         ) {
-            Text(stringResource(Res.string.save))
+            Text(
+                stringResource(
+                    if (isAuthorized.value) Res.string.change else Res.string.save
+                )
+            )
         }
         if (isAuthorized.value) {
             Spacer(modifier = Modifier.height(24.dp))

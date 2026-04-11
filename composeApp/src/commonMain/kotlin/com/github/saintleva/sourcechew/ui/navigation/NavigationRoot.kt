@@ -40,7 +40,7 @@ fun NavigationRoot() {
         configuration = SavedStateConfiguration {
             serializersModule = rootSerializersModule
         },
-        Route.Work.Search
+        Route.Work.WorkRoot
     )
     NavDisplay(
         backStack = rootBackStack,
@@ -49,7 +49,7 @@ fun NavigationRoot() {
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Route.Work> {
+            entry<Route.Work.WorkRoot> {
                 WorkNavigation(onMenuItemClick = { rootBackStack.add(it) } )
             }
             entry<Route.Menu.Authorization> {

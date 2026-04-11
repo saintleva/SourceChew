@@ -1,11 +1,13 @@
 package com.github.saintleva.sourcechew.ui.screens.auth
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.repository.AuthManager
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -18,6 +20,7 @@ class AuthViewModel(private val manager: AuthManager) : ViewModel() {
         initialValue = false
     )
 
+    private val _savedToken = mutableStateOf<String?>(null)
     private val _token = mutableStateOf("") //TODO: Do I need initial value here?
 
     val token: State<String> = _token
@@ -25,19 +28,27 @@ class AuthViewModel(private val manager: AuthManager) : ViewModel() {
     init {
         viewModelScope.launch {
             manager.authToken.collect {
+                _savedToken.value = it
                 _token.value = it ?: ""
             }
         }
     }
 
-    fun canSave() = token.value.isNotBlank()
+    val canSaveState = derivedStateOf {
+        token.value.isNotBlank() && _savedToken.value != token.value
+        //TODO: Remove this
+//        token.value.isNotBlank() && !manager.isTheSameToken(token.value)
+    }
+
+    //TODO: Remove this
+//    fun canSave() = token.value.isNotBlank() && !manager.isTheSameToken(token.value)
 
     fun onTokenChange(newToken: String) {
         _token.value = newToken
     }
 
     fun onTokenSave() {
-        if (!canSave()) return
+        if (!canSaveState.value) return
         viewModelScope.launch {
             manager.saveToken(token.value)
         }
