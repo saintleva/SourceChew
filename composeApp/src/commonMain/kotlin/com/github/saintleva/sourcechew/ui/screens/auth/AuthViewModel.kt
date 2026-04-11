@@ -27,21 +27,18 @@ class AuthViewModel(private val manager: AuthManager) : ViewModel() {
 
     init {
         viewModelScope.launch {
+            val initialToken = manager.authToken.first()
+            _token.value = initialToken ?: ""
+            _savedToken.value = initialToken
             manager.authToken.collect {
                 _savedToken.value = it
-                _token.value = it ?: ""
             }
         }
     }
 
     val canSaveState = derivedStateOf {
         token.value.isNotBlank() && _savedToken.value != token.value
-        //TODO: Remove this
-//        token.value.isNotBlank() && !manager.isTheSameToken(token.value)
     }
-
-    //TODO: Remove this
-//    fun canSave() = token.value.isNotBlank() && !manager.isTheSameToken(token.value)
 
     fun onTokenChange(newToken: String) {
         _token.value = newToken
