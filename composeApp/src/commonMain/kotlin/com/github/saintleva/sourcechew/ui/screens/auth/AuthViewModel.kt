@@ -27,11 +27,12 @@ class AuthViewModel(private val manager: AuthManager) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            val initialToken = manager.authToken.first()
-            _token.value = initialToken ?: ""
-            _savedToken.value = initialToken
-            manager.authToken.collect {
-                _savedToken.value = it
+            manager.authToken.collect { newValue ->
+                val updatedValue = newValue ?: ""
+                _savedToken.value = newValue
+                if (_token.value.isBlank() || _token.value == _savedToken.value) {
+                    _token.value = updatedValue
+                }
             }
         }
     }
