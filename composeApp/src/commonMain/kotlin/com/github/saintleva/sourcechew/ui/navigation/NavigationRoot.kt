@@ -12,11 +12,13 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.saintleva.sourcechew.ui.screens.about.AboutApplicationScreen
 import com.github.saintleva.sourcechew.ui.screens.auth.AuthScreen
+import com.github.saintleva.sourcechew.ui.screens.settings.SettingsScreen
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.about_application
 import sourcechew.composeapp.generated.resources.authorization
+import sourcechew.composeapp.generated.resources.settings
 
 
 @Composable
@@ -61,13 +63,12 @@ fun NavigationRoot() {
                 }
             }
             entry<Route.Menu.Settings> {
-                //TODO: Implement settings screen and navigation
-//                TitledNavigableBackScreen(
-//                    stringResource(Res.string.about_application),
-//                    onBackClick = { rootBackStack.pop() }
-//                ) { innerPadding ->
-//                    AboutApplicationScreen(innerPadding)
-//                }
+                TitledNavigableBackScreen(
+                    stringResource(Res.string.settings),
+                    onBackClick = { rootBackStack.pop() }
+                ) { innerPadding ->
+                    SettingsScreen(innerPadding, koinViewModel())
+                }
             }
             entry<Route.Menu.About> {
                 TitledNavigableBackScreen(

@@ -61,5 +61,9 @@
     <string name="change">Заменить</string>
     <string name="remove">Удалить</string>
     <string name="settings">Настройки</string>
+    <string name="pagination_page_size">Размер страницы пагинации</string>
+    <string name="pagination_page_size_range">Диапазон: %1$d..%2$d</string>
+    <string name="decrease">Уменьшить</string>
+    <string name="increase">Увеличить</string>
     <string name="about">О приложении</string>
 </resources>

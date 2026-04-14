@@ -21,7 +21,7 @@ class AuthViewModel(private val manager: AuthManager) : ViewModel() {
     )
 
     private val _savedToken = mutableStateOf<String?>(null)
-    private val _token = mutableStateOf("") //TODO: Do I need initial value here?
+    private val _token = mutableStateOf("")
 
     val token: State<String> = _token
 
@@ -38,7 +38,10 @@ class AuthViewModel(private val manager: AuthManager) : ViewModel() {
     }
 
     val canSaveState = derivedStateOf {
-        token.value.isNotBlank() && _savedToken.value != token.value
+        val current = token.value.trim()
+        val saved = _savedToken.value?.trim() ?: ""
+
+        current.isNotBlank() && current != saved
     }
 
     fun onTokenChange(newToken: String) {
@@ -48,7 +51,7 @@ class AuthViewModel(private val manager: AuthManager) : ViewModel() {
     fun onTokenSave() {
         if (!canSaveState.value) return
         viewModelScope.launch {
-            manager.saveToken(token.value)
+            manager.saveToken(token.value.trim())
         }
     }
 

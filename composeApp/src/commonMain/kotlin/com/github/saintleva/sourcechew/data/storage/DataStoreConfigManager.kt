@@ -212,5 +212,9 @@ class DataStoreConfigManager(
         override val paginationPageSize = read(
             App.paginationPageSize, defaultPaginationPageSize
         )
+
+        override suspend fun changePaginationPageSize(value: Int) {
+            save(App.paginationPageSize, value)
+        }
     }
 }

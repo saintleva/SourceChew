@@ -110,6 +110,7 @@ class RepoSearchConditionsStateFlows(
 }
 
 const val defaultPaginationPageSize = 10
+val paginationPageSizeRange = 1..100
 
 //TODO: Remove this
 //data class FetchParams(

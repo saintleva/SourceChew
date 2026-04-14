@@ -43,6 +43,7 @@ interface ConfigManager {
 
     interface AppSettingsAccessor {
         val paginationPageSize: Flow<Int>
+        suspend fun changePaginationPageSize(value: Int)
     }
 
     val appSettings: AppSettingsAccessor
