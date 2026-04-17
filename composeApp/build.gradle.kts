@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -45,7 +44,14 @@ kotlin {
     jvm("jvmDesktop")
 
     js {
-        browser()
+        browser {
+            commonWebpackConfig {
+                devServer?.proxy = mutableListOf()
+                cssSupport {
+                    enabled = true
+                }
+            }
+        }
         binaries.executable()
     }
     
@@ -176,6 +182,9 @@ kotlin {
 
         getByName("jsMain") {
             dependsOn(webMain)
+            dependencies {
+                implementation(devNpm("path-browserify", "1.0.1"))
+            }
         }
 
         getByName("wasmJsMain") {

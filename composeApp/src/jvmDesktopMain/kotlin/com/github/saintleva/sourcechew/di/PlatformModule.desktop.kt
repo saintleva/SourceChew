@@ -8,9 +8,15 @@ import com.github.saintleva.sourcechew.BuildConfig
 import com.github.saintleva.sourcechew.data.secure.DesktopSecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
+import org.koin.core.qualifier.Qualifier
+import org.koin.core.qualifier.QualifierValue
 import org.koin.dsl.module
 import java.io.File
 
+
+object ConfigDataStoreFileQualifier : Qualifier {
+    override val value: QualifierValue = this::class.qualifiedName!!
+}
 
 actual val platformModule = module {
 
@@ -21,7 +27,7 @@ actual val platformModule = module {
         }
     }
 
-    single<File>(qualifier = ConfigDataStoreQualifier) {
+    single<File>(qualifier = ConfigDataStoreFileQualifier) {
         val configDir = get<AppDirs>().getUserConfigDir()
         val dataStoreFile = File(configDir, dataStoreFileName)
         if (!dataStoreFile.parentFile.exists()) {
@@ -30,9 +36,9 @@ actual val platformModule = module {
         dataStoreFile
     }
 
-    single<DataStore<Preferences>> {
+    single<DataStore<Preferences>>(qualifier = ConfigDataStoreQualifier) {
         PreferenceDataStoreFactory.create {
-            get<File>(qualifier = ConfigDataStoreQualifier)
+            get<File>(qualifier = ConfigDataStoreFileQualifier)
         }
     }
 
