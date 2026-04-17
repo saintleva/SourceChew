@@ -109,7 +109,7 @@ class RepoSearchConditionsStateFlows(
     )
 }
 
-const val defaultPaginationPageSize = 10
+const val defaultPaginationPageSize = 30
 val paginationPageSizeRange = 1..100
 
 //TODO: Remove this
