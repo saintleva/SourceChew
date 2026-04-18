@@ -6,14 +6,15 @@ import com.github.saintleva.sourcechew.di.initKoin
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "SourceChew",
-    ) {
-        Napier.base(DebugAntilog())
-        initKoin()
-
-        App()
+fun main() {
+    Napier.base(DebugAntilog())
+    initKoin()
+    application {
+        Window(
+            onCloseRequest = ::exitApplication,
+            title = "SourceChew",
+        ) {
+            App()
+        }
     }
 }
