@@ -7,9 +7,10 @@ import io.github.aakira.napier.Napier
 import org.koin.android.ext.koin.androidContext
 
 
-fun initApp(context: Context) {
-    if (BuildConfig.DEBUG) {)
-    Napier.base(DebugAntilog())
+fun initApp(isDebug: Boolean, context: Context) {
+    if (isDebug) {
+        Napier.base(DebugAntilog())
+    }
     Napier.d(tag = "MyApplication") { "Napier initialized" }
     initKoin {
         androidContext(context)

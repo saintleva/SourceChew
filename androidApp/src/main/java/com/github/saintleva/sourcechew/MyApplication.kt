@@ -7,6 +7,6 @@ class MyApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        initApp(BuildConfig.DEBUG, this)
+        initApp(isDebug = BuildConfig.DEBUG, context = this)
     }
 }
