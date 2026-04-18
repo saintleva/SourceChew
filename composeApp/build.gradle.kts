@@ -1,5 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -7,9 +8,9 @@ plugins {
     alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.gmazzoBuildconfig)
     alias(libs.plugins.kotest)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.buildkonfig)
 }
 
 kotlin {
@@ -213,11 +214,13 @@ compose.desktop {
     }
 }
 
-buildConfig {
-    packageName.set("com.github.saintleva.sourcechew")
-    buildConfigField("APPLICATION_NAME", "SourceChew")
-    buildConfigField("APPLICATION_AUTHOR", "saintleva")
-    buildConfigField("PACKAGE_NAME", "com.github.saintleva.sourcechew")
+buildkonfig {
+    packageName = "com.github.saintleva.sourcechew"
+    defaultConfigs {
+        buildConfigField(Type.STRING, "APPLICATION_NAME", "SourceChew")
+        buildConfigField(Type.STRING, "APPLICATION_AUTHOR", "saintleva")
+        buildConfigField(Type.STRING, "PACKAGE_NAME", packageName)
+    }
 }
 
 kotlin.sourceSets.all {

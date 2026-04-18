@@ -22,7 +22,7 @@ actual val platformModule = module {
 
     single<AppDirs> {
         AppDirs {
-            appName = BuildConfig.APPLICATION_NAME
+            appName = BuildKonfig.APPLICATION_NAME
             appAuthor = BuildConfig.APPLICATION_AUTHOR
         }
     }

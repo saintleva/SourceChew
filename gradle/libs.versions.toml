@@ -9,11 +9,10 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotest = { id = "io.kotest", version.ref = "kotest" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 
 #TODO: Remove this
 #android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "androidJunit5" }
-
-gmazzoBuildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "gmazzoBuildconfig" }
 
 [versions]
 
@@ -46,7 +45,7 @@ androidx-paging = "3.4.2"
 ktor = "3.4.2"
 #composeBom = "2026.01.00" //TODO: Remove this
 #androidJunit5 = "2.0.1" //TODO: Remove this
-gmazzoBuildconfig = "6.0.9"
+buildkonfig = "0.18.0"
 java-keyring = "1.0.4"
 ksafe = "1.7.1"
 monitor = "1.8.0"

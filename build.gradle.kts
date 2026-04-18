@@ -12,7 +12,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotest) apply false
     alias(libs.plugins.ksp) apply false
-    alias(libs.plugins.gmazzoBuildconfig) apply false
+    alias(libs.plugins.buildkonfig) apply false
 }
 
 //TODO: Remove it or update to a newer version
