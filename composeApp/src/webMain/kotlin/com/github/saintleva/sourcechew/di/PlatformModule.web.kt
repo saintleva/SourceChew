@@ -11,7 +11,7 @@ import org.koin.dsl.module
 val webCommonModule = module {
     single<DataStore<Preferences>>(qualifier = ConfigDataStoreQualifier) {
         PreferenceDataStoreFactory.createWithPath(
-            produceFile = { "$dataStoreFileName.preferences_pb".toPath() }
+            produceFile = { dataStoreFileName.toPath() }
         )
     }
 }
