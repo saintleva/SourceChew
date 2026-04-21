@@ -1,8 +1,7 @@
 package com.github.saintleva.sourcechew.data.secure
 
 import com.github.javakeyring.Keyring
-import com.github.javakeyring.PasswordAccessException
-import com.github.saintleva.sourcechew.BuildConfig
+import com.github.saintleva.sourcechew.BuildKonfig
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,7 +16,7 @@ class DesktopSecureKeyValueStorage(
     override suspend fun read(key: String): String? {
         return withContext(ioDispatcher) {
             try {
-                keyring.getPassword(BuildConfig.APPLICATION_NAME, key)
+                keyring.getPassword(BuildKonfig.APPLICATION_NAME, key)
             } catch (e: Exception) {
                 null
             }
@@ -26,14 +25,14 @@ class DesktopSecureKeyValueStorage(
 
     override suspend fun write(key: String, value: String) {
         withContext(ioDispatcher) {
-            keyring.setPassword(BuildConfig.APPLICATION_NAME, key, value)
+            keyring.setPassword(BuildKonfig.APPLICATION_NAME, key, value)
         }
     }
 
     override suspend fun remove(key: String) {
         withContext(ioDispatcher) {
             runCatching {
-                keyring.deletePassword(BuildConfig.APPLICATION_NAME, key)
+                keyring.deletePassword(BuildKonfig.APPLICATION_NAME, key)
             }
         }
     }

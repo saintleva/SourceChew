@@ -4,10 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import ca.gosyer.appdirs.AppDirs
-import com.github.saintleva.sourcechew.BuildConfig
+import com.github.saintleva.sourcechew.BuildKonfig
 import com.github.saintleva.sourcechew.data.secure.DesktopSecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
-import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.QualifierValue
 import org.koin.dsl.module
@@ -23,7 +22,7 @@ actual val platformModule = module {
     single<AppDirs> {
         AppDirs {
             appName = BuildKonfig.APPLICATION_NAME
-            appAuthor = BuildConfig.APPLICATION_AUTHOR
+            appAuthor = BuildKonfig.APPLICATION_AUTHOR
         }
     }
 

@@ -16,7 +16,7 @@ buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig"
 
 [versions]
 
-agp = "9.1.0"
+agp = "9.1.1"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
@@ -47,7 +47,7 @@ ktor = "3.4.2"
 #androidJunit5 = "2.0.1" //TODO: Remove this
 buildkonfig = "0.18.0"
 java-keyring = "1.0.4"
-ksafe = "1.7.1"
+ksafe = "1.8.1"
 monitor = "1.8.0"
 
 [libraries]

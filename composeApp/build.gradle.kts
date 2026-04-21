@@ -214,15 +214,23 @@ compose.desktop {
     }
 }
 
+val isRelease: Boolean
+    get() = project.hasProperty("release") ||
+            project.gradle.startParameter.taskNames.any {
+                it.contains("Release", ignoreCase = true) || it.contains("Distribution")
+            }
+
 buildkonfig {
     packageName = "com.github.saintleva.sourcechew"
     defaultConfigs {
         buildConfigField(Type.STRING, "APPLICATION_NAME", "SourceChew")
         buildConfigField(Type.STRING, "APPLICATION_AUTHOR", "saintleva")
         buildConfigField(Type.STRING, "PACKAGE_NAME", packageName)
+        buildConfigField(Type.BOOLEAN, "IS_DEBUG", (!isRelease).toString())
     }
 }
 
-kotlin.sourceSets.all {
-    println("KMP sourceSet: $name")
-}
+//TODO: Remove this
+//kotlin.sourceSets.all {
+//    println("KMP sourceSet: $name")
+//}

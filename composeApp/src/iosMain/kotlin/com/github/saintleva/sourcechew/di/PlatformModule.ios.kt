@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.di
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import com.github.saintleva.sourcechew.BuildKonfig
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.storage.MultiplatformSettingsKeyValueStorage
 import com.russhwolf.settings.KeychainSettings
@@ -22,7 +23,7 @@ import platform.Foundation.NSUserDomainMask
 actual val platformModule = module {
 
     single<Settings> {
-        val bundleId = NSBundle.mainBundle.bundleIdentifier ?: "com.github.saintleva.sourcechew"
+        val bundleId = NSBundle.mainBundle.bundleIdentifier ?: BuildKonfig.PACKAGE_NAME
         KeychainSettings(service = bundleId)
     }
 

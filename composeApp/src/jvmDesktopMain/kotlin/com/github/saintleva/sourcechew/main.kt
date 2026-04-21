@@ -7,7 +7,7 @@ import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
 fun main() {
-    Napier.base(DebugAntilog())
+    if (BuildKonfig.IS_DEBUG) Napier.base(DebugAntilog())
     initKoin()
     application {
         Window(
