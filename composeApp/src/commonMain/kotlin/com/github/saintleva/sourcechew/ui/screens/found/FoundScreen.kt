@@ -37,6 +37,7 @@ import androidx.paging.compose.itemKey
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.ui.common.HandlePagingLoadStates
 import com.github.saintleva.sourcechew.ui.common.pagingAppendFooter
+import io.github.aakira.napier.Napier
 
 
 @Composable
@@ -66,6 +67,7 @@ private fun ItemContent(foundRepo: FoundRepo) {
 
 @Composable
 fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
+    Napier.d(tag = "FoundScreen") { "viewModel.foundFlow = ${viewModel.foundFlow}" }
     val foundRepos = viewModel.foundFlow?.collectAsLazyPagingItems()
     HandlePagingLoadStates(
         lazyPagingItems = foundRepos,

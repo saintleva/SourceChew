@@ -25,12 +25,12 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
-class
-SearchViewModel(
+class SearchViewModel(
     configManager: ConfigManager,
     private val searchInteractor: RepoSearchInteractor
 ) : ViewModel() {
@@ -41,6 +41,10 @@ SearchViewModel(
     val searchState = searchInteractor.searchState
 
     private var _searchJob: Job? = null
+
+    init {
+        Napier.d(tag = "init") { "SearchViewModel created: ${this.hashCode()} with Interactor: ${searchInteractor.hashCode()}" }
+    }
 
     fun onQueryChange(newQuery: String) {
         viewModelScope.launch {
@@ -83,9 +87,10 @@ SearchViewModel(
     }
 
     fun canUsePreviousConditions() =
-        searchInteractor.сanUsePreviousConditions(conditionsStateFlows.toConditions())
+        searchInteractor.canUsePreviousConditions(conditionsStateFlows.toConditions())
 
     fun search() {
+        Napier.d(tag = "init") { "SearchViewModel.search() called with: ${this.hashCode()}" }
         _searchJob = viewModelScope.launch {
             searchInteractor.search(conditionsStateFlows.toConditions(),
                 conditionsStateFlows.usePreviousSearch.value)
@@ -97,7 +102,7 @@ SearchViewModel(
         searchInteractor.switchToSelecting()
     }
 
-    fun onNavigationConsumed() {
+    fun  onNavigationConsumed() {
         searchInteractor.switchToSelecting()
     }
 }

@@ -18,7 +18,9 @@ class GetReposUseCaseImpl(
     override suspend fun invoke(conditions: RepoSearchConditions): Flow<PagingData<FoundRepo>> {
         return Pager(
             config = PagingConfig(
-                pageSize = configManager.appSettings.paginationPageSize.first(),
+                pageSize = 10,
+                //TODO: Fix the bug and uncomment this
+//                pageSize = configManager.appSettings.paginationPageSize.first(),
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {

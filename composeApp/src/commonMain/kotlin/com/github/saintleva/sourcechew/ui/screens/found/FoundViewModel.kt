@@ -19,14 +19,36 @@ package com.github.saintleva.sourcechew.ui.screens.found
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
+import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 
+//TODO: Fix the bug and put this to the normal way
 class FoundViewModel(private val searchInteractor: RepoSearchInteractor) : ViewModel() {
 
-    val searchState = searchInteractor.searchState
+    init {
+        Napier.d(tag = "init") { "FoundViewModel created: ${this.hashCode()} with Interactor: ${searchInteractor.hashCode()}" }
+    }
 
-    val foundFlow = (searchState.value as? SearchState.Found)?.flow?.cachedIn(viewModelScope)
+    val searchState : StateFlow<SearchState>
+        get() {
+            Napier.d(tag = "FoundViewModel") {
+                "searchInteractor.searchState.value = ${searchInteractor.searchState.value}"
+            }
+            return searchInteractor.searchState
+        }
+
+    //TODO: Fix the bug and uncomment this
+//    val foundFlow = (searchState.value as? SearchState.Found)?.flow?.cachedIn(viewModelScope)
+    val foundFlow : Flow<PagingData<FoundRepo>>?
+        get() {
+            Napier.d(tag = "FoundViewModel") { "searchState.value = ${searchState.value}"}
+            return (searchState.value as? SearchState.Found)?.flow?.cachedIn(viewModelScope)
+        }
 }

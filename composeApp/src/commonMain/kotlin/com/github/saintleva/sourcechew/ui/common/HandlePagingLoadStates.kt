@@ -70,6 +70,7 @@ fun <T : Any> HandlePagingLoadStates(
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         if (lazyPagingItems == null) {
+            Napier.d(tag = "HandlePagingLoadStates") { "lazyPagingItems is null" }
             emptyContent(onRetryRefresh)
         } else {
             when (val refreshState = lazyPagingItems.loadState.refresh) {
@@ -83,6 +84,7 @@ fun <T : Any> HandlePagingLoadStates(
 
                 is LoadState.NotLoading -> {
                     if (lazyPagingItems.itemCount == 0) {
+                        Napier.d(tag = "HandlePagingLoadStates") { "lazyPagingItems.itemCount == 0)" }
                         // Simplified check for "empty state" when itemCount == 0.
                         // If refresh is complete and there are no items, consider it an "empty" state.
                         emptyContent(onRetryRefresh)

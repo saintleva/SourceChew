@@ -43,7 +43,7 @@ interface RepoSearchInteractor {
 
     suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean)
 
-    fun сanUsePreviousConditions(newConditions: RepoSearchConditions): Boolean
+    fun canUsePreviousConditions(newConditions: RepoSearchConditions): Boolean
 
     fun switchToSelecting()
 }
