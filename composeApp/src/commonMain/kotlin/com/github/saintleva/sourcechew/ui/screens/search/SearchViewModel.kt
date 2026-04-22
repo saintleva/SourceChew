@@ -102,7 +102,7 @@ class SearchViewModel(
         searchInteractor.switchToSelecting()
     }
 
-    fun  onNavigationConsumed() {
+    fun onNavigationConsumed() {
         searchInteractor.switchToSelecting()
     }
 }

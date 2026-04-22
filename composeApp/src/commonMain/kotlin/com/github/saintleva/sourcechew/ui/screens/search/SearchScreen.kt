@@ -85,7 +85,8 @@ fun SearchScreen(
     LaunchedEffect(searchState.value) {
         if (searchState.value is SearchState.Found) {
             onFound()
-            viewModel.onNavigationConsumed()
+            //TODO: Remove this
+            //viewModel.onNavigationConsumed()
         }
     }
 

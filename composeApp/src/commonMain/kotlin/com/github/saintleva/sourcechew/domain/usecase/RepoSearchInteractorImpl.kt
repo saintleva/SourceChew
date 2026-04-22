@@ -48,15 +48,16 @@ class RepoSearchInteractorImpl(
     }
 
     private suspend fun obtainNewResult(conditions: RepoSearchConditions) {
+        Napier.d(tag = "search") { "Starting obtainNewResult..." }
         val result = getReposUseCase(conditions)
         previousResult = result
         _searchState.update { SearchState.Found(result) }
-        Napier.d(tag = "RepoSearchInteractorImpl") { "_searchState updated. Value is ${_searchState.value}" }
+        Napier.d(tag = "search") { "_searchState updated. Value is ${_searchState.value}" }
     }
 
     private fun usePreviousResult() {
         if (previousResult == null) {
-            Napier.d(tag = "RepoSearchInteractorImpl") {"usePreviousResult() called and previousResult == null" }
+            Napier.d(tag = "search") {"usePreviousResult() called and previousResult == null" }
             _searchState.update { SearchState.Selecting }
         } else {
             _searchState.update { SearchState.Found(previousResult!!) }
