@@ -2,7 +2,9 @@ package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.data.network.utils.isNetworkException
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
@@ -27,6 +29,7 @@ import io.ktor.http.isSuccess
 import io.ktor.http.path
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmName
 
 
 @Serializable
@@ -65,6 +68,20 @@ fun GithubRepoItemDto.toDomain() = FoundRepo(
     stars = stars
 )
 
+@Serializable
+data class GithubErrorResponseDto(
+    val message: String,
+    val errors: List<GithubErrorDetailDto>? = null,
+    @SerialName("documentation_url") val documentationUrl: String? = null
+)
+
+@Serializable
+data class GithubErrorDetailDto(
+    val resource: String? = null,
+    val field: String? = null,
+    val code: String? = null,
+    val message: String? = null
+)
 
 fun GithubSearchResponseDto.toDomain() = items.map { it.toDomain() }
 
@@ -76,17 +93,40 @@ class KtorRestApiService(
     companion object {
         const val SEARCH_REPOSITORIES_ENDPOINT = "/search/repositories"
 
-        val sortVariants = mapOf(
-            RepoSearchSort.BEST_MATCH to null,
-            RepoSearchSort.STARS to "stars",
-            RepoSearchSort.FORKS to "forks",
-            RepoSearchSort.UPDATED to "updated"
-        )
+        private fun RepoSearchScope.toApiValue(): String = when (this) {
+            RepoSearchScope.NAME -> "name"
+            RepoSearchScope.DESCRIPTION -> "description"
+            RepoSearchScope.README -> "readme"
+        }
 
-        val orderVariants = mapOf(
-            SearchOrder.ASCENDING to "asc",
-            SearchOrder.DESCENDING to "desc"
-        )
+        @JvmName("toApiValueScope")
+        private fun Set<RepoSearchScope>.toApiValue(): String =
+            joinToString(",") { it.toApiValue() }
+
+        private fun OnlyFlag.toApiValue(): String = when (this) {
+            OnlyFlag.PUBLIC -> "public"
+            OnlyFlag.PRIVATE -> "private"
+            OnlyFlag.FORK -> "fork"
+            OnlyFlag.ARCHIVED -> "archived"
+            OnlyFlag.MIRROR -> "mirror"
+            OnlyFlag.TEMPLATE -> "template"
+        }
+
+        @JvmName("toApiValueFlags")
+        private fun Set<OnlyFlag>.toApiValue(): String =
+            joinToString(" ") { "is:${it.toApiValue()}" }
+
+        private fun RepoSearchSort.toApiValue(): String? = when (this) {
+            RepoSearchSort.BEST_MATCH -> null
+            RepoSearchSort.STARS -> "stars"
+            RepoSearchSort.FORKS -> "forks"
+            RepoSearchSort.UPDATED -> "updated"
+        }
+
+        private fun SearchOrder.toApiValue(): String = when (this) {
+            SearchOrder.ASCENDING -> "asc"
+            SearchOrder.DESCENDING -> "desc"
+        }
     }
 
     override suspend fun searchItems(
@@ -98,11 +138,23 @@ class KtorRestApiService(
             val response = httpClient.get {
                 url {
                     path(SEARCH_REPOSITORIES_ENDPOINT)
-                    parameter("q", conditions.query)
-                    sortVariants[conditions.sort]?.let { parameter("sort", it) }
-                    parameter("order", orderVariants[conditions.order]!!)
-                    parameter("page", page.toString())
-                    parameter("per_page", pageSize.toString())
+
+                    val queryValue = buildString {
+                        append(conditions.query)
+                        if (conditions.inScope.isNotEmpty()) {
+                            append(" in:${conditions.inScope.toApiValue()}")
+                        }
+                        if (conditions.onlyFlags.isNotEmpty()) {
+                            append(" ${conditions.onlyFlags.toApiValue()}")
+                        }
+                    }
+                    Napier.d(tag = "KtorRestApiService") { "Query: \"$queryValue\"" }
+
+                    parameter("q", queryValue)
+                    conditions.sort.toApiValue()?.let { parameter("sort", it) }
+                    parameter("order", conditions.order.toApiValue())
+                    parameter("page", page)
+                    parameter("per_page", pageSize)
                 }
                 // Important: Disable the default exception throwing for 4xx and 5xx statuses
                 // so we can handle them manually.

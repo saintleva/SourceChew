@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
+import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.SearchScreen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -44,14 +45,23 @@ fun WorkNavigation(
                 }
             }
             entry<Route.Work.Found> {
+                val foundViewModel = koinViewModel<FoundViewModel>()
                 WorkScreen(
                     onSearchItemClick = {
-                        if (backStack.lastOrNull() != Route.Work.Search) backStack.add(Route.Work.Search)
+                        if (backStack.lastOrNull() != Route.Work.Search) {
+                            foundViewModel.onNavigationBack()
+                            backStack.add(Route.Work.Search)
+                        }
                     },
                     onMenuItemClick = onMenuItemClick,
-                    actions = { BackIcon { backStack.pop() } }
+                    actions = {
+                        BackIcon {
+                            foundViewModel.onNavigationBack()
+                            backStack.pop()
+                        }
+                    }
                 ) { modifier ->
-                    FoundScreen(modifier, viewModel = koinViewModel())
+                    FoundScreen(modifier, viewModel = foundViewModel)
                 }
             }
         }
