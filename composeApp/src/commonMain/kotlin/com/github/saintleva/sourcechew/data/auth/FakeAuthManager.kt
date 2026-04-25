@@ -20,6 +20,7 @@ object FakeAuthManager : AuthManager {
 
     private val _authToken = MutableStateFlow(initialToken)
     override val authToken: Flow<String?> = _authToken.asStateFlow()
+    override suspend fun getAccessToken() = _authToken.value
 
     override val isAuthorized: Flow<Boolean> = _authToken.map { token ->
         !token.isNullOrBlank()

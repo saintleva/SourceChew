@@ -29,7 +29,7 @@ private fun createHttpClient(authManager: AuthManager, baseUrl: String) = HttpCl
     install(Auth) {
         bearer {
             loadTokens {
-                val token = authManager.authToken.firstOrNull()
+                val token = authManager.getAccessToken()
                 if (token != null) BearerTokens(token, "")
                 else null
             }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 interface AuthManager {
 
     val authToken: Flow<String?>
+    suspend fun getAccessToken(): String?
     val isAuthorized: Flow<Boolean>
 
     suspend fun saveToken(token: String)

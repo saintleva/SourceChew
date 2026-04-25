@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.data.auth
 import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
 import com.github.saintleva.sourcechew.di.ioDispatcher
 import com.github.saintleva.sourcechew.domain.repository.AuthManager
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -22,8 +23,8 @@ class AuthManagerImpl(
     private val scope = CoroutineScope(coroutineDispatcher + SupervisorJob())
 
     private val _authToken = MutableStateFlow<String?>(null)
+    private val isInitialized = CompletableDeferred<Unit>()
     override val authToken = _authToken.asStateFlow()
-
     override val isAuthorized: Flow<Boolean> = authToken
         .map { !it.isNullOrBlank() }
         .distinctUntilChanged()
@@ -31,7 +32,13 @@ class AuthManagerImpl(
     init {
         scope.launch {
             _authToken.value = storage.read()
+            isInitialized.complete(Unit)
         }
+    }
+
+    override suspend fun getAccessToken(): String? {
+        isInitialized.await()
+        return _authToken.value
     }
 
     override suspend fun saveToken(token: String) {

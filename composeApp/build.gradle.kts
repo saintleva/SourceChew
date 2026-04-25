@@ -122,7 +122,7 @@ kotlin {
         val jvmMain by creating {
             dependsOn(commonMain.get())
             dependencies {
-                implementation(libs.ktor.client.cio)
+                implementation(libs.ktor.client.okhttp)
             }
         }
 
@@ -167,6 +167,9 @@ kotlin {
 
         val iosMain by creating {
             dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.ktor.client.darwin)
+            }
         }
         getByName("iosArm64Main") { dependsOn(iosMain) }
         getByName("iosSimulatorArm64Main") { dependsOn(iosMain) }
@@ -179,6 +182,9 @@ kotlin {
 
         val webMain by creating {
             dependsOn(commonMain.get())
+            dependencies {
+                implementation(libs.ktor.client.js)
+            }
         }
 
         getByName("jsMain") {
