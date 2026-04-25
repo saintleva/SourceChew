@@ -174,11 +174,35 @@ class KtorRestApiService(
                 }
 
                 // Handle expected API errors and map them to DomainError
+
                 response.status == HttpStatusCode.UnprocessableEntity -> { // 422
-                    Result.Failure(SearchError.Validation(response.bodyAsText()))
+                    val rawBody = response.bodyAsText()
+                    val errorMessage = try {
+                        // Using the same JSON configuration as the client
+                        val errorDto = response.body<GithubErrorResponseDto>()
+
+                        // Formatting detailed error messages from GitHub's list
+                        val details = errorDto.errors?.joinToString("; ") { detail ->
+                            detail.message
+                                ?: "Error in field '${detail.field}' (code: ${detail.code})"
+                        }
+
+                        if (!details.isNullOrBlank()) {
+                            "${errorDto.message}: $details"
+                        } else {
+                            errorDto.message
+                        }
+                    } catch (e: Exception) {
+                        // Fallback if JSON parsing fails or body is not a valid GithubErrorResponseDto
+                        rawBody.takeIf { it.isNotBlank() } ?: "Validation Error (422)"
+                    }
+                    Result.Failure(SearchError.Validation(errorMessage))
                 }
 
                 response.status == HttpStatusCode.Unauthorized || response.status == HttpStatusCode.Forbidden -> { // 401, 403
+                    // Logging the body for 403 can help identify if it's a Rate Limit or Auth issue
+                    val errorDetail = response.bodyAsText()
+                    Napier.w(tag = "KtorRestApiService") { "Auth/Limit error: $errorDetail" }
                     Result.Failure(SearchError.ApiLimitOrAuth)
                 }
 
@@ -192,6 +216,10 @@ class KtorRestApiService(
 
                 else -> {
                     // Handle any other non-successful status codes
+                    val unknownBody = response.bodyAsText()
+                    Napier.e(tag = "KtorRestApiService") {
+                        "Unknown error: ${response.status.value}, body: $unknownBody"
+                    }
                     Result.Failure(SearchError.UnknownApiError(response.status.value))
                 }
             }
