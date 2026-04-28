@@ -17,9 +17,9 @@ buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig"
 [versions]
 
 agp = "9.2.0"
-android-compileSdk = "36"
+android-compileSdk = "37"
 android-minSdk = "24"
-android-targetSdk = "36"
+android-targetSdk = "37"
 androidx-activityCompose = "1.13.0"
 androidx-lifecycle = "2.10.0"
 compose = "1.10.3"
@@ -94,6 +94,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "compose-junit4" }
 
 compose-material-icons-core = { group = "org.jetbrains.compose.material", name = "material-icons-core", version.ref = "androidx-materialIcons" }
+compose-material-icons-extended = { group = "org.jetbrains.compose.material", name = "material-icons-extended", version.ref = "androidx-materialIcons" }
 
 androidx-navigation3-ui = { group = "org.jetbrains.androidx.navigation3", name = "navigation3-ui", version.ref = "androidx-navigation3UI" }
 androidx-navigation3-material3-adaptive = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "androidx-navigation3Material" }

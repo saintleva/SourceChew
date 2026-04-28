@@ -60,6 +60,8 @@
     <string name="save">Сохранить</string>
     <string name="change">Заменить</string>
     <string name="remove">Удалить</string>
+    <string name="copy">Копировать</string>
+    <string name="paste">Вставить</string>
     <string name="settings">Настройки</string>
     <string name="pagination_section">Пагинация</string>
     <string name="pagination_page_size">Размер страницы пагинации</string>

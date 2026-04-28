@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
-
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class FoundViewModel(private val searchInteractor: RepoSearchInteractor) : ViewModel() {
 
     init {

@@ -45,7 +45,6 @@ private fun createHttpClient(authManager: AuthManager, baseUrl: String) = HttpCl
 }
 
 val networkModule = module {
-    single<AuthManager> { AuthManagerImpl(storage = get()) }
     single<SearchApiService> {
         KtorRestApiService(httpClient = createHttpClient(get(), baseUrl = "api.github.com"))
         //TODO: Remove this

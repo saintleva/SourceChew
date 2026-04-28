@@ -81,6 +81,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
                 implementation(libs.compose.material.icons.core)
+                implementation(libs.compose.material.icons.extended)
 
                 implementation(libs.datastore.preferences.core)
                 implementation(libs.okio)

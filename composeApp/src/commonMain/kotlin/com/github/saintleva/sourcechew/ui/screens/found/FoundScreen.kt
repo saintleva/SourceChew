@@ -68,7 +68,7 @@ private fun ItemContent(foundRepo: FoundRepo) {
 @Composable
 fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
     Napier.d(tag = "FoundScreen") { "viewModel.foundFlow = ${viewModel.foundFlow}" }
-    val foundRepos = viewModel.foundFlow?.collectAsLazyPagingItems()
+    val foundRepos = viewModel.foundFlow.collectAsLazyPagingItems()
     HandlePagingLoadStates(
         lazyPagingItems = foundRepos,
         modifier = modifier

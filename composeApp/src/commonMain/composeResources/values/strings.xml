@@ -61,6 +61,8 @@ Try changing your search terms.</string>
     <string name="save">Save</string>
     <string name="change">Change</string>
     <string name="remove">Remove</string>
+    <string name="copy">Copy</string>
+    <string name="paste">Paste</string>
     <string name="settings">Settings</string>
     <string name="pagination_section">Pagination</string>
     <string name="pagination_page_size">Pagination page size</string>

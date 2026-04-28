@@ -8,6 +8,8 @@ import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.storage.MultiplatformSettingsKeyValueStorage
 import com.russhwolf.settings.KeychainSettings
 import com.russhwolf.settings.Settings
+import com.github.saintleva.sourcechew.ui.utils.ClipboardService
+import com.github.saintleva.sourcechew.ui.utils.IosClipboardService
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +49,8 @@ actual val platformModule = module {
             }
         )
     }
+
+    single<ClipboardService> { IosClipboardService() }
 }
 
 actual val ioDispatcher = Dispatchers.Default
