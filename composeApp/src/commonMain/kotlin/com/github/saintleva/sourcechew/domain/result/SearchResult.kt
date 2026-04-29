@@ -27,10 +27,12 @@ sealed class SearchError {
      */
     data class Validation(val reason: String) : SearchError()
 
-    /**
-     * Represents an error related to authentication or exceeding API rate limits (e.g., HTTP 401, 403).
-     */
-    data object ApiLimitOrAuth : SearchError()
+
+    data object CommonAccessError : SearchError()
+
+    data object Unauthorized : SearchError()
+
+    data object RateLimitExceeded : SearchError()
 
     /**
      * Represents a "resource not found" error (e.g., HTTP 404).

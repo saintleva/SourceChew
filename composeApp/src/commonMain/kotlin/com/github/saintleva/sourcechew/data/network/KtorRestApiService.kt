@@ -199,11 +199,17 @@ class KtorRestApiService(
                     Result.Failure(SearchError.Validation(errorMessage))
                 }
 
-                response.status == HttpStatusCode.Unauthorized || response.status == HttpStatusCode.Forbidden -> { // 401, 403
-                    // Logging the body for 403 can help identify if it's a Rate Limit or Auth issue
-                    val errorDetail = response.bodyAsText()
-                    Napier.w(tag = "KtorRestApiService") { "Auth/Limit error: $errorDetail" }
-                    Result.Failure(SearchError.ApiLimitOrAuth)
+                response.status == HttpStatusCode.Unauthorized -> { // 401
+                    Result.Failure(SearchError.Unauthorized)
+                }
+
+                response.status == HttpStatusCode.Forbidden -> { // 403
+                    val body = response.bodyAsText()
+                    if (body.contains("rate limit", ignoreCase = true)) {
+                        Result.Failure(SearchError.RateLimitExceeded)
+                    } else {
+                        Result.Failure(SearchError.CommonAccessError)
+                    }
                 }
 
                 response.status == HttpStatusCode.NotFound -> { // 404

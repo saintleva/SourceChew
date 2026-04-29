@@ -8,11 +8,13 @@ import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.error_api_limit
+import sourcechew.composeapp.generated.resources.error_common_access
 import sourcechew.composeapp.generated.resources.error_deserialization
 import sourcechew.composeapp.generated.resources.error_network
 import sourcechew.composeapp.generated.resources.error_not_found
+import sourcechew.composeapp.generated.resources.error_rate_limit_exceeded
 import sourcechew.composeapp.generated.resources.error_server
+import sourcechew.composeapp.generated.resources.error_unauthorized
 import sourcechew.composeapp.generated.resources.error_unknown_api
 import sourcechew.composeapp.generated.resources.error_unknown_infrastructure
 import sourcechew.composeapp.generated.resources.error_validation
@@ -26,7 +28,9 @@ fun getErrorMessage(error: Throwable): String {
         // Unpack our custom PagingDomainException to access the underlying business error.
         is PagingSearchException ->
             when (val searchError = error.error) {
-                is SearchError.ApiLimitOrAuth -> stringResource(Res.string.error_api_limit)
+                is SearchError.CommonAccessError -> stringResource(Res.string.error_common_access)
+                is SearchError.Unauthorized -> stringResource(Res.string.error_unauthorized)
+                is SearchError.RateLimitExceeded -> stringResource(Res.string.error_rate_limit_exceeded)
                 is SearchError.ServerError -> stringResource(Res.string.error_server)
                 is SearchError.Validation -> stringResource(Res.string.error_validation,
                     searchError.reason)

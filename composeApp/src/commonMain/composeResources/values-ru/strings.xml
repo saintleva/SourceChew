@@ -47,7 +47,9 @@
     <string name="error_network">Ошибка сети. Проверьте подключение и попробуйте снова.</string>
     <string name="error_deserialization">Не удалось обработать ответ сервера. Пожалуйста, попробуйте позже.</string>
     <string name="error_server">Сервер временно недоступен. Пожалуйста, попробуйте позже.</string>
-    <string name="error_api_limit">Превышен лимит запросов к API или ошибка аутентификации. Пожалуйста, попробуйте позже.</string>
+    <string name="error_unauthorized">Ошибка аутентификации. Проверьте ваш токен.</string>
+    <string name="error_rate_limit_exceeded">Превышен лимит запросов к API. Пожалуйста, попробуйте позже.</string>
+    <string name="error_common_access">Доступ запрещен. Проверьте ваши права доступа.</string>
     <string name="error_validation">Некорректный поисковый запрос: %1$s</string>
     <string name="error_unknown_api">Произошла непредвиденная ошибка API (Код: %1$d).</string>
     <string name="error_not_found">Запрошенный ресурс не найден.</string>
