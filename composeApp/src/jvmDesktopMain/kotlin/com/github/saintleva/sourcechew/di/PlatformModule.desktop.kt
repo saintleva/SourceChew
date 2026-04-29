@@ -7,8 +7,6 @@ import ca.gosyer.appdirs.AppDirs
 import com.github.saintleva.sourcechew.BuildKonfig
 import com.github.saintleva.sourcechew.data.secure.DesktopSecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
-import com.github.saintleva.sourcechew.ui.utils.ClipboardService
-import com.github.saintleva.sourcechew.ui.utils.DesktopClipboardService
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.QualifierValue
 import org.koin.dsl.module
@@ -44,6 +42,4 @@ actual val platformModule = module {
     }
 
     single<SecureKeyValueStorage> { DesktopSecureKeyValueStorage() }
-
-    single<ClipboardService> { DesktopClipboardService() }
 }

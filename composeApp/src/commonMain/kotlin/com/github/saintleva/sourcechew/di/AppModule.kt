@@ -21,11 +21,18 @@ import com.github.saintleva.sourcechew.ui.screens.auth.AuthViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.SearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
 import com.github.saintleva.sourcechew.ui.screens.settings.SettingsViewModel
+import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
+import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManagerConfig
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 
 val appModule = module {
+
+    single<ClipboardManager> {
+        ClipboardManager(ClipboardManagerConfig(async = true) )
+    }
+
     viewModelOf(::AuthViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SearchViewModel)

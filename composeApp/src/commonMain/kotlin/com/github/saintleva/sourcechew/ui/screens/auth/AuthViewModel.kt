@@ -6,7 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.repository.AuthManager
-import com.github.saintleva.sourcechew.ui.utils.ClipboardService
+import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
+import com.mobilebytelabs.kmptoolkit.clipboard.copyToClipboard
+import com.mobilebytelabs.kmptoolkit.clipboard.getFromClipboard
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -14,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val manager: AuthManager,
-    private val clipboardService: ClipboardService
+    private val clipboardManager: ClipboardManager
 ) : ViewModel() {
 
     val isAuthorized = manager.isAuthorized.stateIn(
@@ -64,15 +66,17 @@ class AuthViewModel(
         }
     }
 
+    fun isClipboardNotEmpty() = clipboardManager.hasText()
+
     fun onTokenCopy() {
         viewModelScope.launch {
-            clipboardService.copy(token.value)
+            clipboardManager.copyAsync(token.value)
         }
     }
 
     fun onTokenPaste() {
         viewModelScope.launch {
-            clipboardService.read()?.let {
+            clipboardManager.pasteAsync()?.let {
                 onTokenChange(it)
             }
         }

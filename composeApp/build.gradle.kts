@@ -106,6 +106,8 @@ kotlin {
                 implementation(libs.ktor.client.logging)
 
                 implementation(libs.multiplatform.settings)
+
+                implementation(libs.cmp.clipboard)
             }
         }
 

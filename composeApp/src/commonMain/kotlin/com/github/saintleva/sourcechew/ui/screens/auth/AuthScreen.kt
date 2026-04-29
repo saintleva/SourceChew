@@ -78,7 +78,8 @@ fun AuthScreen(
         ) {
             TextButton(
                 onClick = viewModel::onTokenPaste,
-                contentPadding = PaddingValues(horizontal = 8.dp)
+                contentPadding = PaddingValues(horizontal = 8.dp),
+                enabled = viewModel.isClipboardNotEmpty()
             ) {
                 Icon(Icons.Default.ContentPaste, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))

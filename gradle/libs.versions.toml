@@ -48,6 +48,7 @@ ktor = "3.4.3"
 buildkonfig = "0.18.0"
 java-keyring = "1.0.4"
 ksafe = "1.8.1"
+kmp-toolkit = "3.2.1"
 monitor = "1.8.0"
 
 [libraries]
@@ -136,3 +137,5 @@ androidx-security-crypto-ktx = { group = "androidx.security", name = "security-c
 security-crypto-datastore-preferences = { group = "io.github.osipxd", name = "security-crypto-datastore-preferences", version.ref = "encrypted-datastore" }
 
 androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
+
+cmp-clipboard = { group = "io.github.mobilebytelabs", name = "cmp-clipboard", version.ref = "kmp-toolkit" }

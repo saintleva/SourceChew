@@ -8,10 +8,6 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.storage.KSafeKeyValueStorage
 import eu.anifantakis.lib.ksafe.KSafe
-import com.github.saintleva.sourcechew.ui.utils.AndroidClipboardService
-import com.github.saintleva.sourcechew.ui.utils.ClipboardService
-import org.koin.core.qualifier.Qualifier
-import org.koin.core.qualifier.QualifierValue
 import org.koin.dsl.module
 
 
@@ -64,8 +60,6 @@ fun createPlatformModule(externalContext: Context? = null) = module {
     single<SecureKeyValueStorage> {
         KSafeKeyValueStorage(ksafe = get())
     }
-
-    single<ClipboardService> { AndroidClipboardService(context = get()) }
 }
 
 actual val platformModule = createPlatformModule()
