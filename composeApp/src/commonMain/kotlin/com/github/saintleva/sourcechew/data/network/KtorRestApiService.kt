@@ -7,6 +7,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
+import com.github.saintleva.sourcechew.domain.repository.FoundReposBlock
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
@@ -14,6 +15,7 @@ import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.SearchResult
 import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
+import com.github.saintleva.sourcechew.domain.usecase.Totality
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -39,6 +41,11 @@ data class GithubSearchResponseDto(
     val items: List<GithubRepoItemDto>
 )
 
+fun GithubSearchResponseDto.toDomain() = FoundReposBlock(
+    totality = Totality(totalCount, incompleteResults),
+    items = items.map { it.toDomain() }
+)
+
 @Serializable
 data class GithubRepoItemDto(
     val id: Long,
@@ -50,13 +57,6 @@ data class GithubRepoItemDto(
     @SerialName("stargazers_count") val stars: Int
 )
 
-// DTO for the owner of the repository
-@Serializable
-data class GitHubOwnerDto(
-    val login: String,
-    val type: String
-)
-
 fun GithubRepoItemDto.toDomain() = FoundRepo(
     id = id,
     name = name,
@@ -66,6 +66,13 @@ fun GithubRepoItemDto.toDomain() = FoundRepo(
     description = description,
     language = language,
     stars = stars
+)
+
+// DTO for the owner of the repository
+@Serializable
+data class GitHubOwnerDto(
+    val login: String,
+    val type: String
 )
 
 @Serializable
@@ -82,9 +89,6 @@ data class GithubErrorDetailDto(
     val code: String? = null,
     val message: String? = null
 )
-
-fun GithubSearchResponseDto.toDomain() = items.map { it.toDomain() }
-
 
 class KtorRestApiService(
     private val httpClient: HttpClient,
@@ -133,7 +137,7 @@ class KtorRestApiService(
         conditions: RepoSearchConditions,
         page: Int,
         pageSize: Int
-    ): SearchResult<List<FoundRepo>> {
+    ): SearchResult<FoundReposBlock> {
         try {
             val response = httpClient.get {
                 url {

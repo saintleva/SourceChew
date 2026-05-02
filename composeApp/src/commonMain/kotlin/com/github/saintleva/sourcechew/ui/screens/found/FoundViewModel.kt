@@ -22,14 +22,17 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.usecase.PaginatedRepos
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class FoundViewModel(private val searchInteractor: RepoSearchInteractor) : ViewModel() {
@@ -40,12 +43,20 @@ class FoundViewModel(private val searchInteractor: RepoSearchInteractor) : ViewM
 
     val searchState = searchInteractor.searchState
 
-    val foundFlow: Flow<PagingData<FoundRepo>> = searchState
-        .map { state -> (state as? SearchState.Found)?.flow }
-        .filterNotNull()
-        .distinctUntilChanged()
-        .flatMapLatest { it }
-        .cachedIn(viewModelScope)
+    val foundFlow: PaginatedRepos = PaginatedRepos(
+        totality = searchState
+            .map { state -> (state as? SearchState.Found)?.flow?.totality }
+            .filterNotNull()
+            .distinctUntilChanged()
+            .flatMapLatest { it }
+            .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1),
+        data = searchState
+            .map { state -> (state as? SearchState.Found)?.flow?.data }
+            .filterNotNull()
+            .distinctUntilChanged()
+            .flatMapLatest { it }
+            .cachedIn(viewModelScope)
+    )
 
     fun onNavigationBack() {
         searchInteractor.switchToSelecting()

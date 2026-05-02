@@ -7,11 +7,15 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.PagingSearchException
 import com.github.saintleva.sourcechew.domain.result.Result
+import com.github.saintleva.sourcechew.domain.usecase.Totality
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 
 class SearchPagingSource(
     private val searchApiService: SearchApiService,
-    private val conditions: RepoSearchConditions
+    private val conditions: RepoSearchConditions,
+    private val totalityState: MutableStateFlow<Totality?>
 ): PagingSource<Int, FoundRepo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FoundRepo> {
@@ -20,13 +24,16 @@ class SearchPagingSource(
         return try {
             when (val result = searchApiService.searchItems(conditions, pageIndex, pageSize)) {
                 is Result.Success -> {
+                    val block = result.value
+                    totalityState.update { block.totality }
                     LoadResult.Page(
-                        data = result.value,
+                        data = block.items,
                         prevKey = if (pageIndex == 1) null else pageIndex - 1,
-                        nextKey = if (result.value.isEmpty()) null else pageIndex + 1
+                        nextKey = if (block.items.isEmpty()) null else pageIndex + 1
                     )
                 }
                 is Result.Failure -> {
+                    totalityState.update { null }
                     LoadResult.Error(PagingSearchException(result.error))
                 }
             }

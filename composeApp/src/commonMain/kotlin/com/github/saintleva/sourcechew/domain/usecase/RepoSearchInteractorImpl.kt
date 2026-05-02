@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class RepoSearchInteractorImpl(
-    val getReposUseCase: GetReposUseCase
+    val getReposInteractor: GetReposInteractor
 ) : RepoSearchInteractor {
 
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Selecting)
     override val searchState = _searchState.asStateFlow()
 
     override var previousConditions: RepoSearchConditions? = null
-    override var previousResult: Flow<PagingData<FoundRepo>>? = null
+    override var previousResult: PaginatedRepos? = null
 
     init {
         Napier.d(tag = "init") { "RepoSearchInteractor created: ${this.hashCode()}" }
@@ -49,7 +49,7 @@ class RepoSearchInteractorImpl(
 
     private suspend fun obtainNewResult(conditions: RepoSearchConditions) {
         Napier.d(tag = "search") { "Starting obtainNewResult..." }
-        val result = getReposUseCase(conditions)
+        val result = getReposInteractor.getRepos(conditions)
         previousResult = result
         _searchState.update { SearchState.Found(result) }
         Napier.d(tag = "search") { "_searchState updated. Value is ${_searchState.value}" }

@@ -25,8 +25,8 @@ import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
 import com.github.saintleva.sourcechew.domain.repository.AuthManager
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.PagingSourceFactory
-import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCase
-import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
+import com.github.saintleva.sourcechew.domain.usecase.GetReposInteractor
+import com.github.saintleva.sourcechew.domain.usecase.GetReposInteractorImpl
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractorImpl
 import org.koin.core.qualifier.Qualifier
@@ -43,6 +43,6 @@ val domainModule = module {
     single<SecureTokenStorage> { DefaultTokenStorage(storage = get()) }
     single<AuthManager> { AuthManagerImpl(storage = get()) }
     single<PagingSourceFactory> { PagingSourceFactoryImpl(apiService = get()) }
-    factory<GetReposUseCase> { GetReposUseCaseImpl(pagingSourceFactory = get(), configManager = get()) }
-    single<RepoSearchInteractor> { RepoSearchInteractorImpl(getReposUseCase = get()) }
+    factory<GetReposInteractor> { GetReposInteractorImpl(pagingSourceFactory = get(), configManager = get()) }
+    single<RepoSearchInteractor> { RepoSearchInteractorImpl(getReposInteractor = get()) }
 }
