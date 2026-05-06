@@ -49,7 +49,7 @@ class FoundViewModel(private val searchInteractor: RepoSearchInteractor) : ViewM
             .filterNotNull()
             .distinctUntilChanged()
             .flatMapLatest { it }
-            .shareIn(viewModelScope, SharingStarted.Lazily, replay = 1),
+            .shareIn(viewModelScope, started = SharingStarted.Lazily, replay = 1),
         data = searchState
             .map { state -> (state as? SearchState.Found)?.flow?.data }
             .filterNotNull()

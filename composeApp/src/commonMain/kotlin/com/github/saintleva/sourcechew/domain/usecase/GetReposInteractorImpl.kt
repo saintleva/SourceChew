@@ -13,18 +13,18 @@ class GetReposInteractorImpl(
     private val configManager: ConfigManager
 ) : GetReposInteractor {
 
-    override val totalityState = MutableStateFlow<Totality?>(null)
+    override val totalityStateFlow = MutableStateFlow<Totality?>(null)
 
     override suspend fun getRepos(conditions: RepoSearchConditions): PaginatedRepos {
         return PaginatedRepos(
-            totality = totalityState,
+            totality = totalityStateFlow,
             data = Pager(
                 config = PagingConfig(
                     pageSize = configManager.appSettings.paginationPageSize.first(),
                     enablePlaceholders = false
                 ),
                 pagingSourceFactory = {
-                    pagingSourceFactory.createForRepoSearch(conditions, totalityState)
+                    pagingSourceFactory.createForRepoSearch(conditions, totalityStateFlow)
                 }
             ).flow
         )

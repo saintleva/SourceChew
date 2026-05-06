@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 class SearchPagingSource(
     private val searchApiService: SearchApiService,
     private val conditions: RepoSearchConditions,
-    private val totalityState: MutableStateFlow<Totality?>
+    private val totalityStateFlow: MutableStateFlow<Totality?>
 ): PagingSource<Int, FoundRepo>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FoundRepo> {
@@ -25,7 +25,7 @@ class SearchPagingSource(
             when (val result = searchApiService.searchItems(conditions, pageIndex, pageSize)) {
                 is Result.Success -> {
                     val block = result.value
-                    totalityState.update { block.totality }
+                    totalityStateFlow.update { block.totality }
                     LoadResult.Page(
                         data = block.items,
                         prevKey = if (pageIndex == 1) null else pageIndex - 1,
@@ -33,7 +33,7 @@ class SearchPagingSource(
                     )
                 }
                 is Result.Failure -> {
-                    totalityState.update { null }
+                    totalityStateFlow.update { null }
                     LoadResult.Error(PagingSearchException(result.error))
                 }
             }

@@ -13,7 +13,7 @@ class PagingSourceFactoryImpl(private val apiService: SearchApiService) : Paging
 
     override fun createForRepoSearch(
         conditions: RepoSearchConditions,
-        totalityState: MutableStateFlow<Totality?>,
+        totalityStateFlow: MutableStateFlow<Totality?>,
     ): PagingSource<Int, FoundRepo> =
-        SearchPagingSource(apiService, conditions, totalityState)
+        SearchPagingSource(apiService, conditions, totalityStateFlow)
 }

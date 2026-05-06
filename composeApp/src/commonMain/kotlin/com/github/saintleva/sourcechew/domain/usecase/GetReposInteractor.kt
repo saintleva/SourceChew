@@ -19,7 +19,7 @@ class PaginatedRepos(
 
 interface GetReposInteractor {
 
-    val totalityState: MutableStateFlow<Totality?>
+    val totalityStateFlow: MutableStateFlow<Totality?>
 
     suspend fun getRepos(conditions: RepoSearchConditions): PaginatedRepos
 }
