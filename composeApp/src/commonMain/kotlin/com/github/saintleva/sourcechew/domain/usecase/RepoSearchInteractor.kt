@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 sealed interface SearchState {
     data object Selecting : SearchState
     data object Searching : SearchState
-    data class Found(val flow: Flow<PagingData<FoundRepo>>) : SearchState
+    data class Found(val flow: PaginatedRepos) : SearchState
 }
 
 interface RepoSearchInteractor {
@@ -36,7 +36,7 @@ interface RepoSearchInteractor {
 
     var previousConditions: RepoSearchConditions?
 
-    var previousResult: Flow<PagingData<FoundRepo>>? //TODO: May I use nullable here?
+    var previousResult: PaginatedRepos? //TODO: May I use nullable here?
 
     val everSearched: Boolean
         get() = (previousResult != null)
