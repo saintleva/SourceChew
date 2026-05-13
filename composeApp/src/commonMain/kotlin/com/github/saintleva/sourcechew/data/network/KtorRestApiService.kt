@@ -7,6 +7,8 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
+import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
+import com.github.saintleva.sourcechew.domain.repository.FoundReposBlock
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
@@ -37,6 +39,11 @@ data class GithubSearchResponseDto(
     @SerialName("total_count") val totalCount: Int,
     @SerialName("incomplete_results") val incompleteResults: Boolean,
     val items: List<GithubRepoItemDto>
+)
+
+fun GithubSearchResponseDto.toDomain() = FoundReposBlock(
+    items = items.map { it.toDomain() },
+    metadata = SearchMetadata(totalCount, incompleteResults)
 )
 
 @Serializable
@@ -82,9 +89,6 @@ data class GithubErrorDetailDto(
     val code: String? = null,
     val message: String? = null
 )
-
-fun GithubSearchResponseDto.toDomain() = items.map { it.toDomain() }
-
 
 class KtorRestApiService(
     private val httpClient: HttpClient,
@@ -133,7 +137,7 @@ class KtorRestApiService(
         conditions: RepoSearchConditions,
         page: Int,
         pageSize: Int
-    ): SearchResult<List<FoundRepo>> {
+    ): SearchResult<FoundReposBlock> {
         try {
             val response = httpClient.get {
                 url {

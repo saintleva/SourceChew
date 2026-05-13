@@ -1,31 +1,47 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.repository.ConfigManager
-import com.github.saintleva.sourcechew.domain.repository.PagingSourceFactory
-import kotlinx.coroutines.flow.Flow
+import com.github.saintleva.sourcechew.domain.repository.SearchApiService
+import com.github.saintleva.sourcechew.domain.result.PagingSearchException
+import com.github.saintleva.sourcechew.domain.result.Result
+import com.jamal_aliev.paginator.dsl.paginator
+import com.jamal_aliev.paginator.load.LoadResult
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
+
 
 class GetReposUseCaseImpl(
-    private val pagingSourceFactory: PagingSourceFactory,
-    private val configManager: ConfigManager
+    private val configManager: ConfigManager,
+    private val searchApiService: SearchApiService
 ) : GetReposUseCase {
 
-    override suspend fun invoke(conditions: RepoSearchConditions): Flow<PagingData<FoundRepo>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                //TODO: Fix the bug and uncomment this
-//                pageSize = configManager.appSettings.paginationPageSize.first(),
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = {
-                pagingSourceFactory.createForRepoSearch(conditions)
+    override suspend fun invoke(conditions: RepoSearchConditions): PaginationFlow {
+        val pageSize = configManager.appSettings.paginationPageSize.first()
+        val paginator = paginator<FoundRepo>(
+            //TODO: Is it right
+            capacity = pageSize
+        ) {
+            load { page ->
+                when (val result = searchApiService.searchItems(conditions, page, pageSize)) {
+                    is Result.Success -> {
+                        LoadResult(
+                            data = result.value.items,
+                            metadata = result.value.metadata
+                        )
+                    }
+                    is Result.Failure -> {
+                        throw PagingSearchException(result.error)
+                    }
+                }
             }
-        ).flow
+        }
+        var metadata: SearchMetadata
+        val uiState = paginator.core.snapshot
+            .onStart { metadata = TODO() }
+            .toUiState()
+        return ExtendedPaginatorUiState(isState, metadata)
     }
 }

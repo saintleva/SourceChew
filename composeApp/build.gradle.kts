@@ -96,8 +96,8 @@ kotlin {
                 implementation(libs.androidx.navigation3.material3.adaptive)
                 implementation(libs.androidx.lifecycle.viewmodel.nav3)
 
-                implementation(libs.androidx.paging.common)
-                implementation(libs.androidx.paging.compose)
+                implementation(libs.paginator)
+                implementation(libs.paginator.compose)
 
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.content.negotiation)
@@ -230,11 +230,13 @@ val isRelease: Boolean
             }
 
 buildkonfig {
-    packageName = "com.github.saintleva.sourcechew"
+    //TODO: Try to use normal packageName property without this boilerplate
+    val pkgName = "com.github.saintleva.sourcechew"
+    packageName = pkgName
     defaultConfigs {
         buildConfigField(Type.STRING, "APPLICATION_NAME", "SourceChew")
         buildConfigField(Type.STRING, "APPLICATION_AUTHOR", "saintleva")
-        buildConfigField(Type.STRING, "PACKAGE_NAME", packageName)
+        buildConfigField(Type.STRING, "PACKAGE_NAME", pkgName)
         buildConfigField(Type.BOOLEAN, "IS_DEBUG", (!isRelease).toString())
     }
 }
