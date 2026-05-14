@@ -42,8 +42,7 @@ multiplatform-settings = "1.3.0"
 napier = "2.7.1"
 koin = "4.2.1"
 appdirs = "2.0.0"
-#androidx-paging = "3.4.2" //TODO: Remove this
-paginator = "8.7.0"
+paginator = "8.7.1"
 ktor = "3.4.3"
 #composeBom = "2026.01.00" //TODO: Remove this
 #androidJunit5 = "2.0.1" //TODO: Remove this
@@ -118,11 +117,8 @@ koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin"
 
 appdirs = { group = "ca.gosyer", name = "kotlin-multiplatform-appdirs", version.ref = "appdirs" }
 
-#TODO: Remove this
-#androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "androidx-paging" }
-#androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidx-paging" }
 paginator = { group = "io.github.jamal-wia", name = "paginator", version.ref = "paginator" }
-paginator-compose = { group = "io.github.jamal-wia", name = "paginator", version.ref = "paginator" }
+paginator-compose = { group = "io.github.jamal-wia", name = "paginator-compose", version.ref = "paginator" }
 
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }

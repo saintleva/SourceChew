@@ -18,22 +18,117 @@
 package com.github.saintleva.sourcechew.ui.screens.found
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
+import com.github.saintleva.sourcechew.ui.common.getErrorMessage
+import com.jamal_aliev.paginator.compose.BindToLazyList
+import com.jamal_aliev.paginator.compose.rememberPrefetchController
+import com.jamal_aliev.paginator.page.PageState
+import com.jamal_aliev.paginator.page.PaginatorUiState
 import io.github.aakira.napier.Napier
+import org.jetbrains.compose.resources.stringResource
+import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.found_items
+import sourcechew.composeapp.generated.resources.loading_error
+import sourcechew.composeapp.generated.resources.loading_more_error
+import sourcechew.composeapp.generated.resources.no_items_found_description
+import sourcechew.composeapp.generated.resources.no_items_found_title
+import sourcechew.composeapp.generated.resources.retry_button
 
+
+@Composable
+fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
+    val ui by viewModel.uiState.collectAsStateWithLifecycle()
+    val meta by viewModel.metadata.collectAsStateWithLifecycle()
+    Napier.d(tag = "FoundScreen") { "uiState = ${ui?.let { it::class.simpleName }}" }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        when (val state = ui) {
+            null,
+            is PaginatorUiState.Idle,
+            is PaginatorUiState.Loading -> FullscreenLoading()
+
+            is PaginatorUiState.Empty -> EmptyState()
+
+            is PaginatorUiState.Error -> ErrorState(
+                cause = state.exception,
+                onRetry = viewModel::restart,
+            )
+
+            is PaginatorUiState.Content -> ContentList(
+                state = state,
+                metadata = meta,
+                viewModel = viewModel,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ContentList(
+    state: PaginatorUiState.Content<FoundRepo>,
+    metadata: SearchMetadata?,
+    viewModel: FoundViewModel,
+) {
+    val pager = viewModel.paginator ?: return
+    val listState = rememberLazyListState()
+    val prefetch = pager.rememberPrefetchController(prefetchDistance = PREFETCH_DISTANCE)
+    val headerCount = if (metadata != null) 1 else 0
+    val footerCount = if (state.appendState != null) 1 else 0
+
+    prefetch.BindToLazyList(
+        listState = listState,
+        dataItemCount = state.items.size,
+        headerCount = headerCount,
+        footerCount = footerCount,
+    )
+
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+        if (metadata != null) {
+            item(key = "metadata-header") { MetadataHeader(metadata) }
+        }
+        items(state.items, key = { it.id }) { ItemContent(it) }
+        state.appendState?.let { appendState ->
+            item(key = "append-indicator") {
+                AppendIndicator(appendState, onRetry = viewModel::loadNext)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MetadataHeader(metadata: SearchMetadata) {
+    Text(
+        text = "${stringResource(Res.string.found_items)}: ${metadata.totalCount}",
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+    )
+}
 
 @Composable
 private fun ItemContent(foundRepo: FoundRepo) {
@@ -52,7 +147,7 @@ private fun ItemContent(foundRepo: FoundRepo) {
             Text("Name: ${foundRepo.name}")
             Text("Full name: ${foundRepo.fullName}")
             Text("Owner login: ${foundRepo.ownerLogin}")
-            Text("Owner login: ${foundRepo.ownerType}")
+            Text("Owner type: ${foundRepo.ownerType}")
             Text("Description: ${foundRepo.description}")
             Text("Language: ${foundRepo.language}")
             Text("Stars: ${foundRepo.stars}")
@@ -61,29 +156,81 @@ private fun ItemContent(foundRepo: FoundRepo) {
 }
 
 @Composable
-fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
-    Napier.d(tag = "FoundScreen") { "viewModel.uiState = ${viewModel.uiState}" }
+private fun AppendIndicator(
+    appendState: PageState<FoundRepo>,
+    onRetry: () -> Unit,
+) {
+    when (appendState) {
+        is PageState.ProgressPage -> Box(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
+        is PageState.ErrorPage -> Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.loading_more_error),
+                color = MaterialTheme.colorScheme.error,
+            )
+            Button(onClick = onRetry) {
+                Text(stringResource(Res.string.retry_button))
+            }
+        }
+        else -> Unit
+    }
+}
 
-    val paginator = viewModel.paginator
-    if (paginator != null) {
-        val listState = rememberLazyListState()
+@Composable
+private fun FullscreenLoading() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+}
 
-        val prefetch = paginator.rememberPrefetchController(
-            prefetchDistance = 10,
-            enableBackwardPrefetch = true,
+@Composable
+private fun EmptyState() {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(Res.string.no_items_found_title),
+            style = MaterialTheme.typography.titleLarge,
         )
-
-        prefetch.BindToLazyList(
-            listState = listState,
-            dataItemCount = uiState.items.size,
-            headerCount = 1,
-            footerCount = 1,
+        Text(
+            text = stringResource(Res.string.no_items_found_description),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 8.dp),
         )
+    }
+}
 
-        LazyColumn(state = listState) {
-            item { Header() }
-            items(uiState.items, key = { it.id }) { Row(it) }
-            item { AppendIndicator(uiState.appendState) }
+@Composable
+private fun ErrorState(cause: Throwable, onRetry: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(Res.string.loading_error),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.error,
+        )
+        Text(
+            text = getErrorMessage(cause),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 8.dp),
+        )
+        Button(onClick = onRetry, modifier = Modifier.padding(top = 16.dp)) {
+            Text(stringResource(Res.string.retry_button))
         }
     }
 }
+
+private const val PREFETCH_DISTANCE = 10

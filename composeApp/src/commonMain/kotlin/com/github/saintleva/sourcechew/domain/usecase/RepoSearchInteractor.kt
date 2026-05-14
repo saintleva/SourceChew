@@ -17,34 +17,33 @@
 
 package com.github.saintleva.sourcechew.domain.usecase
 
-import androidx.paging.PagingData
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.jamal_aliev.paginator.Paginator
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 
 sealed interface SearchState {
     data object Selecting : SearchState
     data object Searching : SearchState
-    data class Found(val paginator: Paginator<FoundRepo>) : SearchState
+    data class Found(
+        val paginator: Paginator<FoundRepo>,
+        val metadata: StateFlow<SearchMetadata?>,
+    ) : SearchState
 }
 
 interface RepoSearchInteractor {
 
     val searchState: StateFlow<SearchState>
 
-    var previousConditions: RepoSearchConditions?
-
-    var previousResult: Paginator<FoundRepo>? //TODO: May I use nullable here?
-
     val everSearched: Boolean
-        get() = (previousResult != null)
 
     suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean)
 
     fun canUsePreviousConditions(newConditions: RepoSearchConditions): Boolean
 
     fun switchToSelecting()
+
+    fun clear()
 }

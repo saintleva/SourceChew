@@ -17,32 +17,66 @@
 
 package com.github.saintleva.sourcechew.ui.screens.found
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
-import com.jamal_aliev.paginator.extension.asUiState
+import com.jamal_aliev.paginator.Paginator
+import com.jamal_aliev.paginator.extension.uiState
+import com.jamal_aliev.paginator.page.PaginatorUiState
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class FoundViewModel(private val searchInteractor: RepoSearchInteractor) : ViewModel() {
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class FoundViewModel(
+    private val searchInteractor: RepoSearchInteractor,
+) : ViewModel() {
 
     init {
-        Napier.d(tag = "init") { "FoundViewModel created: ${this.hashCode()} with Interactor: ${searchInteractor.hashCode()}" }
+        Napier.d(tag = "init") {
+            "FoundViewModel created: ${this.hashCode()} with Interactor: ${searchInteractor.hashCode()}"
+        }
     }
 
-    val paginator = (searchInteractor.searchState as? SearchState.Found)?.paginator
+    val uiState: StateFlow<PaginatorUiState<FoundRepo>?> =
+        searchInteractor.searchState
+            .flatMapLatest { state ->
+                (state as? SearchState.Found)?.paginator?.uiState ?: flowOf(null)
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
 
-    private val _metadata = mutableStateOf<SearchMetadata?>(null)
-    val metadata: State<SearchMetadata?> = _metadata
+    val metadata: StateFlow<SearchMetadata?> =
+        searchInteractor.searchState
+            .flatMapLatest { state ->
+                (state as? SearchState.Found)?.metadata ?: flowOf(null)
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
 
-    val uiState = paginator?.core?.snapshot
-        ?.onStart { _metadata.value = TODO() }
-        ?.asUiState { paginator.core.isStarted }
+    val paginator: Paginator<FoundRepo>?
+        get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator
+
+    fun restart() {
+        viewModelScope.launch { paginator?.restart() }
+    }
+
+    fun loadNext() {
+        viewModelScope.launch { paginator?.goNextPage() }
+    }
 
     fun onNavigationBack() {
         searchInteractor.switchToSelecting()
+    }
+
+    private companion object {
+        const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }

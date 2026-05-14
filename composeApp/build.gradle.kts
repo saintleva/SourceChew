@@ -96,12 +96,8 @@ kotlin {
                 implementation(libs.androidx.navigation3.material3.adaptive)
                 implementation(libs.androidx.lifecycle.viewmodel.nav3)
 
-                //TODO: Use this
-//                implementation(libs.paginator)
-//                implementation(libs.paginator.compose)
-//                implementation(project.dependencies.platform("io.github.jamal-wia:paginator-bom:8.7.0"))
-                implementation("io.github.jamal-wia:paginator:8.7.0")
-                implementation("io.github.jamal-wia:paginator-compose:8.7.0")
+                implementation(libs.paginator)
+                implementation(libs.paginator.compose)
 
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.content.negotiation)
