@@ -7,6 +7,7 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.PagingSearchException
 import com.github.saintleva.sourcechew.domain.result.Result
+import com.jamal_aliev.paginator.Paginator
 import com.jamal_aliev.paginator.dsl.paginator
 import com.jamal_aliev.paginator.extension.asUiState
 import com.jamal_aliev.paginator.load.LoadResult
@@ -19,9 +20,9 @@ class GetReposUseCaseImpl(
     private val searchApiService: SearchApiService
 ) : GetReposUseCase {
 
-    override suspend fun invoke(conditions: RepoSearchConditions): PaginationFlow {
+    override suspend fun invoke(conditions: RepoSearchConditions): Paginator<FoundRepo> {
         val pageSize = configManager.appSettings.paginationPageSize.first()
-        val paginator = paginator<FoundRepo>(
+        return paginator<FoundRepo>(
             //TODO: Is it right
             capacity = pageSize
         ) {
@@ -39,10 +40,5 @@ class GetReposUseCaseImpl(
                 }
             }
         }
-        var metadata: SearchMetadata
-        val uiState = paginator.core.snapshot
-            .onStart { metadata = TODO() }
-            .asUiState { paginator.core.isStarted }
-        return ExtendedPaginatorUiState(uiState, metadata)
     }
 }

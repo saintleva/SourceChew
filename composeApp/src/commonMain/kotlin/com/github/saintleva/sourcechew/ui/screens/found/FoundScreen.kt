@@ -18,13 +18,12 @@
 package com.github.saintleva.sourcechew.ui.screens.found
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -32,11 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.ui.common.HandlePagingLoadStates
-import com.github.saintleva.sourcechew.ui.common.pagingAppendFooter
 import io.github.aakira.napier.Napier
 
 
@@ -67,32 +62,28 @@ private fun ItemContent(foundRepo: FoundRepo) {
 
 @Composable
 fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
-    Napier.d(tag = "FoundScreen") { "viewModel.foundFlow = ${viewModel.foundFlow}" }
-    val foundRepos = viewModel.foundFlow.collectAsLazyPagingItems()
-    HandlePagingLoadStates(
-        lazyPagingItems = foundRepos,
-        modifier = modifier
-    ) {
-        if (foundRepos != null) {
-            // This @Composable block will be executed when data is available
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    count = foundRepos.itemCount,
-                    key = foundRepos.itemKey { it.id }
-                ) { index ->
-                    val item = foundRepos[index]
-                    if (item != null) {
-                        ItemContent(item)
-                    }
-                }
+    Napier.d(tag = "FoundScreen") { "viewModel.uiState = ${viewModel.uiState}" }
 
-                // Use the extension function to add the pagination footer
-                pagingAppendFooter(lazyPagingItems = foundRepos)
-            }
+    val paginator = viewModel.paginator
+    if (paginator != null) {
+        val listState = rememberLazyListState()
+
+        val prefetch = paginator.rememberPrefetchController(
+            prefetchDistance = 10,
+            enableBackwardPrefetch = true,
+        )
+
+        prefetch.BindToLazyList(
+            listState = listState,
+            dataItemCount = uiState.items.size,
+            headerCount = 1,
+            footerCount = 1,
+        )
+
+        LazyColumn(state = listState) {
+            item { Header() }
+            items(uiState.items, key = { it.id }) { Row(it) }
+            item { AppendIndicator(uiState.appendState) }
         }
     }
 }

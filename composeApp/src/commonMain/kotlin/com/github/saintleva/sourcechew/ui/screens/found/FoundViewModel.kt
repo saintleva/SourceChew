@@ -17,46 +17,30 @@
 
 package com.github.saintleva.sourcechew.ui.screens.found
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.usecase.PaginatedRepos
+import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
+import com.jamal_aliev.paginator.extension.asUiState
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.onStart
 
-@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class FoundViewModel(private val searchInteractor: RepoSearchInteractor) : ViewModel() {
 
     init {
         Napier.d(tag = "init") { "FoundViewModel created: ${this.hashCode()} with Interactor: ${searchInteractor.hashCode()}" }
     }
 
-    val searchState = searchInteractor.searchState
+    val paginator = (searchInteractor.searchState as? SearchState.Found)?.paginator
 
-    val foundFlow: PaginatedRepos = PaginatedRepos(
-        totality = searchState
-            .map { state -> (state as? SearchState.Found)?.flow?.totality }
-            .filterNotNull()
-            .distinctUntilChanged()
-            .flatMapLatest { it }
-            .shareIn(viewModelScope, started = SharingStarted.Lazily, replay = 1),
-        data = searchState
-            .map { state -> (state as? SearchState.Found)?.flow?.data }
-            .filterNotNull()
-            .distinctUntilChanged()
-            .flatMapLatest { it }
-            .cachedIn(viewModelScope)
-    )
+    private val _metadata = mutableStateOf<SearchMetadata?>(null)
+    val metadata: State<SearchMetadata?> = _metadata
+
+    val uiState = paginator?.core?.snapshot
+        ?.onStart { _metadata.value = TODO() }
+        ?.asUiState { paginator.core.isStarted }
 
     fun onNavigationBack() {
         searchInteractor.switchToSelecting()

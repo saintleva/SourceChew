@@ -20,6 +20,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 import androidx.paging.PagingData
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.jamal_aliev.paginator.Paginator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -27,7 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 sealed interface SearchState {
     data object Selecting : SearchState
     data object Searching : SearchState
-    data class Found(val flow: PaginatedRepos) : SearchState
+    data class Found(val paginator: Paginator<FoundRepo>) : SearchState
 }
 
 interface RepoSearchInteractor {
@@ -36,7 +37,7 @@ interface RepoSearchInteractor {
 
     var previousConditions: RepoSearchConditions?
 
-    var previousResult: PaginatedRepos? //TODO: May I use nullable here?
+    var previousResult: Paginator<FoundRepo>? //TODO: May I use nullable here?
 
     val everSearched: Boolean
         get() = (previousResult != null)

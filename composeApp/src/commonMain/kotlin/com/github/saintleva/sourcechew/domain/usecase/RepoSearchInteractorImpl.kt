@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 import androidx.paging.PagingData
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.jamal_aliev.paginator.Paginator
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,14 +11,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class RepoSearchInteractorImpl(
-    val getReposInteractor: GetReposInteractor
+    val getReposUseCase: GetReposUseCase
 ) : RepoSearchInteractor {
 
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Selecting)
     override val searchState = _searchState.asStateFlow()
 
     override var previousConditions: RepoSearchConditions? = null
-    override var previousResult: PaginatedRepos? = null
+    override var previousResult: Paginator<FoundRepo>? = null
 
     init {
         Napier.d(tag = "init") { "RepoSearchInteractor created: ${this.hashCode()}" }
@@ -49,7 +50,7 @@ class RepoSearchInteractorImpl(
 
     private suspend fun obtainNewResult(conditions: RepoSearchConditions) {
         Napier.d(tag = "search") { "Starting obtainNewResult..." }
-        val result = getReposInteractor.getRepos(conditions)
+        val result = getReposUseCase(conditions)
         previousResult = result
         _searchState.update { SearchState.Found(result) }
         Napier.d(tag = "search") { "_searchState updated. Value is ${_searchState.value}" }
