@@ -27,10 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 sealed interface SearchState {
     data object Selecting : SearchState
     data object Searching : SearchState
-    data class Found(
-        val paginator: Paginator<FoundRepo>,
-        val metadata: StateFlow<SearchMetadata?>,
-    ) : SearchState
+    data class Found(val paginator: Paginator<FoundRepo>) : SearchState
 }
 
 interface RepoSearchInteractor {

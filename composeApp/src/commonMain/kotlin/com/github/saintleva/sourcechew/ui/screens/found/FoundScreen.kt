@@ -61,12 +61,11 @@ import sourcechew.composeapp.generated.resources.retry_button
 @Composable
 fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
     val ui by viewModel.uiState.collectAsStateWithLifecycle()
-    val meta by viewModel.metadata.collectAsStateWithLifecycle()
+    val meta = viewModel.metadata
     Napier.d(tag = "FoundScreen") { "uiState = ${ui?.let { it::class.simpleName }}" }
 
     Box(modifier = modifier.fillMaxSize()) {
         when (val state = ui) {
-            null,
             is PaginatorUiState.Idle,
             is PaginatorUiState.Loading -> FullscreenLoading()
 
@@ -74,13 +73,13 @@ fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
 
             is PaginatorUiState.Error -> ErrorState(
                 cause = state.exception,
-                onRetry = viewModel::restart,
+                onRetry = viewModel::restart
             )
 
             is PaginatorUiState.Content -> ContentList(
                 state = state,
-                metadata = meta,
-                viewModel = viewModel,
+                metadata = meta.value,
+                viewModel = viewModel
             )
         }
     }
@@ -90,11 +89,11 @@ fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
 private fun ContentList(
     state: PaginatorUiState.Content<FoundRepo>,
     metadata: SearchMetadata?,
-    viewModel: FoundViewModel,
+    viewModel: FoundViewModel
 ) {
-    val pager = viewModel.paginator ?: return
+    val paginator = viewModel.paginator ?: return
     val listState = rememberLazyListState()
-    val prefetch = pager.rememberPrefetchController(prefetchDistance = PREFETCH_DISTANCE)
+    val prefetch = paginator.rememberPrefetchController(prefetchDistance = PREFETCH_DISTANCE)
     val headerCount = if (metadata != null) 1 else 0
     val footerCount = if (state.appendState != null) 1 else 0
 

@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.first
 
 class GetReposUseCaseImpl(
     private val configManager: ConfigManager,
-    private val searchApiService: SearchApiService,
+    private val searchApiService: SearchApiService
 ) : GetReposUseCase {
 
     override suspend fun invoke(conditions: RepoSearchConditions): Paginator<FoundRepo> {
         val pageSize = configManager.appSettings.paginationPageSize.first()
-        return paginator<FoundRepo>(capacity = pageSize) {
+        return paginator<FoundRepo>(capacity = pageSize) { //TODO: Is it right?
             load { page ->
                 when (val result = searchApiService.searchItems(conditions, page, pageSize)) {
                     is Result.Success -> LoadResult(

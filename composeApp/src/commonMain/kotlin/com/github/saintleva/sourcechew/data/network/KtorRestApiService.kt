@@ -146,10 +146,10 @@ class KtorRestApiService(
                     val queryValue = buildString {
                         append(conditions.query)
                         if (conditions.inScope.isNotEmpty()) {
-                            append(" in:${conditions.inScope.toApiValue()}")
+                            append("+in:${conditions.inScope.toApiValue()}")
                         }
                         if (conditions.onlyFlags.isNotEmpty()) {
-                            append(" ${conditions.onlyFlags.toApiValue()}")
+                            append("+${conditions.onlyFlags.toApiValue()}")
                         }
                     }
                     Napier.d(tag = "KtorRestApiService") { "Query: \"$queryValue\"" }

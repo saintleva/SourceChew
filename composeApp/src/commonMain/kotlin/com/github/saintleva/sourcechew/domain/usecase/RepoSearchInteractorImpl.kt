@@ -4,6 +4,7 @@ import com.github.saintleva.sourcechew.di.ioDispatcher
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
+import com.jamal_aliev.paginator.Paginator
 import com.jamal_aliev.paginator.bookmark.BookmarkInt
 import com.jamal_aliev.paginator.page.PageState
 import io.github.aakira.napier.Napier
@@ -22,7 +23,7 @@ import kotlinx.coroutines.flow.update
 
 class RepoSearchInteractorImpl(
     private val getReposUseCase: GetReposUseCase,
-    coroutineDispatcher: CoroutineDispatcher = ioDispatcher,
+    coroutineDispatcher: CoroutineDispatcher = ioDispatcher
 ) : RepoSearchInteractor {
 
     private val scope = CoroutineScope(coroutineDispatcher + SupervisorJob())
@@ -30,7 +31,7 @@ class RepoSearchInteractorImpl(
     override val searchState = _searchState.asStateFlow()
 
     private var previousConditions: RepoSearchConditions? = null
-    private var lastFound: SearchState.Found? = null
+    private var lastFound: Paginator<FoundRepo>? = null
 
     override val everSearched: Boolean
         get() = lastFound != null
@@ -41,15 +42,15 @@ class RepoSearchInteractorImpl(
 
     override suspend fun search(
         conditions: RepoSearchConditions,
-        usePreviousSearch: Boolean,
+        usePreviousSearch: Boolean
     ) {
         _searchState.update { SearchState.Searching }
         val cached = lastFound
         if (usePreviousSearch && cached != null && conditions == previousConditions) {
             Napier.d(tag = "search") {
-                "Reusing cached paginator: ${cached.paginator.hashCode()}"
+                "Reusing cached paginator: ${cached.hashCode()}"
             }
-            _searchState.update { cached }
+            _searchState.update { SearchState.Found(cached) }
         } else {
             obtainNewResult(conditions)
         }
@@ -63,7 +64,7 @@ class RepoSearchInteractorImpl(
     }
 
     override fun clear() {
-        lastFound?.paginator?.release()
+        lastFound?.release()
         lastFound = null
         previousConditions = null
         scope.cancel()
@@ -71,30 +72,21 @@ class RepoSearchInteractorImpl(
 
     private suspend fun obtainNewResult(conditions: RepoSearchConditions) {
         Napier.d(tag = "search") { "obtainNewResult($conditions)" }
-        lastFound?.paginator?.let { previous ->
+        lastFound?.let { previous ->
             Napier.d(tag = "search") { "Releasing previous paginator: ${previous.hashCode()}" }
             previous.release(silently = true)
         }
 
-        val pager = getReposUseCase(conditions)
-        val metadata: StateFlow<SearchMetadata?> = pager.core.snapshot
-            .map { pages -> pages.firstSearchMetadata() }
-            .stateIn(scope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
-
-        val found = SearchState.Found(pager, metadata)
+        val paginator = getReposUseCase(conditions)
         previousConditions = conditions
-        lastFound = found
-        _searchState.update { found }
-        Napier.d(tag = "search") { "Published Found(paginator=${pager.hashCode()})" }
+        lastFound = paginator
+        _searchState.update { SearchState.Found(paginator) }
+        Napier.d(tag = "search") { "Published Found(paginator=${paginator.hashCode()})" }
 
-        pager.jump(BookmarkInt(FIRST_PAGE))
+        paginator.jump(BookmarkInt(FIRST_PAGE))
     }
-
-    private fun List<PageState<FoundRepo>>.firstSearchMetadata(): SearchMetadata? =
-        firstNotNullOfOrNull { (it as? PageState.SuccessPage<FoundRepo>)?.metadata as? SearchMetadata }
 
     companion object {
         private const val FIRST_PAGE = 1
-        private const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }
