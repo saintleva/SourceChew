@@ -253,7 +253,7 @@ class KtorRestApiService(
                     UnknownInfrastructureException(e)
                 }
             }
-            // Propagate our domain-specific exception to be handled by the caller (e.g., PagingSource).
+            // Propagate our domain-specific exception to be handled by the caller (the Paginator load lambda).
             throw domainException
         }
     }

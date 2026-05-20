@@ -2,12 +2,11 @@ package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.repository.FoundReposBlock
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
-import com.github.saintleva.sourcechew.domain.result.RepoSearchResult
 import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.result.SearchResult
-import com.github.saintleva.sourcechew.domain.usecase.Totality
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -43,7 +42,12 @@ class MockSearchApiService(
             throw Exception("Mock API Error: Failed to fetch search results for query: ${conditions.query}")
         }
         if (randomGenerator.nextDouble() < returnEmptyListProbability) {
-            return Result.Success(FoundReposBlock(Totality(0, false), emptyList()))
+            return Result.Success(
+                FoundReposBlock(
+                    items = emptyList(),
+                    metadata = SearchMetadata(totalCount = 0, incompleteResults = false),
+                )
+            )
         }
 
         val items = mutableListOf<FoundRepo>()
@@ -51,7 +55,12 @@ class MockSearchApiService(
         val totalCount = conditions.inScope.size * eachCount
         val startIndex = (page - 1) * pageSize
         if (startIndex >= totalCount) {
-            return Result.Success(FoundReposBlock(Totality(0, false), emptyList()))
+            return Result.Success(
+                FoundReposBlock(
+                    items = emptyList(),
+                    metadata = SearchMetadata(totalCount = 0, incompleteResults = false),
+                )
+            )
         }
 
         val itemsOnThisPageCount = minOf(pageSize, totalCount - startIndex)
@@ -73,6 +82,11 @@ class MockSearchApiService(
             delay(delayImitation)
         }
 
-        return Result.Success(FoundReposBlock(Totality(totalCount, false), items))
+        return Result.Success(
+            FoundReposBlock(
+                items = items,
+                metadata = SearchMetadata(totalCount = totalCount, incompleteResults = false),
+            )
+        )
     }
 }
