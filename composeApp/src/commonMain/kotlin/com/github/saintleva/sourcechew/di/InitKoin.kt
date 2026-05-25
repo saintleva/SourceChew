@@ -24,6 +24,6 @@ import org.koin.dsl.KoinAppDeclaration
 fun initKoin(config: KoinAppDeclaration? = null) {
     startKoin {
         config?.invoke(this)
-        modules(appModule, domainModule, networkModule, platformModule)
+        modules(appModule, domainModule, dataModule, platformModule)
     }
 }

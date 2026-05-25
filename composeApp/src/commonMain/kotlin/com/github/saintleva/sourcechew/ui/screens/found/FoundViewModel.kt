@@ -17,8 +17,6 @@
 
 package com.github.saintleva.sourcechew.ui.screens.found
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
@@ -34,7 +32,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -54,21 +52,28 @@ class FoundViewModel(
     val paginator: Paginator<FoundRepo>?
         get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator
 
-    private val _metadata = mutableStateOf<SearchMetadata?>(null)
-    val metadata: State<SearchMetadata?> = _metadata
+    val metadata: StateFlow<SearchMetadata?> = searchInteractor.searchState
+        .flatMapLatest { state ->
+            val p = (state as? SearchState.Found)?.paginator
+            if (p != null) {
+                p.core.snapshot.map { snapshot ->
+                    snapshot.firstNotNullOfOrNull { it.metadata as? SearchMetadata }
+                }
+            } else {
+                flowOf(null)
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            initialValue = null
+        )
 
     val uiState: StateFlow<PaginatorUiState<FoundRepo>> = searchInteractor.searchState
         .flatMapLatest { state ->
             val p = (state as? SearchState.Found)?.paginator
             if (p != null) {
-                p.core.snapshot
-                    .onEach { snapshot ->
-                        // Extract SearchMetadata from any of the loaded pages in the snapshot
-                        snapshot.firstNotNullOfOrNull { it.metadata as? SearchMetadata }?.let {
-                            _metadata.value = it
-                        }
-                    }
-                    .asUiState { p.core.isStarted }
+                p.core.snapshot.asUiState { p.core.isStarted }
             } else {
                 // Return Idle state if no paginator is currently active
                 flowOf(PaginatorUiState.Idle)

@@ -10,6 +10,7 @@ import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.repository.FoundReposBlock
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
+import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
 import com.github.saintleva.sourcechew.domain.result.Result
@@ -146,10 +147,10 @@ class KtorRestApiService(
                     val queryValue = buildString {
                         append(conditions.query)
                         if (conditions.inScope.isNotEmpty()) {
-                            append("+in:${conditions.inScope.toApiValue()}")
+                            append(" in:${conditions.inScope.toApiValue()}")
                         }
                         if (conditions.onlyFlags.isNotEmpty()) {
-                            append("+${conditions.onlyFlags.toApiValue()}")
+                            append(" ${conditions.onlyFlags.toApiValue()}")
                         }
                     }
                     Napier.d(tag = "KtorRestApiService") { "Query: \"$queryValue\"" }
@@ -236,6 +237,8 @@ class KtorRestApiService(
         } catch (e: Exception) {
             // This block catches exceptions that occur *before* we can inspect the HTTP response.
             // This includes network issues (no internet), DNS problems, timeouts, etc.
+            if (e is AppException) throw e
+
             val domainException = when {
                 // Ktor often throws IOException for connectivity problems (e.g., Airplane Mode).
                 isNetworkException(e) -> NetworkException(e)
@@ -252,6 +255,10 @@ class KtorRestApiService(
                     }
                     UnknownInfrastructureException(e)
                 }
+            }
+
+            Napier.d(tag = "KtorRestApiService", throwable = domainException) {
+                "before 'throw domainException'"
             }
             // Propagate our domain-specific exception to be handled by the caller (the Paginator load lambda).
             throw domainException

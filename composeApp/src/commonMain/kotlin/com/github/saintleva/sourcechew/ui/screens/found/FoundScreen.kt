@@ -61,7 +61,7 @@ import sourcechew.composeapp.generated.resources.retry_button
 @Composable
 fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
     val ui by viewModel.uiState.collectAsStateWithLifecycle()
-    val meta = viewModel.metadata
+    val meta by viewModel.metadata.collectAsStateWithLifecycle()
     Napier.d(tag = "FoundScreen") { "uiState = ${ui?.let { it::class.simpleName }}" }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -78,7 +78,7 @@ fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
 
             is PaginatorUiState.Content -> ContentList(
                 state = state,
-                metadata = meta.value,
+                metadata = meta,
                 viewModel = viewModel
             )
         }

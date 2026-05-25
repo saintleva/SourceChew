@@ -49,6 +49,7 @@ Try changing your search terms.</string>
     <string name="error_deserialization">Failed to read the server response. Please try again later.</string>
     <string name="error_server">The server is currently unavailable. Please try again later.</string>
     <string name="error_unauthorized">Authentication failed. Please check your token.</string>
+    <string name="error_invalid_token">Invalid token. Only printable ASCII characters are allowed.</string>
     <string name="error_rate_limit_exceeded">API rate limit exceeded. Please try again later.</string>
     <string name="error_common_access">Access denied. Please check your permissions.</string>
     <string name="error_validation">Invalid search query: %1$s</string>

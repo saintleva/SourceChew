@@ -22,4 +22,9 @@ class DeserializationException(cause: Throwable) : AppException(cause)
  */
 class UnknownInfrastructureException(cause: Throwable) : AppException(cause)
 
+/**
+ * Thrown when the stored token contains invalid characters (e.g., non-ASCII characters).
+ */
+class InvalidTokenException : AppException(null)
+
 class PagingSearchException(val error: SearchError): AppException(null)
