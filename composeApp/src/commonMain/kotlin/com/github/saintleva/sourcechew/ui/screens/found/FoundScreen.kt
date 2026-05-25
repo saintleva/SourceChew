@@ -111,6 +111,7 @@ private fun ContentList(
         items(state.items, key = { it.id }) { ItemContent(it) }
         state.appendState?.let { appendState ->
             item(key = "append-indicator") {
+                Napier.d(tag = "FoundScreen") { "Append indicator must be showed" }
                 AppendIndicator(appendState, onRetry = viewModel::loadNext)
             }
         }
