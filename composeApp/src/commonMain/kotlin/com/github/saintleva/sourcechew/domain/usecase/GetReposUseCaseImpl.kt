@@ -6,9 +6,9 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigManager
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.PagingSearchException
 import com.github.saintleva.sourcechew.domain.result.Result
-import com.jamal_aliev.paginator.Paginator
-import com.jamal_aliev.paginator.dsl.paginator
-import com.jamal_aliev.paginator.load.LoadResult
+import com.jamal_aliev.paginator.offset.Paginator
+import com.jamal_aliev.paginator.offset.dsl.paginator
+import com.jamal_aliev.paginator.offset.load.LoadResult
 import kotlinx.coroutines.flow.first
 
 

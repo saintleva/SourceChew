@@ -43,10 +43,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
-import com.jamal_aliev.paginator.compose.BindToLazyList
-import com.jamal_aliev.paginator.compose.rememberPrefetchController
-import com.jamal_aliev.paginator.page.PageState
-import com.jamal_aliev.paginator.page.PaginatorUiState
+import com.jamal_aliev.paginator.compose.offset.BindToLazyList
+import com.jamal_aliev.paginator.compose.offset.rememberPrefetchController
+import com.jamal_aliev.paginator.core.extension.isErrorState
+import com.jamal_aliev.paginator.core.extension.isProgressState
+import com.jamal_aliev.paginator.core.page.PageState
+import com.jamal_aliev.paginator.core.page.PaginatorUiState
 import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -93,7 +95,10 @@ private fun ContentList(
 ) {
     val paginator = viewModel.paginator ?: return
     val listState = rememberLazyListState()
-    val prefetch = paginator.rememberPrefetchController(prefetchDistance = PREFETCH_DISTANCE)
+    val prefetch = paginator.rememberPrefetchController(
+        prefetchDistance = PREFETCH_DISTANCE,
+        silentlyLoading = false,
+    )
     val headerCount = if (metadata != null) 1 else 0
     val footerCount = if (state.appendState != null) 1 else 0
 
@@ -160,26 +165,32 @@ private fun AppendIndicator(
     appendState: PageState<FoundRepo>,
     onRetry: () -> Unit,
 ) {
-    when (appendState) {
-        is PageState.ProgressPage -> Box(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator()
-        }
-        is PageState.ErrorPage -> Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = stringResource(Res.string.loading_more_error),
-                color = MaterialTheme.colorScheme.error,
-            )
-            Button(onClick = onRetry) {
-                Text(stringResource(Res.string.retry_button))
+    when {
+        appendState.isProgressState() -> {
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
             }
         }
+
+        appendState.isErrorState() -> {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = stringResource(Res.string.loading_more_error),
+                    color = MaterialTheme.colorScheme.error,
+                )
+                Button(onClick = onRetry) {
+                    Text(stringResource(Res.string.retry_button))
+                }
+            }
+        }
+
         else -> Unit
     }
 }

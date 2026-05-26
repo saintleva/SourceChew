@@ -4,9 +4,9 @@ import com.github.saintleva.sourcechew.di.ioDispatcher
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
-import com.jamal_aliev.paginator.Paginator
-import com.jamal_aliev.paginator.bookmark.BookmarkInt
-import com.jamal_aliev.paginator.page.PageState
+import com.jamal_aliev.paginator.offset.Paginator
+import com.jamal_aliev.paginator.offset.bookmark.BookmarkInt
+import com.jamal_aliev.paginator.core.page.PageState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
