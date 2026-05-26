@@ -23,9 +23,9 @@ import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
-import com.jamal_aliev.paginator.Paginator
-import com.jamal_aliev.paginator.extension.asUiState
-import com.jamal_aliev.paginator.page.PaginatorUiState
+import com.jamal_aliev.paginator.offset.Paginator
+import com.jamal_aliev.paginator.core.extension.asUiState
+import com.jamal_aliev.paginator.core.page.PaginatorUiState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted

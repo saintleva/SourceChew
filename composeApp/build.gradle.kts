@@ -96,8 +96,8 @@ kotlin {
                 implementation(libs.androidx.navigation3.material3.adaptive)
                 implementation(libs.androidx.lifecycle.viewmodel.nav3)
 
-                implementation(libs.paginator)
-                implementation(libs.paginator.compose)
+                implementation(libs.paginator.offset)
+                implementation(libs.paginator.compose.offset)
 
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.content.negotiation)
@@ -202,6 +202,10 @@ kotlin {
             dependsOn(ksafeMain)
         }
     }
+}
+
+dependencies {
+    commonMainImplementation(platform(libs.paginator.bom))
 }
 
 tasks.withType<Test>().configureEach {

@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.jamal_aliev.paginator.Paginator
+import com.jamal_aliev.paginator.offset.Paginator
 
 
 interface GetReposUseCase {
