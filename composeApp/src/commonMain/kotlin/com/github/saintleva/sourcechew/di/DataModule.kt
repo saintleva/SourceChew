@@ -10,7 +10,7 @@ val dataModule = module {
     single<SearchApiService> {
         KtorRestApiService(
             httpClient = createHttpClient(
-                authManager = get(),
+                authRepository = get(),
                 baseUrl = "api.github.com"
             )
         )

@@ -32,22 +32,21 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.models.defaultPaginationPageSize
-import com.github.saintleva.sourcechew.domain.repository.ConfigManager
+import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-class DataStoreConfigManager(
+class DataStoreConfigStore(
     private val dataStore: DataStore<Preferences>
-) : ConfigManager {
+) : ConfigStore {
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
@@ -102,7 +101,7 @@ class DataStoreConfigManager(
         }
     }
 
-    override val repoConditions = object : ConfigManager.RepoSearchConditionsAccessor {
+    override val repoConditions = object : ConfigStore.RepoSearchConditionsAccessor {
 
         //TODO: Remove this
 //        private fun loadQueryFirstTime(): String {
@@ -207,7 +206,7 @@ class DataStoreConfigManager(
         }
     }
 
-    override val appSettings = object : ConfigManager.AppSettingsAccessor {
+    override val appSettings = object : ConfigStore.AppSettingsAccessor {
 
         override val paginationPageSize = read(
             App.paginationPageSize, defaultPaginationPageSize

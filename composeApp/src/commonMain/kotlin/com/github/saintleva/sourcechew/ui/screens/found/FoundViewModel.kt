@@ -24,9 +24,9 @@ import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
-import com.jamal_aliev.paginator.offset.Paginator
 import com.jamal_aliev.paginator.core.extension.asUiState
 import com.jamal_aliev.paginator.core.page.PaginatorUiState
+import com.jamal_aliev.paginator.offset.Paginator
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,7 +48,6 @@ class FoundViewModel(
             "FoundViewModel created: ${this.hashCode()} with Interactor: ${searchInteractor.hashCode()}"
         }
     }
-
 
     val paginator: Paginator<FoundRepo>?
         get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator
@@ -85,6 +84,7 @@ class FoundViewModel(
             started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
             initialValue = PaginatorUiState.Idle
         )
+
     fun consumeInitialScroll(): ScrollPosition? = searchInteractor.lastScrollPosition
 
     fun saveScroll(index: Int, offset: Int) {

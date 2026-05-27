@@ -5,7 +5,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.saintleva.sourcechew.domain.repository.AuthManager
+import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
 import com.mobilebytelabs.kmptoolkit.clipboard.copyToClipboard
 import com.mobilebytelabs.kmptoolkit.clipboard.getFromClipboard
@@ -15,11 +15,11 @@ import kotlinx.coroutines.launch
 
 
 class AuthViewModel(
-    private val manager: AuthManager,
+    private val repository: AuthRepository,
     private val clipboardManager: ClipboardManager
 ) : ViewModel() {
 
-    val isAuthorized = manager.isAuthorized.stateIn(
+    val isAuthorized = repository.isAuthorized.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = false
@@ -32,7 +32,7 @@ class AuthViewModel(
 
     init {
         viewModelScope.launch {
-            manager.authToken.collect { newValue ->
+            repository.authToken.collect { newValue ->
                 val updatedValue = newValue ?: ""
                 _savedToken.value = newValue
                 if (_token.value.isBlank() || _token.value == _savedToken.value) {
@@ -56,13 +56,13 @@ class AuthViewModel(
     fun onTokenSave() {
         if (!canSaveState.value) return
         viewModelScope.launch {
-            manager.saveToken(token.value.trim())
+            repository.saveToken(token.value.trim())
         }
     }
 
     fun onTokenClear() {
         viewModelScope.launch {
-            manager.clearToken()
+            repository.clearToken()
         }
     }
 

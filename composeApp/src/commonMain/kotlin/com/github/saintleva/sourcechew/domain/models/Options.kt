@@ -58,6 +58,12 @@ data class RepoSearchConditions(
     val sort: RepoSearchSort,
     val order: SearchOrder
 ) {
+
+    fun maySearch(): Boolean {
+        val allPrivacySelected = OnlyFlag.PUBLIC in onlyFlags && OnlyFlag.PRIVATE in onlyFlags
+        return query.isNotBlank() && inScope.isNotEmpty() && !allPrivacySelected
+    }
+
     companion object {
         val default = RepoSearchConditions(
             query = "",
@@ -68,55 +74,3 @@ data class RepoSearchConditions(
         )
     }
 }
-
-class RepoSearchConditionsFlows(
-    val query: Flow<String>,
-    val inScope: Map<RepoSearchScope, Flow<Boolean>>,
-    val onlyFlags: Map<OnlyFlag, Flow<Boolean>>,
-    val sort: Flow<RepoSearchSort>,
-    val order: Flow<SearchOrder>,
-    val usePreviousSearch: Flow<Boolean>
-) {
-    fun toConditionsStateFlow(
-        scope: CoroutineScope,
-        started: SharingStarted = SharingStarted.WhileSubscribed(5000)
-    ) = RepoSearchConditionsStateFlows(
-        query.stateIn(scope, started, initialValue = RepoSearchConditions.default.query),
-        inScope.mapValues { it.value.stateIn(scope, started,
-            initialValue = it.key in RepoSearchConditions.default.inScope) },
-        onlyFlags.mapValues { it.value.stateIn(scope, started,
-            initialValue = it.key in RepoSearchConditions.default.onlyFlags) },
-        sort.stateIn(scope, started, initialValue = RepoSearchConditions.default.sort),
-        order.stateIn(scope, started, initialValue = RepoSearchConditions.default.order),
-        usePreviousSearch.stateIn(scope, started, initialValue = false)
-    )
-}
-
-class RepoSearchConditionsStateFlows(
-    val query: StateFlow<String>,
-    val inScope: Map<RepoSearchScope, StateFlow<Boolean>>,
-    val onlyFlags: Map<OnlyFlag, StateFlow<Boolean>>,
-    val sort: StateFlow<RepoSearchSort>,
-    val order: StateFlow<SearchOrder>,
-    val usePreviousSearch: StateFlow<Boolean>
-) {
-        fun toConditions() = RepoSearchConditions(
-        query.value,
-        inScope.makeSet { it.value },
-        onlyFlags.makeSet { it.value },
-            sort.value,
-            order.value
-    )
-}
-
-const val defaultPaginationPageSize = 30
-val paginationPageSizeRange = 1..100
-
-//TODO: Remove this
-//data class FetchParams(
-//    val pageSize: Int
-//) {
-//    companion object {
-//        val defaultPageSize = 30
-//    }
-//}

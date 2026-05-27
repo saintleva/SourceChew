@@ -1,6 +1,6 @@
 package com.github.saintleva.sourcechew.data.network
 
-import com.github.saintleva.sourcechew.domain.repository.AuthManager
+import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.github.saintleva.sourcechew.domain.result.InvalidTokenException
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.auth.Auth
@@ -13,7 +13,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 
-internal fun createHttpClient(authManager: AuthManager, baseUrl: String) = HttpClient {
+internal fun createHttpClient(authRepository: AuthRepository, baseUrl: String) = HttpClient {
     install(ContentNegotiation) {
         json(Json{
             prettyPrint = true
@@ -24,7 +24,7 @@ internal fun createHttpClient(authManager: AuthManager, baseUrl: String) = HttpC
     install(Auth) {
         bearer {
             loadTokens {
-                val token = authManager.getAccessToken() ?: return@loadTokens null
+                val token = authRepository.getAccessToken() ?: return@loadTokens null
 
                 // Validation: GitHub tokens must consist of printable ASCII characters.
                 // If non-ASCII characters (e.g., Cyrillic) are present, throw an exception.

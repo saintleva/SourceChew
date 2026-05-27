@@ -33,6 +33,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -85,8 +86,6 @@ fun SearchScreen(
     LaunchedEffect(searchState.value) {
         if (searchState.value is SearchState.Found) {
             onFound()
-            //TODO: Remove this
-            //viewModel.onNavigationConsumed()
         }
     }
 
@@ -108,63 +107,21 @@ fun SearchScreen(
 @Composable
 private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean) {
 
-    val scopeStrings = mapOf(
-        RepoSearchScope.NAME to stringResource(Res.string.names),
-        RepoSearchScope.DESCRIPTION to stringResource(Res.string.descriptions),
-        RepoSearchScope.README to stringResource(Res.string.readme)
-    )
-    val onlyFlagStrings = mapOf(
-        OnlyFlag.PUBLIC to stringResource(Res.string.public_only),
-        OnlyFlag.PRIVATE to stringResource(Res.string.private_only),
-        OnlyFlag.FORK to stringResource(Res.string.fork_only),
-        OnlyFlag.ARCHIVED to stringResource(Res.string.archived_only),
-        OnlyFlag.MIRROR to stringResource(Res.string.mirror_only),
-        OnlyFlag.TEMPLATE to stringResource(Res.string.template_only)
-    )
-    val sortStrings = mapOf(
-        RepoSearchSort.BEST_MATCH to stringResource(Res.string.best_match),
-        RepoSearchSort.STARS to stringResource(Res.string.stars),
-        RepoSearchSort.FORKS to stringResource(Res.string.forks),
-        RepoSearchSort.UPDATED to stringResource(Res.string.updated_time)
-    )
-    val orderStrings = mapOf(
-        SearchOrder.ASCENDING to stringResource(Res.string.ascending),
-        SearchOrder.DESCENDING to stringResource(Res.string.descending),
-    )
-
-    val conditions = viewModel.conditionsStateFlows
-    val query = conditions.query.collectAsStateWithLifecycle()
-    val selectedSearchScope = conditions.inScope.mapValues { it.value.collectAsStateWithLifecycle() }
-    val selectedOnlyFlags = conditions.onlyFlags.mapValues { it.value.collectAsStateWithLifecycle() }
-    val selectedSort = conditions.sort.collectAsStateWithLifecycle()
-    val selectedOrder = conditions.order.collectAsStateWithLifecycle()
-    val usePreviousSearch = conditions.usePreviousSearch.collectAsStateWithLifecycle()
-
-
-    fun maySearch(): Boolean {
-        Napier.d(tag = "SearchContent") { "maySearch() called" }
-
-        val allPrivacySelected = selectedOnlyFlags[OnlyFlag.PUBLIC]!!.value &&
-                selectedOnlyFlags[OnlyFlag.PRIVATE]!!.value
-
-        val inScopeIsNotEmpty = selectedSearchScope[RepoSearchScope.NAME]!!.value
-                || selectedSearchScope[RepoSearchScope.DESCRIPTION]!!.value
-                || selectedSearchScope[RepoSearchScope.README]!!.value
-
-        return query.value.isNotBlank() && inScopeIsNotEmpty && !allPrivacySelected
-    }
+    val conditions by viewModel.conditions.collectAsStateWithLifecycle()
+    val usePreviousRepoSearch by viewModel.usePreviousRepoSearch.collectAsStateWithLifecycle()
+    val maySearch by viewModel.maySearch.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         OutlinedTextField(
-            value = query.value,
+            value = conditions.query,
             onValueChange = viewModel::onQueryChange,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = selectingEnabled,
             textStyle = TextStyle(fontSize = 16.sp),
             label = { Text(stringResource(Res.string.enter_search_text)) },
-            isError = query.value.isBlank()
+            isError = conditions.query.isBlank()
         )
         Column(modifier = Modifier.padding(horizontal = 8.dp)) {
             Text(
@@ -180,9 +137,9 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
                 RepoSearchScope.entries.forEach { scope ->
                     val textStyle = MaterialTheme.typography.labelLarge
                     FilterChip(
-                        selected = selectedSearchScope[scope]!!.value,
+                        selected = scope in conditions.inScope,
                         onClick = { viewModel.toggleScope(scope) },
-                        label = { Text(text = scopeStrings[scope]!!, style = textStyle) },
+                        label = { Text(text = scope.displayText(), style = textStyle) },
                         enabled = selectingEnabled
                     )
                 }
@@ -191,8 +148,8 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
         ExpandableSection(title = stringResource(Res.string.additional_filters)) {
             OnlyFlag.entries.forEach { flag ->
                 CheckBoxWithText(
-                    text = onlyFlagStrings[flag]!!,
-                    checked = selectedOnlyFlags[flag]!!.value,
+                    text = flag.displayText(),
+                    checked = flag in conditions.onlyFlags,
                     onCheckedChange = { viewModel.toggleOnlyFlag(flag) },
                     enabled = selectingEnabled,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -202,8 +159,8 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
         ExpandableSection(title = stringResource(Res.string.sort_by)) {
             RepoSearchSort.entries.forEach { sort ->
                 RadioButtonWithText(
-                    text = sortStrings[sort]!!,
-                    selected = selectedSort.value == sort,
+                    text = sort.displayText(),
+                    selected = conditions.sort == sort,
                     onClick = { viewModel.onSortChange(sort) },
                     enabled = selectingEnabled,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -213,8 +170,8 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
         ExpandableSection(title = stringResource(Res.string.order)) {
             SearchOrder.entries.forEach { order ->
                 RadioButtonWithText(
-                    text = orderStrings[order]!!,
-                    selected = selectedOrder.value == order,
+                    text = order.displayText(),
+                    selected = conditions.order == order,
                     onClick = { viewModel.onOrderChange(order) },
                     enabled = selectingEnabled,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -223,7 +180,7 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
         }
         CheckBoxWithText(
             text = stringResource(Res.string.use_previous_search_conditions),
-            checked = usePreviousSearch.value,
+            checked = usePreviousRepoSearch,
             onCheckedChange = viewModel::usePreviousSearchChange,
             enabled = selectingEnabled && viewModel.canUsePreviousConditions(),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -231,7 +188,7 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
         Button(
             onClick = viewModel::search,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
-            enabled = selectingEnabled && maySearch()
+            enabled = selectingEnabled && maySearch
         ) {
             Text(stringResource(Res.string.search))
         }
@@ -255,4 +212,35 @@ private fun SearchProgress(viewModel: SearchViewModel) {
             Text(stringResource(Res.string.stop_search))
         }
     }
+}
+
+@Composable
+private fun RepoSearchScope.displayText(): String = when (this) {
+    RepoSearchScope.NAME -> stringResource(Res.string.names)
+    RepoSearchScope.DESCRIPTION -> stringResource(Res.string.descriptions)
+    RepoSearchScope.README -> stringResource(Res.string.readme)
+}
+
+@Composable
+private fun OnlyFlag.displayText(): String = when (this) {
+    OnlyFlag.PUBLIC -> stringResource(Res.string.public_only)
+    OnlyFlag.PRIVATE -> stringResource(Res.string.private_only)
+    OnlyFlag.FORK -> stringResource(Res.string.fork_only)
+    OnlyFlag.ARCHIVED -> stringResource(Res.string.archived_only)
+    OnlyFlag.MIRROR -> stringResource(Res.string.mirror_only)
+    OnlyFlag.TEMPLATE -> stringResource(Res.string.template_only)
+}
+
+@Composable
+private fun RepoSearchSort.displayText(): String = when (this) {
+    RepoSearchSort.BEST_MATCH -> stringResource(Res.string.best_match)
+    RepoSearchSort.STARS -> stringResource(Res.string.stars)
+    RepoSearchSort.FORKS -> stringResource(Res.string.forks)
+    RepoSearchSort.UPDATED -> stringResource(Res.string.updated_time)
+}
+
+@Composable
+private fun SearchOrder.displayText(): String = when (this) {
+    SearchOrder.ASCENDING -> stringResource(Res.string.ascending)
+    SearchOrder.DESCENDING -> stringResource(Res.string.descending)
 }

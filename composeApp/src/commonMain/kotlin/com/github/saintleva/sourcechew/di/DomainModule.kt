@@ -17,12 +17,12 @@
 
 package com.github.saintleva.sourcechew.di
 
-import com.github.saintleva.sourcechew.data.auth.AuthManagerImpl
+import com.github.saintleva.sourcechew.data.auth.AuthRepositoryImpl
 import com.github.saintleva.sourcechew.data.secure.DefaultTokenStorage
 import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
-import com.github.saintleva.sourcechew.data.storage.DataStoreConfigManager
-import com.github.saintleva.sourcechew.domain.repository.AuthManager
-import com.github.saintleva.sourcechew.domain.repository.ConfigManager
+import com.github.saintleva.sourcechew.data.storage.DataStoreConfigStore
+import com.github.saintleva.sourcechew.domain.repository.AuthRepository
+import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCase
 import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
@@ -37,9 +37,9 @@ object ConfigDataStoreQualifier : Qualifier {
 }
 
 val domainModule = module {
-    single<ConfigManager> { DataStoreConfigManager(dataStore = get(qualifier = ConfigDataStoreQualifier)) }
+    single<ConfigStore> { DataStoreConfigStore(dataStore = get(qualifier = ConfigDataStoreQualifier)) }
     single<SecureTokenStorage> { DefaultTokenStorage(storage = get()) }
-    single<AuthManager> { AuthManagerImpl(storage = get()) }
-    factory<GetReposUseCase> { GetReposUseCaseImpl(configManager = get(), searchApiService = get()) }
+    single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
+    factory<GetReposUseCase> { GetReposUseCaseImpl(configStore = get(), searchApiService = get()) }
     single<RepoSearchInteractor> { RepoSearchInteractorImpl(getReposUseCase = get()) }
 }

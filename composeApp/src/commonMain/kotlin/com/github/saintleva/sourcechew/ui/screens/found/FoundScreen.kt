@@ -103,6 +103,7 @@ private fun ContentList(
             firstVisibleItemScrollOffset = initial?.offset ?: 0,
         )
     }
+
     DisposableEffect(paginator) {
         onDispose {
             viewModel.saveScroll(
@@ -111,6 +112,7 @@ private fun ContentList(
             )
         }
     }
+
     val prefetch = paginator.rememberPrefetchController(
         prefetchDistance = PREFETCH_DISTANCE,
         silentlyLoading = false,

@@ -19,24 +19,51 @@ package com.github.saintleva.sourcechew.ui.screens.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
-import com.github.saintleva.sourcechew.domain.repository.ConfigManager
+import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
 class SearchViewModel(
-    configManager: ConfigManager,
+    private val repoConditionsStore: ConfigStore<RepoSearchConditions>,
+    private val appSettingsStore: ConfigStore<AppSettings>,
     private val searchInteractor: RepoSearchInteractor
 ) : ViewModel() {
 
-    val accessor = configManager.repoConditions
-    val conditionsStateFlows = accessor.flows.toConditionsStateFlow(viewModelScope)
+    val conditions = repoConditionsStore.config.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        initialValue = RepoSearchConditions.default
+    )
+
+    val maySearch: StateFlow<Boolean> = conditions
+        .map { it.maySearch() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            initialValue = false
+        )
+
+    val usePreviousRepoSearch: StateFlow<Boolean> = appSettingsStore.config
+        .map { it.usePreviousRepoSearch }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            initialValue = AppSettings.default.usePreviousRepoSearch
+        )
 
     val searchState = searchInteractor.searchState
 
@@ -46,54 +73,63 @@ class SearchViewModel(
         Napier.d(tag = "init") { "SearchViewModel created: ${this.hashCode()} with Interactor: ${searchInteractor.hashCode()}" }
     }
 
-    fun onQueryChange(newQuery: String) {
+    fun onQueryChange(query: String) {
         viewModelScope.launch {
-            accessor.changeQuery(newQuery)
+            repoConditionsStore.update { it.copy(query = query) }
         }
     }
 
     fun toggleScope(scope: RepoSearchScope) {
         viewModelScope.launch {
-            accessor.toggleScopeItem(scope)
+            repoConditionsStore.update { current ->
+                val newScopes = if (scope in current.inScope) {
+                    current.inScope - scope
+                } else {
+                    current.inScope + scope
+                }
+                current.copy(inScope = newScopes)
+            }
         }
     }
 
     fun toggleOnlyFlag(flag: OnlyFlag) {
         viewModelScope.launch {
-            when (flag) {
-                OnlyFlag.PUBLIC -> accessor.togglePublicOnlyFlag()
-                OnlyFlag.PRIVATE -> accessor.togglePrivateOnlyFlag()
-                else -> accessor.toggleOnlyFlag(flag)
+            repoConditionsStore.update { current ->
+                val newFlags = if (flag in current.onlyFlags) {
+                    current.onlyFlags - flag
+                } else {
+                    current.onlyFlags + flag
+                }
+                current.copy(onlyFlags = newFlags)
             }
         }
     }
 
     fun onSortChange(sort: RepoSearchSort) {
         viewModelScope.launch {
-            accessor.changeSort(sort)
+            repoConditionsStore.update { it.copy(sort = sort) }
         }
     }
 
     fun onOrderChange(order: SearchOrder) {
         viewModelScope.launch {
-            accessor.changeOrder(order)
+            repoConditionsStore.update { it.copy(order = order) }
         }
     }
 
     fun usePreviousSearchChange(checked: Boolean) {
         viewModelScope.launch {
-            accessor.changeUsePreviousSearch(checked)
+            appSettingsStore.update { it.copy(usePreviousRepoSearch = checked) }
         }
     }
 
     fun canUsePreviousConditions() =
-        searchInteractor.canUsePreviousConditions(conditionsStateFlows.toConditions())
+        searchInteractor.canUsePreviousConditions(conditions.value)
 
     fun search() {
         Napier.d(tag = "init") { "SearchViewModel.search() called with: ${this.hashCode()}" }
         _searchJob = viewModelScope.launch {
-            searchInteractor.search(conditionsStateFlows.toConditions(),
-                conditionsStateFlows.usePreviousSearch.value)
+            searchInteractor.search(conditions.value, usePreviousRepoSearch.value)
         }
     }
 
@@ -102,7 +138,7 @@ class SearchViewModel(
         searchInteractor.switchToSelecting()
     }
 
-    fun onNavigationConsumed() {
-        searchInteractor.switchToSelecting()
+    private companion object {
+        const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }
