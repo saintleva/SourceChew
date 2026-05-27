@@ -33,6 +33,8 @@ class RepoSearchInteractorImpl(
     private var previousConditions: RepoSearchConditions? = null
     private var lastFound: Paginator<FoundRepo>? = null
 
+    override var lastScrollPosition: ScrollPosition? = null
+
     override val everSearched: Boolean
         get() = lastFound != null
 
@@ -67,6 +69,7 @@ class RepoSearchInteractorImpl(
         lastFound?.release()
         lastFound = null
         previousConditions = null
+        lastScrollPosition = null
         scope.cancel()
     }
 
@@ -80,6 +83,7 @@ class RepoSearchInteractorImpl(
         val paginator = getReposUseCase(conditions)
         previousConditions = conditions
         lastFound = paginator
+        lastScrollPosition = null
         _searchState.update { SearchState.Found(paginator) }
         Napier.d(tag = "search") { "Published Found(paginator=${paginator.hashCode()})" }
 

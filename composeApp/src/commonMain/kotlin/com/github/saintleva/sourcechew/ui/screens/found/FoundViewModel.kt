@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
+import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.jamal_aliev.paginator.offset.Paginator
 import com.jamal_aliev.paginator.core.extension.asUiState
@@ -84,6 +85,12 @@ class FoundViewModel(
             started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
             initialValue = PaginatorUiState.Idle
         )
+    fun consumeInitialScroll(): ScrollPosition? = searchInteractor.lastScrollPosition
+
+    fun saveScroll(index: Int, offset: Int) {
+        searchInteractor.lastScrollPosition = ScrollPosition(index, offset)
+    }
+
     fun restart() {
         viewModelScope.launch { paginator?.restart() }
     }

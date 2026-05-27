@@ -30,11 +30,15 @@ sealed interface SearchState {
     data class Found(val paginator: Paginator<FoundRepo>) : SearchState
 }
 
+data class ScrollPosition(val index: Int, val offset: Int)
+
 interface RepoSearchInteractor {
 
     val searchState: StateFlow<SearchState>
 
     val everSearched: Boolean
+
+    var lastScrollPosition: ScrollPosition?
 
     suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean)
 
