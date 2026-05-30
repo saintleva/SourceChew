@@ -2,13 +2,20 @@ package com.github.saintleva.sourcechew.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.okio.OkioStorage
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
+import com.github.saintleva.sourcechew.data.storage.AppPreferences
 import com.github.saintleva.sourcechew.data.storage.KSafeKeyValueStorage
 import eu.anifantakis.lib.ksafe.KSafe
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 import org.koin.dsl.module
+import kotlin.io.path.toPath
+import kotlin.io.resolve
 
 
 //TODO: Use or remove this
@@ -25,10 +32,20 @@ fun createPlatformModule(externalContext: Context? = null) = module {
         single<Context> { context }
     }
 
-    single<DataStore<Preferences>>(qualifier = ConfigDataStoreQualifier) {
-        PreferenceDataStoreFactory.create {
-            get<Context>().preferencesDataStoreFile(dataStoreFileName)
-        }
+    single<DataStore<AppPreferences>> {
+        val context = get<Context>()
+
+        DataStoreFactory.create(
+            storage = OkioStorage(
+                fileSystem = FileSystem.SYSTEM,
+                // Koin automatically resolves OkioSerializer<AppPreferences> provided in DomainModule
+                serializer = get(),
+                producePath = {
+                    // Store in the app's internal files directory
+                    context.filesDir.resolve(PREFS_DATA_STORE_FILE_NAME).toOkioPath()
+                }
+            )
+        )
     }
 
     //TODO: Use or remove this

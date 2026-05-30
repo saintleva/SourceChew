@@ -94,7 +94,8 @@ androidx-navigation3-ui = { group = "org.jetbrains.androidx.navigation3", name =
 androidx-navigation3-material3-adaptive = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive-navigation3", version.ref = "androidx-navigation3Material" }
 androidx-lifecycle-viewmodel-nav3 = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle" }
 
-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
+datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastore" }
+datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "datastore" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 multiplatform-settings = { group = "com.russhwolf", name = "multiplatform-settings", version.ref = "multiplatform-settings" }
 

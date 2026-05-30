@@ -17,13 +17,6 @@
 
 package com.github.saintleva.sourcechew.domain.models
 
-import com.github.saintleva.sourcechew.domain.utils.makeSet
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
-
 
 enum class RepoSearchScope {
     NAME, DESCRIPTION, README

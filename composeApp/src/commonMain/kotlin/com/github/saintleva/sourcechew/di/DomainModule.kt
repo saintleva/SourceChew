@@ -17,29 +17,75 @@
 
 package com.github.saintleva.sourcechew.di
 
+import androidx.datastore.core.okio.OkioSerializer
 import com.github.saintleva.sourcechew.data.auth.AuthRepositoryImpl
 import com.github.saintleva.sourcechew.data.secure.DefaultTokenStorage
 import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
+import com.github.saintleva.sourcechew.data.storage.AppPreferences
+import com.github.saintleva.sourcechew.data.storage.BytesCodec
+import com.github.saintleva.sourcechew.data.storage.CodecOkioSerializer
 import com.github.saintleva.sourcechew.data.storage.DataStoreConfigStore
+import com.github.saintleva.sourcechew.data.storage.StringFormatCodec
+import com.github.saintleva.sourcechew.domain.models.AppSettings
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCase
 import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractorImpl
+import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.QualifierValue
 import org.koin.dsl.module
 
 
-object ConfigDataStoreQualifier : Qualifier {
-    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.ConfigDataStoreQualifier"
+object ConfigJsonQualifier : Qualifier {
+    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.ConfigJsonQualifier"
 }
 
 val domainModule = module {
-    single<ConfigStore> { DataStoreConfigStore(dataStore = get(qualifier = ConfigDataStoreQualifier)) }
+
+    single<Json>(qualifier = ConfigJsonQualifier) {
+        Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
+    }
+
+    single<BytesCodec<AppPreferences>> {
+        StringFormatCodec(
+            format = get(qualifier = ConfigJsonQualifier),
+            serializer = AppPreferences.serializer()
+        )
+    }
+
+    single<OkioSerializer<AppPreferences>> {
+        CodecOkioSerializer(
+            defaultValue = AppPreferences(),
+            codec = get()
+        )
+    }
+
+    single<ConfigStore<AppSettings>> {
+        DataStoreConfigStore(
+            dataStore = get(), // Provided by PlatformModule
+            lens = AppPreferences.AppSettingsLens
+        )
+    }
+
+    single<ConfigStore<RepoSearchConditions>> {
+        DataStoreConfigStore(
+            dataStore = get(), // Provided by PlatformModule
+            lens = AppPreferences.RepoSearchLens
+        )
+    }
+
     single<SecureTokenStorage> { DefaultTokenStorage(storage = get()) }
+
     single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
+
     factory<GetReposUseCase> { GetReposUseCaseImpl(configStore = get(), searchApiService = get()) }
+
     single<RepoSearchInteractor> { RepoSearchInteractorImpl(getReposUseCase = get()) }
 }

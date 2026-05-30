@@ -75,6 +75,7 @@ class SearchViewModel(
 
     fun onQueryChange(query: String) {
         viewModelScope.launch {
+            //TODO: Use Debounce
             repoConditionsStore.update { it.copy(query = query) }
         }
     }

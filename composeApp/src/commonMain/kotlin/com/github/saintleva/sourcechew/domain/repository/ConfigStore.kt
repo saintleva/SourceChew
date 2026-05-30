@@ -20,6 +20,11 @@ package com.github.saintleva.sourcechew.domain.repository
 import kotlinx.coroutines.flow.Flow
 
 
+interface ConfigLens<Whole, Part> {
+    fun get(whole: Whole): Part
+    fun set(whole: Whole, part: Part): Whole
+}
+
 interface ConfigStore<T> {
     val config: Flow<T>
     suspend fun update(updater: (T) -> T)

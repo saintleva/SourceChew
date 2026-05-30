@@ -83,7 +83,8 @@ kotlin {
                 implementation(libs.compose.material.icons.core)
                 implementation(libs.compose.material.icons.extended)
 
-                implementation(libs.datastore.preferences.core)
+                implementation(libs.datastore.core)
+                implementation(libs.datastore.core.okio)
                 implementation(libs.okio)
 
                 implementation(libs.napier)

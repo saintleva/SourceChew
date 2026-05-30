@@ -18,11 +18,15 @@
 package com.github.saintleva.sourcechew.ui.screens.search
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -34,8 +38,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -89,16 +98,46 @@ fun SearchScreen(
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            //TODO: Make good top padding
-            //.padding(WindowInsets.safeContent.asPaddingValues())
-            .verticalScroll(rememberScrollState())
+    BoxWithConstraints(
+        modifier = modifier.fillMaxSize()
     ) {
-        SearchContent(viewModel, searchState.value != SearchState.Searching)
-        if (searchState.value == SearchState.Searching) {
-            SearchProgress(viewModel)
+        val screenHeight = maxHeight
+        val density = LocalDensity.current
+        var contentHeightDp by remember { mutableStateOf(0.dp) }
+
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Wrap SearchContent to measure its exact height on the screen
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        contentHeightDp = with(density) { coordinates.size.height.toDp() }
+                    }
+            ) {
+                SearchContent(
+                    viewModel = viewModel,
+                    selectingEnabled = searchState.value != SearchState.Searching
+                )
+            }
+
+            if (searchState.value == SearchState.Searching) {
+                // Calculate the remaining screen height below the search button
+                val remainingHeight = screenHeight - contentHeightDp
+
+                SearchProgress(
+                    viewModel = viewModel,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        // If there is remaining space (remainingHeight > 0), stretch the progress to fill it.
+                        // If there is no space (e.g., on a small screen or with expanded filters),
+                        // the minimum height will be 0.dp, taking only its natural height and scrolling along.
+                        .heightIn(min = if (remainingHeight > 0.dp) remainingHeight else 0.dp)
+                )
+            }
         }
     }
 }
@@ -195,14 +234,15 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
     }
 }
 
-//TODO: Force CircularProgressIndicator to occupy full residuary space of screen if scrolling
-// is not using
 @Composable
-private fun SearchProgress(viewModel: SearchViewModel) {
+private fun SearchProgress(
+    viewModel: SearchViewModel,
+    modifier: Modifier
+) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center // Centers the spinner and stop button vertically within the remaining area
     ) {
         CircularProgressIndicator(modifier = Modifier.padding(8.dp))
         Button(
