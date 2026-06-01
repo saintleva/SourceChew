@@ -29,9 +29,8 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.SharingStarted
+import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,7 +44,7 @@ class SearchViewModel(
 
     val conditions = repoConditionsStore.config.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = WhileUiSubscribed,
         initialValue = RepoSearchConditions.default
     )
 
@@ -53,7 +52,7 @@ class SearchViewModel(
         .map { it.maySearch() }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            started = WhileUiSubscribed,
             initialValue = false
         )
 
@@ -61,7 +60,7 @@ class SearchViewModel(
         .map { it.usePreviousRepoSearch }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            started = WhileUiSubscribed,
             initialValue = AppSettings.default.usePreviousRepoSearch
         )
 
@@ -137,9 +136,5 @@ class SearchViewModel(
     fun stop() {
         _searchJob?.cancel()
         searchInteractor.switchToSelecting()
-    }
-
-    private companion object {
-        const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }

@@ -8,11 +8,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.models.paginationPageSizeRange
+import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.ui.common.NumberSpinEdit
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -43,7 +42,7 @@ fun SettingsScreen(
     modifier: Modifier,
     viewModel: SettingsViewModel
 ) {
-    val pageSize by viewModel.pageSize.collectAsStateWithLifecycle()
+    val settings by viewModel.settings.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -54,16 +53,17 @@ fun SettingsScreen(
     ) {
         SettingsSection(title = stringResource(Res.string.pagination_section)) {
             Column {
+                val range = AppSettings.paginationPageSizeRange
                 NumberSpinEdit(
                     label = stringResource(Res.string.pagination_page_size),
                     rangeLabel = stringResource(
                         Res.string.pagination_page_size_range,
-                        paginationPageSizeRange.first,
-                        paginationPageSizeRange.last
+                        range.first,
+                        range.last
                     ),
-                    value = pageSize,
+                    value = settings.paginationPageSize,
                     onValueChange = viewModel::onPageSizeChange,
-                    range = paginationPageSizeRange,
+                    range = range,
                     decreaseContentDescription = stringResource(Res.string.decrease),
                     increaseContentDescription = stringResource(Res.string.increase)
                 )

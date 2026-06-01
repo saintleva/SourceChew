@@ -1,6 +1,9 @@
 package com.github.saintleva.sourcechew.domain.models
 
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class AppSettings(
     val paginationPageSize: Int,
     val usePreviousRepoSearch: Boolean,

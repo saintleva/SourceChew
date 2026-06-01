@@ -85,7 +85,7 @@ val domainModule = module {
 
     single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
 
-    factory<GetReposUseCase> { GetReposUseCaseImpl(configStore = get(), searchApiService = get()) }
+    factory<GetReposUseCase> { GetReposUseCaseImpl(appSettingsStore = get(), searchApiService = get()) }
 
     single<RepoSearchInteractor> { RepoSearchInteractorImpl(getReposUseCase = get()) }
 }

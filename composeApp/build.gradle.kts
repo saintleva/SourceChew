@@ -11,10 +11,11 @@ plugins {
     alias(libs.plugins.kotest)
     alias(libs.plugins.ksp)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.kotzilla)
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 
     android {
         androidResources {
@@ -85,6 +86,7 @@ kotlin {
 
                 implementation(libs.datastore.core)
                 implementation(libs.datastore.core.okio)
+                implementation(libs.datastore.preferences.core)
                 implementation(libs.okio)
 
                 implementation(libs.napier)
@@ -92,6 +94,8 @@ kotlin {
                 api(libs.koin.core)
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
+
+                implementation(libs.kotzilla.sdk.compose)
 
                 implementation(libs.androidx.navigation3.ui)
                 implementation(libs.androidx.navigation3.material3.adaptive)
@@ -244,6 +248,11 @@ buildkonfig {
         buildConfigField(Type.STRING, "PACKAGE_NAME", pkgName)
         buildConfigField(Type.BOOLEAN, "IS_DEBUG", (!isRelease).toString())
     }
+}
+
+kotzilla {
+    versionName = "1.0.0" // add your app version name
+    composeInstrumentation = false
 }
 
 //TODO: Remove this

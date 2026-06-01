@@ -7,9 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
-import com.mobilebytelabs.kmptoolkit.clipboard.copyToClipboard
 import com.mobilebytelabs.kmptoolkit.clipboard.getFromClipboard
-import kotlinx.coroutines.flow.SharingStarted
+import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -21,7 +20,7 @@ class AuthViewModel(
 
     val isAuthorized = repository.isAuthorized.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = WhileUiSubscribed,
         initialValue = false
     )
 

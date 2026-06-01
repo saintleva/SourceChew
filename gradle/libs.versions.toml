@@ -10,6 +10,7 @@ kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kotest = { id = "io.kotest", version.ref = "kotest" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+kotzilla = { id = "io.kotzilla.kotzilla-plugin", version.ref = "kotzilla" }
 
 [versions]
 
@@ -36,6 +37,7 @@ androidx-security-crypto = "1.1.0"
 multiplatform-settings = "1.3.0"
 napier = "2.7.1"
 koin = "4.2.1"
+kotzilla = "2.2.0"
 appdirs = "2.0.0"
 paginator = "9.0.0"
 ktor = "3.5.0"
@@ -96,6 +98,7 @@ androidx-lifecycle-viewmodel-nav3 = { group = "org.jetbrains.androidx.lifecycle"
 
 datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastore" }
 datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "datastore" }
+datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
 okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 multiplatform-settings = { group = "com.russhwolf", name = "multiplatform-settings", version.ref = "multiplatform-settings" }
 
@@ -107,6 +110,8 @@ koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin"
 koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel", version.ref = "koin" }
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
+
+kotzilla-sdk-compose = { group = "io.kotzilla", name = "kotzilla-sdk-compose", version.ref = "kotzilla" }
 
 appdirs = { group = "ca.gosyer", name = "kotlin-multiplatform-appdirs", version.ref = "appdirs" }
 

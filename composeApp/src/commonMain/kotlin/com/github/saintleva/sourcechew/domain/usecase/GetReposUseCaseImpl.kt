@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
+import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
@@ -13,13 +14,13 @@ import kotlinx.coroutines.flow.first
 
 
 class GetReposUseCaseImpl(
-    private val configStore: ConfigStore,
+    private val appSettingsStore: ConfigStore<AppSettings>,
     private val searchApiService: SearchApiService
 ) : GetReposUseCase {
 
     override suspend fun invoke(conditions: RepoSearchConditions): Paginator<FoundRepo> {
-        val pageSize = configStore.appSettings.paginationPageSize.first()
-        return paginator<FoundRepo>(capacity = pageSize) { //TODO: Is it right?
+        val pageSize = appSettingsStore.config.first().paginationPageSize
+        return paginator<FoundRepo>(capacity = pageSize) {
             load { page ->
                 when (val result = searchApiService.searchItems(conditions, page, pageSize)) {
                     is Result.Success -> LoadResult(

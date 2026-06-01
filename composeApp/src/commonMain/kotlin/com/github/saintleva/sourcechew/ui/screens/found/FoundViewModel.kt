@@ -29,7 +29,7 @@ import com.jamal_aliev.paginator.core.page.PaginatorUiState
 import com.jamal_aliev.paginator.offset.Paginator
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.SharingStarted
+import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -65,7 +65,7 @@ class FoundViewModel(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            started = WhileUiSubscribed,
             initialValue = null
         )
 
@@ -81,7 +81,7 @@ class FoundViewModel(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            started = WhileUiSubscribed,
             initialValue = PaginatorUiState.Idle
         )
 
@@ -101,9 +101,5 @@ class FoundViewModel(
 
     fun onNavigationBack() {
         searchInteractor.switchToSelecting()
-    }
-
-    private companion object {
-        const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }

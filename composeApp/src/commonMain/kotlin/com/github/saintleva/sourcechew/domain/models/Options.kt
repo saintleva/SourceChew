@@ -17,15 +17,19 @@
 
 package com.github.saintleva.sourcechew.domain.models
 
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class RepoSearchScope {
     NAME, DESCRIPTION, README
 }
 
+@Serializable
 enum class OnlyFlag {
     PUBLIC, PRIVATE, FORK, ARCHIVED, MIRROR, TEMPLATE
 }
 
+@Serializable
 enum class RepoSearchSort(val code: Int) {
     BEST_MATCH(0), STARS(1), FORKS(2), UPDATED(3);
 
@@ -35,6 +39,7 @@ enum class RepoSearchSort(val code: Int) {
     }
 }
 
+@Serializable
 enum class SearchOrder(val code: Int) {
     ASCENDING(0), DESCENDING(1);
 
@@ -44,6 +49,7 @@ enum class SearchOrder(val code: Int) {
     }
 }
 
+@Serializable
 data class RepoSearchConditions(
     val query: String,
     val inScope: Set<RepoSearchScope>,

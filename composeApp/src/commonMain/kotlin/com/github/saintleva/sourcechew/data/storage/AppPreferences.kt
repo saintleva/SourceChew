@@ -10,8 +10,7 @@ import kotlinx.serialization.Serializable
 data class AppPreferences(
     val appSettings: AppSettings = AppSettings.default,
     val repoSearchConditions: RepoSearchConditions = RepoSearchConditions.default,
-)
-{
+) {
     companion object {
         val AppSettingsLens = object : ConfigLens<AppPreferences, AppSettings> {
             override fun get(whole: AppPreferences) = whole.appSettings

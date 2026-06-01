@@ -1,17 +1,23 @@
 package com.github.saintleva.sourcechew.di
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.okio.WebLocalStorage
+import com.github.saintleva.sourcechew.data.storage.AppPreferences
 import kotlinx.coroutines.Dispatchers
-import okio.Path.Companion.toPath
 import org.koin.dsl.module
 
 
 val webCommonModule = module {
-    single<DataStore<Preferences>>(qualifier = ConfigDataStoreQualifier) {
-        PreferenceDataStoreFactory.createWithPath(
-            produceFile = { dataStoreFileName.toPath() }
+
+    single<DataStore<AppPreferences>> {
+        DataStoreFactory.create(
+            // Use WebLocalStorage which writes directly to the browser's window.localStorage
+            storage = WebLocalStorage(
+                // Koin resolves OkioSerializer<AppPreferences> provided in DomainModule
+                serializer = get(),
+                name = PREFS_DATA_STORE_FILE_NAME
+            )
         )
     }
 }
