@@ -216,7 +216,7 @@ dependencies {
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
     filter {
-        isFailOnNoMatchingTests = false
+        isFailOnNoMatchingTests = true
     }
 }
 

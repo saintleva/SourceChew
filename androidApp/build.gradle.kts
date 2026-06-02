@@ -49,6 +49,11 @@ android {
     }
 
     sourceSets {
+        //TODO: Use or remove this
+//        getByName("test") {
+//            kotlin.directories.add("../composeApp/src/commonTest/kotlin")
+//            resources.directories.add("../composeApp/src/commonTest/resources")
+//        }
         getByName("androidTest") {
             kotlin.directories.add("../composeApp/src/commonTest/kotlin")
             resources.directories.add("../composeApp/src/commonTest/resources")
@@ -89,6 +94,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    testImplementation(projects.composeApp)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.kotest.extensions.koin)
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
 

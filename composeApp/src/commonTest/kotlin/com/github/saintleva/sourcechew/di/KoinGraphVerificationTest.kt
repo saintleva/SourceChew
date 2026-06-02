@@ -6,6 +6,7 @@ import org.koin.dsl.module
 import org.koin.test.verify.verify
 
 class KoinGraphVerificationTest : FunSpec({
+
     test("Verify Koin Dependency Graph") {
         @OptIn(KoinExperimentalAPI::class)
         module {

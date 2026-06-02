@@ -34,6 +34,7 @@ import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCase
 import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractorImpl
+import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.QualifierValue
@@ -46,7 +47,7 @@ object ConfigJsonQualifier : Qualifier {
 
 val domainModule = module {
 
-    single<Json>(qualifier = ConfigJsonQualifier) {
+    single<StringFormat>(qualifier = ConfigJsonQualifier) {
         Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
