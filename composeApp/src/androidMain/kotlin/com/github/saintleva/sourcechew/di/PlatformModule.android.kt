@@ -33,6 +33,8 @@ fun createPlatformModule(externalContext: Context? = null) = module {
     }
 
     single<DataStore<AppPreferences>> {
+        println("DATASTORE CREATED")
+
         val context = get<Context>()
 
         DataStoreFactory.create(

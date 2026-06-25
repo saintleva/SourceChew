@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.ui.screens.auth
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.repository.AuthRepository

@@ -18,12 +18,12 @@
 package com.github.saintleva.sourcechew.di
 
 import com.github.saintleva.sourcechew.ui.screens.auth.AuthViewModel
-import com.github.saintleva.sourcechew.ui.screens.search.SearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
+import com.github.saintleva.sourcechew.ui.screens.search.SearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.settings.SettingsViewModel
 import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
 import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManagerConfig
-import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 
@@ -33,8 +33,34 @@ val appModule = module {
         ClipboardManager(ClipboardManagerConfig(async = true) )
     }
 
-    viewModelOf(::AuthViewModel)
-    viewModelOf(::SettingsViewModel)
-    viewModelOf(::SearchViewModel)
-    viewModelOf(::FoundViewModel)
+    //TODO: Migrate to this ord.koin.plugin.module.dsl.viewModel and use this and Koin Complier Plugin !
+//    viewModel<AuthViewModel>()
+//    viewModel<SettingsViewModel>()
+//    viewModel<SearchViewModel>()
+//    viewModel<FoundViewModel>()
+
+    viewModel<AuthViewModel> {
+        AuthViewModel(
+            repository = get(),
+            clipboardManager = get()
+        )
+    }
+
+    viewModel<SettingsViewModel> {
+        SettingsViewModel(appSettingsStore = get(qualifier = AppSettingsStoreQualifier))
+    }
+
+    viewModel<SearchViewModel> {
+        SearchViewModel(
+            repoConditionsStore = get(qualifier = RepoSearchConditionsStoreQualifier),
+            appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
+            searchInteractor = get(),
+        )
+    }
+
+    viewModel<FoundViewModel> {
+        FoundViewModel(
+            searchInteractor = get()
+        )
+    }
 }

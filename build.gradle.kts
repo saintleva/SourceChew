@@ -13,7 +13,10 @@ plugins {
     alias(libs.plugins.kotest) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.buildkonfig) apply false
-    alias(libs.plugins.kotzilla) apply true
+    alias(libs.plugins.koinCompiler) apply true
+
+    //TODO: Use or remove this
+//    alias(libs.plugins.kotzilla) apply true
 }
 
 //TODO: Remove it or update to a newer version

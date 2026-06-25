@@ -45,6 +45,14 @@ object ConfigJsonQualifier : Qualifier {
     override val value: QualifierValue = "com.github.saintleva.sourcechew.di.ConfigJsonQualifier"
 }
 
+object AppSettingsStoreQualifier : Qualifier {
+    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.AppSettingsStoreQualifier"
+}
+
+object RepoSearchConditionsStoreQualifier : Qualifier {
+    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.RepoSearchConditionsStoreQualifier"
+}
+
 val domainModule = module {
 
     single<StringFormat>(qualifier = ConfigJsonQualifier) {
@@ -68,14 +76,14 @@ val domainModule = module {
         )
     }
 
-    single<ConfigStore<AppSettings>> {
+    single<ConfigStore<AppSettings>>(qualifier = AppSettingsStoreQualifier) {
         DataStoreConfigStore(
             dataStore = get(), // Provided by PlatformModule
             lens = AppPreferences.AppSettingsLens
         )
     }
 
-    single<ConfigStore<RepoSearchConditions>> {
+    single<ConfigStore<RepoSearchConditions>>(qualifier = RepoSearchConditionsStoreQualifier) {
         DataStoreConfigStore(
             dataStore = get(), // Provided by PlatformModule
             lens = AppPreferences.RepoSearchLens
@@ -86,7 +94,12 @@ val domainModule = module {
 
     single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
 
-    factory<GetReposUseCase> { GetReposUseCaseImpl(appSettingsStore = get(), searchApiService = get()) }
+    factory<GetReposUseCase> {
+        GetReposUseCaseImpl(
+            appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
+            searchApiService = get()
+        )
+    }
 
     single<RepoSearchInteractor> { RepoSearchInteractorImpl(getReposUseCase = get()) }
 }

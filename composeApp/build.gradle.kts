@@ -11,7 +11,9 @@ plugins {
     alias(libs.plugins.kotest)
     alias(libs.plugins.ksp)
     alias(libs.plugins.buildkonfig)
-    alias(libs.plugins.kotzilla)
+    //TODO: Use or remove this
+//    alias(libs.plugins.kotzilla)
+    alias(libs.plugins.koinCompiler)
 }
 
 kotlin {
@@ -95,7 +97,8 @@ kotlin {
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
 
-                implementation(libs.kotzilla.sdk.compose)
+                //TODO: Use or remove this
+//                implementation(libs.kotzilla.sdk.compose)
 
                 implementation(libs.androidx.navigation3.ui)
                 implementation(libs.androidx.navigation3.material3.adaptive)
@@ -250,10 +253,11 @@ buildkonfig {
     }
 }
 
-kotzilla {
-    versionName = "1.0.0" // add your app version name
-    composeInstrumentation = false
-}
+//TODO: Use or remove this
+//kotzilla {
+//    versionName = "1.0.0" // add your app version name
+//    composeInstrumentation = false
+//}
 
 //TODO: Remove this
 //kotlin.sourceSets.all {

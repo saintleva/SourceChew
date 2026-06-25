@@ -76,7 +76,7 @@ fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
             is PaginatorUiState.Empty -> EmptyState()
 
             is PaginatorUiState.Error -> ErrorState(
-                cause = state.exception,
+                cause = state.state.exception,
                 onRetry = viewModel::restart
             )
 
