@@ -19,6 +19,7 @@ package com.github.saintleva.sourcechew.ui.screens.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.OnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
@@ -27,12 +28,19 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
+import com.github.saintleva.sourcechew.ui.utils.DEBOUNCE
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
@@ -42,11 +50,15 @@ class SearchViewModel(
     private val searchInteractor: RepoSearchInteractor
 ) : ViewModel() {
 
-    val conditions = repoConditionsStore.config.stateIn(
-        scope = viewModelScope,
-        started = WhileUiSubscribed,
-        initialValue = RepoSearchConditions.default
-    )
+    private val _conditions = MutableStateFlow(RepoSearchConditions.default)
+    val conditions: StateFlow<RepoSearchConditions> = _conditions.asStateFlow()
+
+    //TODO: Remove this
+//    val conditions = repoConditionsStore.config.stateIn(
+//        scope = viewModelScope,
+//        started = WhileUiSubscribed,
+//        initialValue = RepoSearchConditions.default
+//    )
 
     val maySearch: StateFlow<Boolean> = conditions
         .map { it.maySearch() }
@@ -70,51 +82,50 @@ class SearchViewModel(
 
     init {
         Napier.d(tag = "init") { "SearchViewModel created: ${this.hashCode()} with Interactor: ${searchInteractor.hashCode()}" }
-    }
 
-    fun onQueryChange(query: String) {
         viewModelScope.launch {
-            //TODO: Use Debounce
-            repoConditionsStore.update { it.copy(query = query) }
+            _conditions.value = repoConditionsStore.config.first()
+            _conditions
+                .drop(1)
+                .debounce(DEBOUNCE)
+                .collect { currentConditions ->
+                    repoConditionsStore.update { currentConditions }
+                }
         }
     }
 
+    fun onQueryChange(query: String) {
+        _conditions.update { it.copy(query = query) }
+    }
+
     fun toggleScope(scope: RepoSearchScope) {
-        viewModelScope.launch {
-            repoConditionsStore.update { current ->
-                val newScopes = if (scope in current.inScope) {
-                    current.inScope - scope
-                } else {
-                    current.inScope + scope
-                }
-                current.copy(inScope = newScopes)
+        _conditions.update { current ->
+            val newScopes = if (scope in current.inScope) {
+                current.inScope - scope
+            } else {
+                current.inScope + scope
             }
+            current.copy(inScope = newScopes)
         }
     }
 
     fun toggleOnlyFlag(flag: OnlyFlag) {
-        viewModelScope.launch {
-            repoConditionsStore.update { current ->
-                val newFlags = if (flag in current.onlyFlags) {
-                    current.onlyFlags - flag
-                } else {
-                    current.onlyFlags + flag
-                }
-                current.copy(onlyFlags = newFlags)
+        _conditions.update { current ->
+            val newFlags = if (flag in current.onlyFlags) {
+                current.onlyFlags - flag
+            } else {
+                current.onlyFlags + flag
             }
+            current.copy(onlyFlags = newFlags)
         }
     }
 
     fun onSortChange(sort: RepoSearchSort) {
-        viewModelScope.launch {
-            repoConditionsStore.update { it.copy(sort = sort) }
-        }
+        _conditions.update { it.copy(sort = sort) }
     }
 
     fun onOrderChange(order: SearchOrder) {
-        viewModelScope.launch {
-            repoConditionsStore.update { it.copy(order = order) }
-        }
+        _conditions.update { it.copy(order = order) }
     }
 
     fun usePreviousSearchChange(checked: Boolean) {

@@ -9,4 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
  * come back from a short-lived configuration change (such as rotations). If the UI stops
  * observing for longer, the cache is kept but the upstream flows are stopped.
  */
+
+const val DEBOUNCE = 500L
+
 val WhileUiSubscribed: SharingStarted = SharingStarted.WhileSubscribed(5_000L)
