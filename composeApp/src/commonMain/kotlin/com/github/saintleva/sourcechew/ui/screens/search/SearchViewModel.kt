@@ -53,13 +53,6 @@ class SearchViewModel(
     private val _conditions = MutableStateFlow(RepoSearchConditions.default)
     val conditions: StateFlow<RepoSearchConditions> = _conditions.asStateFlow()
 
-    //TODO: Remove this
-//    val conditions = repoConditionsStore.config.stateIn(
-//        scope = viewModelScope,
-//        started = WhileUiSubscribed,
-//        initialValue = RepoSearchConditions.default
-//    )
-
     val maySearch: StateFlow<Boolean> = conditions
         .map { it.maySearch() }
         .stateIn(

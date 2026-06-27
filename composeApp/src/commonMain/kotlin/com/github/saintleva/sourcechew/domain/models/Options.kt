@@ -30,22 +30,33 @@ enum class OnlyFlag {
 }
 
 @Serializable
-enum class RepoSearchSort(val code: Int) {
-    BEST_MATCH(0), STARS(1), FORKS(2), UPDATED(3);
+enum class RepoSearchSort {
+    BEST_MATCH, STARS, FORKS, UPDATED;
 
     companion object {
         val default = BEST_MATCH
-        fun fromCode(code: Int) = entries.find { it.code == code } ?: default
     }
 }
 
 @Serializable
-enum class SearchOrder(val code: Int) {
-    ASCENDING(0), DESCENDING(1);
+enum class SearchOrder {
+    ASCENDING, DESCENDING;
 
     companion object {
         val default = DESCENDING
-        fun fromCode(code: Int) = entries.find { it.code == code } ?: default
+    }
+}
+
+@Serializable
+data class CommonFilters(
+    val query: String,
+    val order: SearchOrder
+) {
+    companion object {
+        val default = CommonFilters(
+            query = "",
+            order = SearchOrder.default
+        )
     }
 }
 
