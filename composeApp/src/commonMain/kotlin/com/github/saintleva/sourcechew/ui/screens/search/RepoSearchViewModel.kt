@@ -19,9 +19,8 @@ package com.github.saintleva.sourcechew.ui.screens.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.saintleva.sourcechew.domain.models.AppSettings
-import com.github.saintleva.sourcechew.domain.models.OnlyFlag
+import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
@@ -32,6 +31,7 @@ import com.github.saintleva.sourcechew.ui.utils.DEBOUNCE
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Job
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
+import com.github.saintleva.sourcechew.ui.utils.updateCommonFilters
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-class SearchViewModel(
+class RepoSearchViewModel(
     private val repoConditionsStore: ConfigStore<RepoSearchConditions>,
     private val appSettingsStore: ConfigStore<AppSettings>,
     private val searchInteractor: RepoSearchInteractor
@@ -88,7 +88,15 @@ class SearchViewModel(
     }
 
     fun onQueryChange(query: String) {
-        _conditions.update { it.copy(query = query) }
+        _conditions.updateCommonFilters { it.copy(query = query) }
+    }
+
+    fun onOrderChange(order: SearchOrder) {
+        _conditions.updateCommonFilters { it.copy(order = order) }
+    }
+
+    fun onSortChange(sort: RepoSearchSort) {
+        _conditions.update { it.copy(sort = sort) }
     }
 
     fun toggleScope(scope: RepoSearchScope) {
@@ -102,7 +110,7 @@ class SearchViewModel(
         }
     }
 
-    fun toggleOnlyFlag(flag: OnlyFlag) {
+    fun toggleOnlyFlag(flag: RepoOnlyFlag) {
         _conditions.update { current ->
             val newFlags = if (flag in current.onlyFlags) {
                 current.onlyFlags - flag
@@ -111,14 +119,6 @@ class SearchViewModel(
             }
             current.copy(onlyFlags = newFlags)
         }
-    }
-
-    fun onSortChange(sort: RepoSearchSort) {
-        _conditions.update { it.copy(sort = sort) }
-    }
-
-    fun onOrderChange(order: SearchOrder) {
-        _conditions.update { it.copy(order = order) }
     }
 
     fun usePreviousSearchChange(checked: Boolean) {

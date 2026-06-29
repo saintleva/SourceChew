@@ -23,10 +23,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -49,7 +47,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.models.OnlyFlag
+import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
@@ -57,7 +55,6 @@ import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
-import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.additional_filters
@@ -87,7 +84,7 @@ import sourcechew.composeapp.generated.resources.use_previous_search_conditions
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    viewModel: SearchViewModel,
+    viewModel: RepoSearchViewModel,
     onFound: () -> Unit
 ) {
     val searchState = viewModel.searchState.collectAsStateWithLifecycle()
@@ -144,7 +141,7 @@ fun SearchScreen(
 
 
 @Composable
-private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean) {
+private fun SearchContent(viewModel: RepoSearchViewModel, selectingEnabled: Boolean) {
 
     val conditions by viewModel.conditions.collectAsStateWithLifecycle()
     val usePreviousRepoSearch by viewModel.usePreviousRepoSearch.collectAsStateWithLifecycle()
@@ -185,7 +182,7 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
             }
         }
         ExpandableSection(title = stringResource(Res.string.additional_filters)) {
-            OnlyFlag.entries.forEach { flag ->
+            RepoOnlyFlag.entries.forEach { flag ->
                 CheckBoxWithText(
                     text = flag.displayText(),
                     checked = flag in conditions.onlyFlags,
@@ -236,7 +233,7 @@ private fun SearchContent(viewModel: SearchViewModel, selectingEnabled: Boolean)
 
 @Composable
 private fun SearchProgress(
-    viewModel: SearchViewModel,
+    viewModel: RepoSearchViewModel,
     modifier: Modifier
 ) {
     Column(
@@ -262,13 +259,13 @@ private fun RepoSearchScope.displayText(): String = when (this) {
 }
 
 @Composable
-private fun OnlyFlag.displayText(): String = when (this) {
-    OnlyFlag.PUBLIC -> stringResource(Res.string.public_only)
-    OnlyFlag.PRIVATE -> stringResource(Res.string.private_only)
-    OnlyFlag.FORK -> stringResource(Res.string.fork_only)
-    OnlyFlag.ARCHIVED -> stringResource(Res.string.archived_only)
-    OnlyFlag.MIRROR -> stringResource(Res.string.mirror_only)
-    OnlyFlag.TEMPLATE -> stringResource(Res.string.template_only)
+private fun RepoOnlyFlag.displayText(): String = when (this) {
+    RepoOnlyFlag.PUBLIC -> stringResource(Res.string.public_only)
+    RepoOnlyFlag.PRIVATE -> stringResource(Res.string.private_only)
+    RepoOnlyFlag.FORK -> stringResource(Res.string.fork_only)
+    RepoOnlyFlag.ARCHIVED -> stringResource(Res.string.archived_only)
+    RepoOnlyFlag.MIRROR -> stringResource(Res.string.mirror_only)
+    RepoOnlyFlag.TEMPLATE -> stringResource(Res.string.template_only)
 }
 
 @Composable

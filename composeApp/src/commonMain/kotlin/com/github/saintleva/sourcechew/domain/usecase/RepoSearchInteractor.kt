@@ -17,6 +17,7 @@
 
 package com.github.saintleva.sourcechew.domain.usecase
 
+import com.github.saintleva.sourcechew.domain.models.FoundItem
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
@@ -24,17 +25,17 @@ import com.jamal_aliev.paginator.offset.Paginator
 import kotlinx.coroutines.flow.StateFlow
 
 
-sealed interface SearchState {
-    data object Selecting : SearchState
-    data object Searching : SearchState
-    data class Found(val paginator: Paginator<FoundRepo>) : SearchState
+sealed interface SearchState<out Item : FoundItem> {
+    data object Selecting : SearchState<Nothing>
+    data object Searching : SearchState<Nothing>
+    data class Found<out Item : FoundItem>(val paginator: Paginator<out Item>) : SearchState<Item>
 }
 
 data class ScrollPosition(val index: Int, val offset: Int)
 
-interface RepoSearchInteractor {
+interface SearchInteractor<out Item : FoundItem> {
 
-    val searchState: StateFlow<SearchState>
+    val searchState: StateFlow<SearchState<Item>>
 
     val everSearched: Boolean
 

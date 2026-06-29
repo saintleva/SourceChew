@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.data.network.utils.isNetworkException
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.models.OnlyFlag
+import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
@@ -108,17 +108,17 @@ class KtorRestApiService(
         private fun Set<RepoSearchScope>.toApiValue(): String =
             joinToString(",") { it.toApiValue() }
 
-        private fun OnlyFlag.toApiValue(): String = when (this) {
-            OnlyFlag.PUBLIC -> "public"
-            OnlyFlag.PRIVATE -> "private"
-            OnlyFlag.FORK -> "fork"
-            OnlyFlag.ARCHIVED -> "archived"
-            OnlyFlag.MIRROR -> "mirror"
-            OnlyFlag.TEMPLATE -> "template"
+        private fun RepoOnlyFlag.toApiValue(): String = when (this) {
+            RepoOnlyFlag.PUBLIC -> "public"
+            RepoOnlyFlag.PRIVATE -> "private"
+            RepoOnlyFlag.FORK -> "fork"
+            RepoOnlyFlag.ARCHIVED -> "archived"
+            RepoOnlyFlag.MIRROR -> "mirror"
+            RepoOnlyFlag.TEMPLATE -> "template"
         }
 
         @JvmName("toApiValueFlags")
-        private fun Set<OnlyFlag>.toApiValue(): String =
+        private fun Set<RepoOnlyFlag>.toApiValue(): String =
             joinToString(" ") { "is:${it.toApiValue()}" }
 
         private fun RepoSearchSort.toApiValue(): String? = when (this) {
