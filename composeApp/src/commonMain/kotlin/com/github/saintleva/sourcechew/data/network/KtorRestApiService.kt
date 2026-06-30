@@ -1,13 +1,14 @@
 package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.data.network.utils.isNetworkException
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
+import com.github.saintleva.sourcechew.domain.repository.FoundItemsBlock
 import com.github.saintleva.sourcechew.domain.repository.FoundReposBlock
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.AppException
@@ -35,65 +36,9 @@ import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmName
 
 
-@Serializable
-data class GithubSearchResponseDto(
-    @SerialName("total_count") val totalCount: Int,
-    @SerialName("incomplete_results") val incompleteResults: Boolean,
-    val items: List<GithubRepoItemDto>
-)
-
-fun GithubSearchResponseDto.toDomain() = FoundReposBlock(
-    items = items.map { it.toDomain() },
-    metadata = SearchMetadata(totalCount, incompleteResults)
-)
-
-@Serializable
-data class GithubRepoItemDto(
-    val id: Long,
-    val name: String,
-    @SerialName("full_name") val fullName: String,
-    val owner: GitHubOwnerDto,
-    val description: String?,
-    val language: String?,
-    @SerialName("stargazers_count") val stars: Int
-)
-
-// DTO for the owner of the repository
-@Serializable
-data class GitHubOwnerDto(
-    val login: String,
-    val type: String
-)
-
-fun GithubRepoItemDto.toDomain() = FoundRepo(
-    id = id,
-    name = name,
-    fullName = fullName,
-    ownerLogin = owner.login,
-    ownerType = owner.type,
-    description = description,
-    language = language,
-    stars = stars
-)
-
-@Serializable
-data class GithubErrorResponseDto(
-    val message: String,
-    val errors: List<GithubErrorDetailDto>? = null,
-    @SerialName("documentation_url") val documentationUrl: String? = null
-)
-
-@Serializable
-data class GithubErrorDetailDto(
-    val resource: String? = null,
-    val field: String? = null,
-    val code: String? = null,
-    val message: String? = null
-)
-
-class KtorRestApiService(
+class KtorRestApiService<SearchConditions, out FoundItem: FoundBase>(
     private val httpClient: HttpClient,
-): SearchApiService {
+): SearchApiService<SearchConditions, FoundItem> {
 
     companion object {
         const val SEARCH_REPOSITORIES_ENDPOINT = "/search/repositories"
@@ -135,10 +80,10 @@ class KtorRestApiService(
     }
 
     override suspend fun searchItems(
-        conditions: RepoSearchConditions,
+        conditions: SearchConditions,
         page: Int,
         pageSize: Int
-    ): SearchResult<FoundReposBlock> {
+    ): SearchResult<FoundItemsBlock<FoundItem>> {
         try {
             val response = httpClient.get {
                 url {

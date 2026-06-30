@@ -17,33 +17,33 @@
 
 package com.github.saintleva.sourcechew.domain.usecase
 
-import com.github.saintleva.sourcechew.domain.models.FoundItem
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
+import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.jamal_aliev.paginator.offset.Paginator
 import kotlinx.coroutines.flow.StateFlow
 
 
-sealed interface SearchState<out Item : FoundItem> {
+sealed interface SearchState<out FoundItem: FoundBase> {
     data object Selecting : SearchState<Nothing>
     data object Searching : SearchState<Nothing>
-    data class Found<out Item : FoundItem>(val paginator: Paginator<out Item>) : SearchState<Item>
+    data class Found<out FoundItem: FoundBase>(
+        val paginator: Paginator<out FoundItem>
+    ) : SearchState<FoundItem>
+
 }
 
 data class ScrollPosition(val index: Int, val offset: Int)
 
-interface SearchInteractor<out Item : FoundItem> {
+interface SearchInteractor<ItemSearchConditions, out FoundItem: FoundBase> {
 
-    val searchState: StateFlow<SearchState<Item>>
+    val searchState: StateFlow<SearchState<FoundItem>>
 
     val everSearched: Boolean
 
     var lastScrollPosition: ScrollPosition?
 
-    suspend fun search(conditions: RepoSearchConditions, usePreviousSearch: Boolean)
+    suspend fun search(conditions: ItemSearchConditions, usePreviousSearch: Boolean)
 
-    fun canUsePreviousConditions(newConditions: RepoSearchConditions): Boolean
+    fun canUsePreviousConditions(newConditions: ItemSearchConditions): Boolean
 
     fun switchToSelecting()
 

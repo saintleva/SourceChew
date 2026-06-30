@@ -30,10 +30,10 @@ import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCase
-import com.github.saintleva.sourcechew.domain.usecase.GetReposUseCaseImpl
+import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCase
+import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
-import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractorImpl
+import com.github.saintleva.sourcechew.domain.usecase.SearchInteractorImpl
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.Qualifier
@@ -94,12 +94,12 @@ val domainModule = module {
 
     single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
 
-    factory<GetReposUseCase> {
-        GetReposUseCaseImpl(
+    factory<FetchItemsUseCase> {
+        FetchItemsUseCaseImpl(
             appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
             searchApiService = get()
         )
     }
 
-    single<RepoSearchInteractor> { RepoSearchInteractorImpl(getReposUseCase = get()) }
+    single<RepoSearchInteractor> { SearchInteractorImpl(fetchItemsUseCase = get()) }
 }

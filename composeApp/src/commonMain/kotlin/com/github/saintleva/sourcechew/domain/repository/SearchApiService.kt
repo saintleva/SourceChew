@@ -1,20 +1,19 @@
 package com.github.saintleva.sourcechew.domain.repository
 
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.result.SearchResult
 
 
-class FoundReposBlock(
-    val items: List<FoundRepo>,
+class FoundItemsBlock<out FoundItem: FoundBase>(
+    val items: List<FoundItem>,
     val metadata: SearchMetadata
 )
 
-interface SearchApiService {
+interface SearchApiService<ItemSearchConditions, out FoundItem: FoundBase> {
     suspend fun searchItems(
-        conditions: RepoSearchConditions,
+        conditions: ItemSearchConditions,
         page: Int,
         pageSize: Int
-    ): SearchResult<FoundReposBlock>
+    ): SearchResult<FoundItemsBlock<FoundItem>>
 }
