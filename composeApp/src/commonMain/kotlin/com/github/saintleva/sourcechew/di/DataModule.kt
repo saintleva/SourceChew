@@ -1,7 +1,7 @@
 package com.github.saintleva.sourcechew.di
 
 import androidx.datastore.core.okio.OkioSerializer
-import com.github.saintleva.sourcechew.data.network.KtorRestApiService
+import com.github.saintleva.sourcechew.data.network.KtorRepoRestApiService
 import com.github.saintleva.sourcechew.data.network.createHttpClient
 import com.github.saintleva.sourcechew.data.storage.AppPreferences
 import com.github.saintleva.sourcechew.data.storage.BytesCodec
@@ -37,7 +37,7 @@ val dataModule = module {
     }
 
     single<SearchApiService> {
-        KtorRestApiService(
+        KtorRepoRestApiService(
             httpClient = createHttpClient(
                 authRepository = get(),
                 baseUrl = "api.github.com"

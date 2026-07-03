@@ -2,15 +2,7 @@ package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.data.network.utils.isNetworkException
 import com.github.saintleva.sourcechew.domain.models.FoundBase
-import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
-import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
-import com.github.saintleva.sourcechew.domain.models.SearchOrder
-import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.repository.FoundItemsBlock
-import com.github.saintleva.sourcechew.domain.repository.FoundReposBlock
-import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
@@ -19,106 +11,48 @@ import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.SearchResult
 import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
 import io.github.aakira.napier.Napier
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ServerResponseException
-import io.ktor.client.plugins.expectSuccess
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
-import io.ktor.http.path
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlin.jvm.JvmName
+import kotlin.coroutines.cancellation.CancellationException
 
 
-class KtorRestApiService<SearchConditions, out FoundItem: FoundBase>(
-    private val httpClient: HttpClient,
-): SearchApiService<SearchConditions, FoundItem> {
+interface BaseKtorRestApiService<ItemSearchConditions, out FoundItem: FoundBase> {
 
-    companion object {
-        const val SEARCH_REPOSITORIES_ENDPOINT = "/search/repositories"
+    // Performs the actual HTTP reques
+    suspend fun getHttpResponse(
+        conditions: ItemSearchConditions,
+        page: Int,
+        pageSize: Int
+    ): HttpResponse
 
-        private fun RepoSearchScope.toApiValue(): String = when (this) {
-            RepoSearchScope.NAME -> "name"
-            RepoSearchScope.DESCRIPTION -> "description"
-            RepoSearchScope.README -> "readme"
-        }
+    // Delegated parsing of successful response to the specific subclass
+    suspend fun deserializeSuccess(response: HttpResponse): FoundItemsBlock<FoundItem>
 
-        @JvmName("toApiValueScope")
-        private fun Set<RepoSearchScope>.toApiValue(): String =
-            joinToString(",") { it.toApiValue() }
-
-        private fun RepoOnlyFlag.toApiValue(): String = when (this) {
-            RepoOnlyFlag.PUBLIC -> "public"
-            RepoOnlyFlag.PRIVATE -> "private"
-            RepoOnlyFlag.FORK -> "fork"
-            RepoOnlyFlag.ARCHIVED -> "archived"
-            RepoOnlyFlag.MIRROR -> "mirror"
-            RepoOnlyFlag.TEMPLATE -> "template"
-        }
-
-        @JvmName("toApiValueFlags")
-        private fun Set<RepoOnlyFlag>.toApiValue(): String =
-            joinToString(" ") { "is:${it.toApiValue()}" }
-
-        private fun RepoSearchSort.toApiValue(): String? = when (this) {
-            RepoSearchSort.BEST_MATCH -> null
-            RepoSearchSort.STARS -> "stars"
-            RepoSearchSort.FORKS -> "forks"
-            RepoSearchSort.UPDATED -> "updated"
-        }
-
-        private fun SearchOrder.toApiValue(): String = when (this) {
-            SearchOrder.ASCENDING -> "asc"
-            SearchOrder.DESCENDING -> "desc"
-        }
-    }
-
-    override suspend fun searchItems(
-        conditions: SearchConditions,
+    suspend fun searchItems(
+        conditions: ItemSearchConditions,
         page: Int,
         pageSize: Int
     ): SearchResult<FoundItemsBlock<FoundItem>> {
+        val logTag = this::class.simpleName ?: "BaseKtorRestApiService"
         try {
-            val response = httpClient.get {
-                url {
-                    path(SEARCH_REPOSITORIES_ENDPOINT)
-
-                    val queryValue = buildString {
-                        append(conditions.query)
-                        if (conditions.inScope.isNotEmpty()) {
-                            append(" in:${conditions.inScope.toApiValue()}")
-                        }
-                        if (conditions.onlyFlags.isNotEmpty()) {
-                            append(" ${conditions.onlyFlags.toApiValue()}")
-                        }
-                    }
-                    Napier.d(tag = "KtorRestApiService") { "Query: \"$queryValue\"" }
-
-                    parameter("q", queryValue)
-                    conditions.sort.toApiValue()?.let { parameter("sort", it) }
-                    parameter("order", conditions.order.toApiValue())
-                    parameter("page", page)
-                    parameter("per_page", pageSize)
-                }
-                // Important: Disable the default exception throwing for 4xx and 5xx statuses
-                // so we can handle them manually.
-                expectSuccess = false
-            }
+            val response = getHttpResponse(conditions, page, pageSize)
 
             return when {
                 // Handle successful responses
                 response.status.isSuccess() -> {
                     try {
-                        // On success, parse the body and wrap it in Result.success
-                        Result.Success(response.body<GithubSearchResponseDto>().toDomain())
+                        // Delegate parsing to the subclass and wrap it in our custom Result.Success
+                        Result.Success(deserializeSuccess(response))
                     } catch (e: Exception) {
-                        // A parsing failure on a successful response is an infrastructure error.
+                        if (e is CancellationException) throw e
+                        if (e is AppException) throw e
+                        // A parsing failure on a successful response is an infrastructure error
                         throw DeserializationException(e)
                     }
                 }
@@ -173,7 +107,7 @@ class KtorRestApiService<SearchConditions, out FoundItem: FoundBase>(
                 else -> {
                     // Handle any other non-successful status codes
                     val unknownBody = response.bodyAsText()
-                    Napier.e(tag = "KtorRestApiService") {
+                    Napier.e(tag = "KtorRepoRestApiService") {
                         "Unknown error: ${response.status.value}, body: $unknownBody"
                     }
                     Result.Failure(SearchError.UnknownApiError(response.status.value))
@@ -182,6 +116,7 @@ class KtorRestApiService<SearchConditions, out FoundItem: FoundBase>(
         } catch (e: Exception) {
             // This block catches exceptions that occur *before* we can inspect the HTTP response.
             // This includes network issues (no internet), DNS problems, timeouts, etc.
+            if (e is CancellationException) throw e
             if (e is AppException) throw e
 
             val domainException = when {
@@ -195,14 +130,14 @@ class KtorRestApiService<SearchConditions, out FoundItem: FoundBase>(
 
                 // For any other unexpected exception, wrap it as an unknown infrastructure error.
                 else -> {
-                    Napier.d(tag = "KtorRestApiService") {
+                    Napier.d(tag = logTag) {
                         "Caught unknown exception class: ${e::class.simpleName}, message: ${e.message}"
                     }
                     UnknownInfrastructureException(e)
                 }
             }
 
-            Napier.d(tag = "KtorRestApiService", throwable = domainException) {
+            Napier.d(tag = logTag, throwable = domainException) {
                 "before 'throw domainException'"
             }
             // Propagate our domain-specific exception to be handled by the caller (the Paginator load lambda).

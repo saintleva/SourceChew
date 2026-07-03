@@ -23,11 +23,6 @@ fun <T, R : FoundBase> GithubSearchResponseDto<T>.toDomain(itemMapper: (T) -> R)
     metadata = SearchMetadata(totalCount, incompleteResults)
 )
 
-fun GithubSearchResponseDto<GithubOwnerDto>.toDomain() = FoundItemsBlock(
-    items = items.map { it.toDomain() },
-    metadata = SearchMetadata(totalCount, incompleteResults)
-)
-
 @Serializable
 data class GithubRepoDto(
     val id: Long,
@@ -47,7 +42,7 @@ data class GithubOwnerDto(
     val type: String,
     val login: String,
     val url: String,
-    val avatarUrl: String
+    @SerialName("avatar_url") val avatarUrl: String
 )
 
 fun GithubRepoDto.toDomain() = FoundRepo(
@@ -63,10 +58,10 @@ fun GithubRepoDto.toDomain() = FoundRepo(
 
 fun GithubOwnerDto.toDomain() = FoundOwner(
     id = id,
-    type = when (type) {
-        "User" -> OwnerType.USER
-        "Organization" -> OwnerType.ORGANIZATION
-        else -> throw DeserializationException(IllegalStateException("Unknown owner type: $type"))
+    type = when (type.lowercase()) {
+        "user" -> OwnerType.USER
+        "organization" -> OwnerType.ORGANIZATION
+        else -> throw IllegalArgumentException("Unknown owner type: $type")
     },
     login = login,
     url = url,
@@ -75,7 +70,7 @@ fun GithubOwnerDto.toDomain() = FoundOwner(
 
 @Serializable
 data class GithubErrorResponseDto(
-    val message: String,
+    val message: String? = null,
     val errors: List<GithubErrorDetailDto>? = null,
     @SerialName("documentation_url") val documentationUrl: String? = null
 )
