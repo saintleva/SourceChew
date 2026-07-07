@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.data.network
 import com.github.saintleva.sourcechew.data.network.utils.isNetworkException
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.repository.FoundItemsBlock
+import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
@@ -22,9 +23,10 @@ import io.ktor.http.isSuccess
 import kotlin.coroutines.cancellation.CancellationException
 
 
-interface BaseKtorRestApiService<ItemSearchConditions, out FoundItem: FoundBase> {
+interface BaseKtorRestApiService<ItemSearchConditions, out FoundItem: FoundBase>
+    : SearchApiService<ItemSearchConditions, FoundItem> {
 
-    // Performs the actual HTTP reques
+    // Performs the actual HTTP request
     suspend fun getHttpResponse(
         conditions: ItemSearchConditions,
         page: Int,
@@ -34,7 +36,7 @@ interface BaseKtorRestApiService<ItemSearchConditions, out FoundItem: FoundBase>
     // Delegated parsing of successful response to the specific subclass
     suspend fun deserializeSuccess(response: HttpResponse): FoundItemsBlock<FoundItem>
 
-    suspend fun searchItems(
+    override suspend fun searchItems(
         conditions: ItemSearchConditions,
         page: Int,
         pageSize: Int
@@ -71,10 +73,13 @@ interface BaseKtorRestApiService<ItemSearchConditions, out FoundItem: FoundBase>
                                 ?: "Error in field '${detail.field}' (code: ${detail.code})"
                         }
 
+                        val message = errorDto.message
                         if (!details.isNullOrBlank()) {
-                            "${errorDto.message}: $details"
+                            // If details are present, combine them with message or use details only if message is null
+                            if (message != null) "$message: $details" else details
                         } else {
-                            errorDto.message
+                            // If no details, use the message or a default fallback string
+                            message ?: "Validation Error (422)"
                         }
                     } catch (e: Exception) {
                         // Fallback if JSON parsing fails or body is not a valid GithubErrorResponseDto
@@ -113,11 +118,13 @@ interface BaseKtorRestApiService<ItemSearchConditions, out FoundItem: FoundBase>
                     Result.Failure(SearchError.UnknownApiError(response.status.value))
                 }
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: AppException) {
+            throw e
         } catch (e: Exception) {
             // This block catches exceptions that occur *before* we can inspect the HTTP response.
             // This includes network issues (no internet), DNS problems, timeouts, etc.
-            if (e is CancellationException) throw e
-            if (e is AppException) throw e
 
             val domainException = when {
                 // Ktor often throws IOException for connectivity problems (e.g., Airplane Mode).
