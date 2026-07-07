@@ -9,6 +9,7 @@ data class IntFilter(
     val operator: Operator
 ) {
     enum class Operator {
+        EQ,  // ==
         GT,  // >
         LT,  // <
         GTE, // >=

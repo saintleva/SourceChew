@@ -117,6 +117,7 @@ data class RepoSearchConditions(
 data class OwnerSearchConditions(
     override val common: CommonFilters,
     val inScope: Set<OwnerSearchScope>,
+    val types: Set<OwnerType>,
     val sort: OwnerSearchSort,
     val repos: IntFilter?,
     val followers: IntFilter?,
@@ -135,6 +136,7 @@ data class OwnerSearchConditions(
         val default = OwnerSearchConditions(
             common = CommonFilters.default,
             inScope = setOf(OwnerSearchScope.LOGIN),
+            types = setOf(OwnerType.USER, OwnerType.ORGANIZATION),
             sort = OwnerSearchSort.BEST_MATCH,
             repos = null,
             followers = null,
