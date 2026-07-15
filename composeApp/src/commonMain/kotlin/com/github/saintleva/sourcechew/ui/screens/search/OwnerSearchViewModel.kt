@@ -17,59 +17,48 @@
 
 package com.github.saintleva.sourcechew.ui.screens.search
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.AppSettings
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
-import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
-import com.github.saintleva.sourcechew.domain.models.SearchOrder
-import com.github.saintleva.sourcechew.domain.models.updateCommonFilters
+import com.github.saintleva.sourcechew.domain.models.FoundOwner
+import com.github.saintleva.sourcechew.domain.models.IntFilter
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchScope
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
+import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
+import com.github.saintleva.sourcechew.domain.usecase.OwnerSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
-import com.github.saintleva.sourcechew.ui.utils.DEBOUNCE
-import io.github.aakira.napier.Napier
-import kotlinx.coroutines.Job
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
-class RepoSearchViewModel(
-    conditionsStore: ConfigStore<RepoSearchConditions>,
+class OwnerSearchViewModel(
+    conditionsStore: ConfigStore<OwnerSearchConditions>,
     private val appSettingsStore: ConfigStore<AppSettings>,
-    searchInteractor: SearchInteractor<RepoSearchConditions, FoundRepo>
-) : BaseSearchViewModel<RepoSearchConditions, FoundRepo>(
+    searchInteractor: SearchInteractor<OwnerSearchConditions, FoundOwner>
+) : BaseSearchViewModel<OwnerSearchConditions, FoundOwner>(
     conditionsStore = conditionsStore,
     appSettingsStore = appSettingsStore,
     searchInteractor = searchInteractor,
-    initialConditions = RepoSearchConditions.default
+    initialConditions = OwnerSearchConditions.default
 ) {
 
     override val usePreviousSearch: StateFlow<Boolean> = appSettingsStore.config
-        .map { it.usePreviousRepoSearch }
+        .map { it.usePreviousOwnerSearch }
         .stateIn(
             scope = viewModelScope,
             started = WhileUiSubscribed,
-            initialValue = AppSettings.default.usePreviousRepoSearch
+            initialValue = AppSettings.default.usePreviousOwnerSearch
         )
 
-    fun onSortChange(sort: RepoSearchSort) {
+    fun onSortChange(sort: OwnerSearchSort) {
         _conditions.update { it.copy(sort = sort) }
     }
 
-    fun toggleScope(scope: RepoSearchScope) {
+    fun toggleScope(scope: OwnerSearchScope) {
         _conditions.update { current ->
             val newScopes = if (scope in current.inScope) {
                 current.inScope - scope
@@ -80,20 +69,32 @@ class RepoSearchViewModel(
         }
     }
 
-    fun toggleOnlyFlag(flag: RepoOnlyFlag) {
+    fun toggleType(type: OwnerType) {
         _conditions.update { current ->
-            val newFlags = if (flag in current.onlyFlags) {
-                current.onlyFlags - flag
+            val newTypes = if (type in current.types) {
+                current.types - type
             } else {
-                current.onlyFlags + flag
+                current.types + type
             }
-            current.copy(onlyFlags = newFlags)
+            current.copy(types = newTypes)
         }
+    }
+
+    fun onReposFilterChange(filter: IntFilter?) {
+        _conditions.update { it.copy(repos = filter) }
+    }
+
+    fun onFollowersFilterChange(filter: IntFilter?) {
+        _conditions.update { it.copy(followers = filter) }
+    }
+
+    fun onLocationChange(location: String?) {
+        _conditions.update { it.copy(location = location) }
     }
 
     override fun usePreviousSearchChange(checked: Boolean) {
         viewModelScope.launch {
-            appSettingsStore.update { it.copy(usePreviousRepoSearch = checked) }
+            appSettingsStore.update { it.copy(usePreviousOwnerSearch = checked) }
         }
     }
 }

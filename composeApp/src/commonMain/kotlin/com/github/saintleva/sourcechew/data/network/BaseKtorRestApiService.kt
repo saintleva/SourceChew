@@ -51,9 +51,11 @@ interface BaseKtorRestApiService<ItemSearchConditions, out FoundItem: FoundBase>
                     try {
                         // Delegate parsing to the subclass and wrap it in our custom Result.Success
                         Result.Success(deserializeSuccess(response))
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: AppException) {
+                        throw e
                     } catch (e: Exception) {
-                        if (e is CancellationException) throw e
-                        if (e is AppException) throw e
                         // A parsing failure on a successful response is an infrastructure error
                         throw DeserializationException(e)
                     }

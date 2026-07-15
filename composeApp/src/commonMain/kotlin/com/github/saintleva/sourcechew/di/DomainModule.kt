@@ -27,12 +27,15 @@ import com.github.saintleva.sourcechew.data.storage.CodecOkioSerializer
 import com.github.saintleva.sourcechew.data.storage.DataStoreConfigStore
 import com.github.saintleva.sourcechew.data.storage.StringFormatCodec
 import com.github.saintleva.sourcechew.domain.models.AppSettings
+import com.github.saintleva.sourcechew.domain.models.FoundOwner
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCaseImpl
-import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
+import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractorImpl
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
@@ -51,6 +54,10 @@ object AppSettingsStoreQualifier : Qualifier {
 
 object RepoSearchConditionsStoreQualifier : Qualifier {
     override val value: QualifierValue = "com.github.saintleva.sourcechew.di.RepoSearchConditionsStoreQualifier"
+}
+
+object OwnerSearchConditionsStoreQualifier : Qualifier {
+    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.OwnerSearchConditionsStoreQualifier"
 }
 
 val domainModule = module {
@@ -90,16 +97,36 @@ val domainModule = module {
         )
     }
 
+    single<ConfigStore<OwnerSearchConditions>>(qualifier = OwnerSearchConditionsStoreQualifier) {
+        DataStoreConfigStore(
+            dataStore = get(), // Provided by PlatformModule
+            lens = AppPreferences.OwnerSearchLens
+        )
+    }
+
     single<SecureTokenStorage> { DefaultTokenStorage(storage = get()) }
 
     single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
 
-    factory<FetchItemsUseCase> {
+    factory<FetchItemsUseCase<RepoSearchConditions, FoundRepo>> {
         FetchItemsUseCaseImpl(
             appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
             searchApiService = get()
         )
     }
 
-    single<RepoSearchInteractor> { SearchInteractorImpl(fetchItemsUseCase = get()) }
+    factory<FetchItemsUseCase<OwnerSearchConditions, FoundOwner>> {
+        FetchItemsUseCaseImpl(
+            appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
+            searchApiService = get()
+        )
+    }
+
+    single<SearchInteractor<RepoSearchConditions, FoundRepo>> {
+        SearchInteractorImpl(fetchItemsUseCase = get())
+    }
+
+    single<SearchInteractor<OwnerSearchConditions, FoundOwner>> {
+        SearchInteractorImpl(fetchItemsUseCase = get())
+    }
 }

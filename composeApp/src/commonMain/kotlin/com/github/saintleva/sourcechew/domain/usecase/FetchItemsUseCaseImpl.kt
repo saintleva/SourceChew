@@ -21,7 +21,7 @@ class FetchItemsUseCaseImpl<ItemSearchConditions, out FoundItem: FoundBase>(
 
     override suspend fun invoke(conditions: ItemSearchConditions): Paginator<out FoundItem> {
         val pageSize = appSettingsStore.config.first().paginationPageSize
-        return paginator<FoundItem>(capacity = pageSize) {
+        return paginator(capacity = pageSize) {
             load { page ->
                 when (val result = searchApiService.searchItems(conditions, page, pageSize)) {
                     is Result.Success -> LoadResult(

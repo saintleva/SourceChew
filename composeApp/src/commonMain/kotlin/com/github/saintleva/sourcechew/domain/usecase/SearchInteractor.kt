@@ -18,6 +18,10 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.FoundBase
+import com.github.saintleva.sourcechew.domain.models.FoundOwner
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.jamal_aliev.paginator.offset.Paginator
 import kotlinx.coroutines.flow.StateFlow
 

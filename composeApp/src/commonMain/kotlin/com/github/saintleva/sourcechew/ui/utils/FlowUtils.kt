@@ -1,6 +1,8 @@
 package com.github.saintleva.sourcechew.ui.utils
 
 import kotlinx.coroutines.flow.SharingStarted
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Common [SharingStarted] strategy for ViewModels.
@@ -10,6 +12,6 @@ import kotlinx.coroutines.flow.SharingStarted
  * observing for longer, the cache is kept but the upstream flows are stopped.
  */
 
-const val DEBOUNCE = 500L
+val DEBOUNCE = 500.milliseconds
 
 val WhileUiSubscribed: SharingStarted = SharingStarted.WhileSubscribed(5_000L)

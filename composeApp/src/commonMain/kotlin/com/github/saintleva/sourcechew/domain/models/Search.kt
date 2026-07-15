@@ -86,15 +86,19 @@ interface HasCommonFilters<T: HasCommonFilters<T>> {
     fun withCommon(common: CommonFilters): T
 }
 
+interface BaseSearchConditions<T : BaseSearchConditions<T>> : HasCommonFilters<T> {
+    fun maySearch(): Boolean
+}
+
 @Serializable
 data class RepoSearchConditions(
     override val common: CommonFilters,
     val inScope: Set<RepoSearchScope>,
     val onlyFlags: Set<RepoOnlyFlag>,
     val sort: RepoSearchSort
-) : HasCommonFilters<RepoSearchConditions> {
+) : BaseSearchConditions<RepoSearchConditions> {
 
-    fun maySearch(): Boolean {
+    override fun maySearch(): Boolean {
         val allPrivacySelected = RepoOnlyFlag.PUBLIC in onlyFlags && RepoOnlyFlag.PRIVATE in onlyFlags
         return inScope.isNotEmpty() && !allPrivacySelected
     }
@@ -122,9 +126,9 @@ data class OwnerSearchConditions(
     val repos: IntFilter?,
     val followers: IntFilter?,
     val location: String?
-) : HasCommonFilters<OwnerSearchConditions> {
+) : BaseSearchConditions<OwnerSearchConditions> {
 
-    fun maySearch(): Boolean {
+    override fun maySearch(): Boolean {
         return inScope.isNotEmpty()
     }
 

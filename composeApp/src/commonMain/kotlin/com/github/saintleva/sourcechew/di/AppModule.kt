@@ -19,6 +19,7 @@ package com.github.saintleva.sourcechew.di
 
 import com.github.saintleva.sourcechew.ui.screens.auth.AuthViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
+import com.github.saintleva.sourcechew.ui.screens.search.OwnerSearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.RepoSearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.settings.SettingsViewModel
 import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
@@ -52,7 +53,15 @@ val appModule = module {
 
     viewModel<RepoSearchViewModel> {
         RepoSearchViewModel(
-            repoConditionsStore = get(qualifier = RepoSearchConditionsStoreQualifier),
+            conditionsStore = get(qualifier = RepoSearchConditionsStoreQualifier),
+            appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
+            searchInteractor = get(),
+        )
+    }
+
+    viewModel<OwnerSearchViewModel> {
+        OwnerSearchViewModel(
+            conditionsStore = get(qualifier = OwnerSearchConditionsStoreQualifier),
             appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
             searchInteractor = get(),
         )
