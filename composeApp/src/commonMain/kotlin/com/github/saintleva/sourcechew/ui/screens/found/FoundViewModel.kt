@@ -19,17 +19,17 @@ package com.github.saintleva.sourcechew.ui.screens.found
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
-import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
+import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
+import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import com.jamal_aliev.paginator.core.extension.asUiState
 import com.jamal_aliev.paginator.core.page.PaginatorUiState
 import com.jamal_aliev.paginator.offset.Paginator
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -39,8 +39,8 @@ import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class FoundViewModel(
-    private val searchInteractor: RepoSearchInteractor
+class FoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
+    private val searchInteractor: SearchInteractor<ItemSearchConditions, FoundItem>
 ) : ViewModel() {
 
     init {
@@ -49,8 +49,8 @@ class FoundViewModel(
         }
     }
 
-    val paginator: Paginator<FoundRepo>?
-        get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator
+    val paginator: Paginator<FoundItem>?
+        get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator as Paginator<FoundItem>?
 
     val metadata: StateFlow<SearchMetadata?> = searchInteractor.searchState
         .flatMapLatest { state ->
@@ -69,21 +69,22 @@ class FoundViewModel(
             initialValue = null
         )
 
-    val uiState: StateFlow<PaginatorUiState<FoundRepo>> = searchInteractor.searchState
-        .flatMapLatest { state ->
-            val p = (state as? SearchState.Found)?.paginator
-            if (p != null) {
-                p.core.snapshot.asUiState { p.core.isStarted }
-            } else {
-                // Return Idle state if no paginator is currently active
-                flowOf(PaginatorUiState.Idle)
-            }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = PaginatorUiState.Idle
-        )
+    //TODO: Remove this
+//    val uiState: StateFlow<PaginatorUiState<FoundItem>> = searchInteractor.searchState
+//        .flatMapLatest { state ->
+//            val p = (state as? SearchState.Found)?.paginator
+//            if (p != null) {
+//                p.core.snapshot.asUiState { p.core.isStarted }
+//            } else {
+//                // Return Idle state if no paginator is currently active
+//                flowOf(PaginatorUiState.Idle)
+//            }
+//        }
+//        .stateIn(
+//            scope = viewModelScope,
+//            started = WhileUiSubscribed,
+//            initialValue = PaginatorUiState.Idle
+//        )
 
     fun consumeInitialScroll(): ScrollPosition? = searchInteractor.lastScrollPosition
 

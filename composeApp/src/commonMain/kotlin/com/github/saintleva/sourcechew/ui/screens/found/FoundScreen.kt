@@ -42,10 +42,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import com.jamal_aliev.paginator.compose.offset.BindToLazyList
+import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
 import com.jamal_aliev.paginator.compose.offset.rememberPrefetchController
 import com.jamal_aliev.paginator.core.extension.isErrorState
 import com.jamal_aliev.paginator.core.extension.isProgressState
@@ -63,9 +65,22 @@ import sourcechew.composeapp.generated.resources.retry_button
 
 
 @Composable
-fun FoundScreen(modifier: Modifier, viewModel: FoundViewModel) {
-    val ui by viewModel.uiState.collectAsStateWithLifecycle()
+fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
+    modifier: Modifier,
+    viewModel: FoundViewModel<ItemSearchConditions, FoundItem>
+) {
     val meta by viewModel.metadata.collectAsStateWithLifecycle()
+
+    PaginatedLazyColumn<FoundItem>(
+        paginator = viewModel.paginator!!,
+        modifier = modifier.fillMaxSize(),
+        key = { it.id },
+        loadingContent = { FullscreenLoading() },
+        emptyContent = { EmptyState() },
+        errorContent = { state -> ErrorState(cause = state.exception, onRetry = viewModel::restart) },
+        itemContent = { ItemContent(it) }
+    )
+
     Napier.d(tag = "FoundScreen") { "uiState = ${ui?.let { it::class.simpleName }}" }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -95,6 +110,7 @@ private fun ContentList(
     metadata: SearchMetadata?,
     viewModel: FoundViewModel
 ) {
+
     val paginator = viewModel.paginator ?: return
     val listState = remember(paginator) {
         val initial = viewModel.consumeInitialScroll()

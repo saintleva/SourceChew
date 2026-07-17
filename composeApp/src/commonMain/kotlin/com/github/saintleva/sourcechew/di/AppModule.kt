@@ -17,6 +17,10 @@
 
 package com.github.saintleva.sourcechew.di
 
+import com.github.saintleva.sourcechew.domain.models.FoundOwner
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.ui.screens.auth.AuthViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.OwnerSearchViewModel
@@ -67,7 +71,13 @@ val appModule = module {
         )
     }
 
-    viewModel<FoundViewModel> {
+    viewModel<FoundViewModel<RepoSearchConditions, FoundRepo>> {
+        FoundViewModel(
+            searchInteractor = get()
+        )
+    }
+
+    viewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>> {
         FoundViewModel(
             searchInteractor = get()
         )
