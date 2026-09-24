@@ -9,6 +9,7 @@ import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.models.updateCommonFilters
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
+import com.github.saintleva.sourcechew.domain.utils.Lens
 import com.github.saintleva.sourcechew.ui.utils.DEBOUNCE
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import kotlinx.coroutines.FlowPreview
@@ -29,7 +30,8 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
     private val conditionsStore: ConfigStore<SearchConditions>,
     private val appSettingsStore: ConfigStore<AppSettings>,
     private val searchInteractor: SearchInteractor<SearchConditions, FoundItem>,
-    initialConditions: SearchConditions
+    initialConditions: SearchConditions,
+    private val usePreviousSearchLens: Lens<AppSettings, Boolean>
 ) : ViewModel() {
 
     protected val _conditions = MutableStateFlow(initialConditions)
@@ -43,8 +45,19 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
             initialValue = false
         )
 
-    abstract val usePreviousSearch: StateFlow<Boolean>
-    abstract fun usePreviousSearchChange(checked: Boolean)
+    val usePreviousSearch: StateFlow<Boolean> = appSettingsStore.config
+        .map { usePreviousSearchLens.get(it) }
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileUiSubscribed,
+            initialValue = usePreviousSearchLens.get(AppSettings.default)
+        )
+
+    fun usePreviousSearchChange(checked: Boolean) {
+        viewModelScope.launch {
+            appSettingsStore.update { usePreviousSearchLens.set(it, checked) }
+        }
+    }
 
     val searchState = searchInteractor.searchState
 

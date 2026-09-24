@@ -144,7 +144,7 @@ fun SearchScreen(
 private fun SearchContent(viewModel: RepoSearchViewModel, selectingEnabled: Boolean) {
 
     val conditions by viewModel.conditions.collectAsStateWithLifecycle()
-    val usePreviousRepoSearch by viewModel.usePreviousRepoSearch.collectAsStateWithLifecycle()
+    val usePreviousRepoSearch by viewModel.usePreviousSearch.collectAsStateWithLifecycle()
     val maySearch by viewModel.maySearch.collectAsStateWithLifecycle()
 
     Column(

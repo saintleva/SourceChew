@@ -18,15 +18,15 @@
 package com.github.saintleva.sourcechew.data.storage
 
 import androidx.datastore.core.DataStore
-import com.github.saintleva.sourcechew.domain.repository.ConfigLens
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
+import com.github.saintleva.sourcechew.domain.utils.Lens
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 
 class DataStoreConfigStore<T>(
     private val dataStore: DataStore<AppPreferences>,
-    private val lens: ConfigLens<AppPreferences, T>
+    private val lens: Lens<AppPreferences, T>
 ) : ConfigStore<T> {
 
     override val config: Flow<T> = dataStore.data.map { lens.get(it) }

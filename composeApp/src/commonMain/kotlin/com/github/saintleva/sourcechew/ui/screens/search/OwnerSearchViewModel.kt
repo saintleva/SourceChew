@@ -17,7 +17,6 @@
 
 package com.github.saintleva.sourcechew.ui.screens.search
 
-import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.IntFilter
@@ -26,33 +25,20 @@ import com.github.saintleva.sourcechew.domain.models.OwnerSearchScope
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.usecase.OwnerSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
-import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class OwnerSearchViewModel(
     conditionsStore: ConfigStore<OwnerSearchConditions>,
-    private val appSettingsStore: ConfigStore<AppSettings>,
+    appSettingsStore: ConfigStore<AppSettings>,
     searchInteractor: SearchInteractor<OwnerSearchConditions, FoundOwner>
 ) : BaseSearchViewModel<OwnerSearchConditions, FoundOwner>(
     conditionsStore = conditionsStore,
     appSettingsStore = appSettingsStore,
     searchInteractor = searchInteractor,
-    initialConditions = OwnerSearchConditions.default
+    initialConditions = OwnerSearchConditions.default,
+    usePreviousSearchLens = AppSettings.UsePreviousOwnerSearchLens
 ) {
-
-    override val usePreviousSearch: StateFlow<Boolean> = appSettingsStore.config
-        .map { it.usePreviousOwnerSearch }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = AppSettings.default.usePreviousOwnerSearch
-        )
 
     fun onSortChange(sort: OwnerSearchSort) {
         _conditions.update { it.copy(sort = sort) }
@@ -90,11 +76,5 @@ class OwnerSearchViewModel(
 
     fun onLocationChange(location: String?) {
         _conditions.update { it.copy(location = location) }
-    }
-
-    override fun usePreviousSearchChange(checked: Boolean) {
-        viewModelScope.launch {
-            appSettingsStore.update { it.copy(usePreviousOwnerSearch = checked) }
-        }
     }
 }

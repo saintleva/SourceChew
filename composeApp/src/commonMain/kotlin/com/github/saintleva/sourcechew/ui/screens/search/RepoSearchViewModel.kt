@@ -17,53 +17,27 @@
 
 package com.github.saintleva.sourcechew.ui.screens.search
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
-import com.github.saintleva.sourcechew.domain.models.SearchOrder
-import com.github.saintleva.sourcechew.domain.models.updateCommonFilters
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.usecase.RepoSearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
-import com.github.saintleva.sourcechew.ui.utils.DEBOUNCE
-import io.github.aakira.napier.Napier
-import kotlinx.coroutines.Job
-import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-
 
 class RepoSearchViewModel(
     conditionsStore: ConfigStore<RepoSearchConditions>,
-    private val appSettingsStore: ConfigStore<AppSettings>,
+    appSettingsStore: ConfigStore<AppSettings>,
     searchInteractor: SearchInteractor<RepoSearchConditions, FoundRepo>
 ) : BaseSearchViewModel<RepoSearchConditions, FoundRepo>(
     conditionsStore = conditionsStore,
     appSettingsStore = appSettingsStore,
     searchInteractor = searchInteractor,
-    initialConditions = RepoSearchConditions.default
+    initialConditions = RepoSearchConditions.default,
+    usePreviousSearchLens = AppSettings.UsePreviousRepoSearchLens
 ) {
-
-    override val usePreviousSearch: StateFlow<Boolean> = appSettingsStore.config
-        .map { it.usePreviousRepoSearch }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = AppSettings.default.usePreviousRepoSearch
-        )
 
     fun onSortChange(sort: RepoSearchSort) {
         _conditions.update { it.copy(sort = sort) }
@@ -88,12 +62,6 @@ class RepoSearchViewModel(
                 current.onlyFlags + flag
             }
             current.copy(onlyFlags = newFlags)
-        }
-    }
-
-    override fun usePreviousSearchChange(checked: Boolean) {
-        viewModelScope.launch {
-            appSettingsStore.update { it.copy(usePreviousRepoSearch = checked) }
         }
     }
 }
