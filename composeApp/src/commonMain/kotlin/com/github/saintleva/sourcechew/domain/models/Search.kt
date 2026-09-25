@@ -84,6 +84,12 @@ data class CommonFilters(
 interface HasCommonFilters<T: HasCommonFilters<T>> {
     val common: CommonFilters
     fun withCommon(common: CommonFilters): T
+
+    val query: String
+        get() = common.query
+
+    val order: SearchOrder
+        get() = common.order
 }
 
 interface BaseSearchConditions<T : BaseSearchConditions<T>> : HasCommonFilters<T> {

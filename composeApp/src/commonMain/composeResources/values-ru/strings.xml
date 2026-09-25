@@ -73,4 +73,15 @@
     <string name="decrease">Уменьшить</string>
     <string name="increase">Увеличить</string>
     <string name="about">О приложении</string>
+    <string name="login">Логин</string>
+    <string name="fullname">Полное имя</string>
+    <string name="email">Электронная почта</string>
+    <string name="user">Пользователь</string>
+    <string name="organization">Организация</string>
+    <string name="joined_time">Времени регистрации</string>
+    <string name="followers">Количеству подписчиков</string>
+    <string name="owner_type">Тип владельца</string>
+    <string name="location">Местоположение</string>
+    <string name="repos_count">Количество репозиториев</string>
+    <string name="followers_count">Количество подписчиков</string>
 </resources>

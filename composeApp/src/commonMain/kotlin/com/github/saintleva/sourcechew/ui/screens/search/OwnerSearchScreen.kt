@@ -24,41 +24,40 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
-import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchScope
+import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
+import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.additional_filters
-import sourcechew.composeapp.generated.resources.archived_only
 import sourcechew.composeapp.generated.resources.best_match
-import sourcechew.composeapp.generated.resources.descriptions
-import sourcechew.composeapp.generated.resources.fork_only
-import sourcechew.composeapp.generated.resources.forks
-import sourcechew.composeapp.generated.resources.mirror_only
-import sourcechew.composeapp.generated.resources.names
-import sourcechew.composeapp.generated.resources.private_only
-import sourcechew.composeapp.generated.resources.public_only
-import sourcechew.composeapp.generated.resources.readme
+import sourcechew.composeapp.generated.resources.email
+import sourcechew.composeapp.generated.resources.followers
+import sourcechew.composeapp.generated.resources.fullname
+import sourcechew.composeapp.generated.resources.joined_time
+import sourcechew.composeapp.generated.resources.location
+import sourcechew.composeapp.generated.resources.login
+import sourcechew.composeapp.generated.resources.organization
+import sourcechew.composeapp.generated.resources.owner_type
+import sourcechew.composeapp.generated.resources.repositories
 import sourcechew.composeapp.generated.resources.search_in
 import sourcechew.composeapp.generated.resources.sort_by
-import sourcechew.composeapp.generated.resources.stars
-import sourcechew.composeapp.generated.resources.template_only
-import sourcechew.composeapp.generated.resources.updated_time
+import sourcechew.composeapp.generated.resources.user
 
 @Composable
-fun SearchScreen(
+fun OwnerSearchScreen(
     modifier: Modifier = Modifier,
-    viewModel: RepoSearchViewModel,
+    viewModel: OwnerSearchViewModel,
     onFound: () -> Unit,
 ) {
     BaseSearchScreen(
@@ -66,7 +65,7 @@ fun SearchScreen(
         viewModel = viewModel,
         onFound = onFound,
     ) { conditions, selectingEnabled ->
-        RepoSpecificFilters(
+        OwnerSpecificFilters(
             viewModel = viewModel,
             conditions = conditions,
             selectingEnabled = selectingEnabled,
@@ -75,9 +74,9 @@ fun SearchScreen(
 }
 
 @Composable
-private fun RepoSpecificFilters(
-    viewModel: RepoSearchViewModel,
-    conditions: RepoSearchConditions,
+private fun OwnerSpecificFilters(
+    viewModel: OwnerSearchViewModel,
+    conditions: OwnerSearchConditions,
     selectingEnabled: Boolean,
 ) {
     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -93,7 +92,7 @@ private fun RepoSpecificFilters(
                 alignment = Alignment.CenterHorizontally,
             ),
         ) {
-            RepoSearchScope.entries.forEach { scope ->
+            OwnerSearchScope.entries.forEach { scope ->
                 val textStyle = MaterialTheme.typography.labelLarge
                 FilterChip(
                     selected = scope in conditions.inScope,
@@ -105,18 +104,32 @@ private fun RepoSpecificFilters(
         }
     }
     ExpandableSection(title = stringResource(Res.string.additional_filters)) {
-        RepoOnlyFlag.entries.forEach { flag ->
+        Text(
+            text = stringResource(Res.string.owner_type),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+        )
+        OwnerType.entries.forEach { type ->
             CheckBoxWithText(
-                text = flag.displayText(),
-                checked = flag in conditions.onlyFlags,
-                onCheckedChange = { viewModel.toggleOnlyFlag(flag) },
+                text = type.displayText(),
+                checked = type in conditions.types,
+                onCheckedChange = { viewModel.toggleType(type) },
                 enabled = selectingEnabled,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             )
         }
+        OutlinedTextField(
+            value = conditions.location ?: "",
+            onValueChange = { viewModel.onLocationChange(it.ifBlank { null }) },
+            label = { Text(stringResource(Res.string.location)) },
+            enabled = selectingEnabled,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+        )
     }
     ExpandableSection(title = stringResource(Res.string.sort_by)) {
-        RepoSearchSort.entries.forEach { sort ->
+        OwnerSearchSort.entries.forEach { sort ->
             RadioButtonWithText(
                 text = sort.displayText(),
                 selected = conditions.sort == sort,
@@ -129,26 +142,22 @@ private fun RepoSpecificFilters(
 }
 
 @Composable
-private fun RepoSearchScope.displayText(): String = when (this) {
-    RepoSearchScope.NAME -> stringResource(Res.string.names)
-    RepoSearchScope.DESCRIPTION -> stringResource(Res.string.descriptions)
-    RepoSearchScope.README -> stringResource(Res.string.readme)
+private fun OwnerSearchScope.displayText(): String = when (this) {
+    OwnerSearchScope.LOGIN -> stringResource(Res.string.login)
+    OwnerSearchScope.FULLNAME -> stringResource(Res.string.fullname)
+    OwnerSearchScope.EMAIL -> stringResource(Res.string.email)
 }
 
 @Composable
-private fun RepoOnlyFlag.displayText(): String = when (this) {
-    RepoOnlyFlag.PUBLIC -> stringResource(Res.string.public_only)
-    RepoOnlyFlag.PRIVATE -> stringResource(Res.string.private_only)
-    RepoOnlyFlag.FORK -> stringResource(Res.string.fork_only)
-    RepoOnlyFlag.ARCHIVED -> stringResource(Res.string.archived_only)
-    RepoOnlyFlag.MIRROR -> stringResource(Res.string.mirror_only)
-    RepoOnlyFlag.TEMPLATE -> stringResource(Res.string.template_only)
+private fun OwnerType.displayText(): String = when (this) {
+    OwnerType.USER -> stringResource(Res.string.user)
+    OwnerType.ORGANIZATION -> stringResource(Res.string.organization)
 }
 
 @Composable
-private fun RepoSearchSort.displayText(): String = when (this) {
-    RepoSearchSort.BEST_MATCH -> stringResource(Res.string.best_match)
-    RepoSearchSort.STARS -> stringResource(Res.string.stars)
-    RepoSearchSort.FORKS -> stringResource(Res.string.forks)
-    RepoSearchSort.UPDATED -> stringResource(Res.string.updated_time)
+private fun OwnerSearchSort.displayText(): String = when (this) {
+    OwnerSearchSort.BEST_MATCH -> stringResource(Res.string.best_match)
+    OwnerSearchSort.FOLLOWERS -> stringResource(Res.string.followers)
+    OwnerSearchSort.REPOSITORIES -> stringResource(Res.string.repositories)
+    OwnerSearchSort.JOINED -> stringResource(Res.string.joined_time)
 }

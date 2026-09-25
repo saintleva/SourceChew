@@ -74,4 +74,15 @@ Try changing your search terms.</string>
     <string name="decrease">Decrease</string>
     <string name="increase">Increase</string>
     <string name="about">About</string>
+    <string name="login">Login</string>
+    <string name="fullname">Full name</string>
+    <string name="email">Email</string>
+    <string name="user">User</string>
+    <string name="organization">Organization</string>
+    <string name="joined_time">Joined time</string>
+    <string name="followers">Followers</string>
+    <string name="owner_type">Owner type</string>
+    <string name="location">Location</string>
+    <string name="repos_count">Repositories count</string>
+    <string name="followers_count">Followers count</string>
 </resources>

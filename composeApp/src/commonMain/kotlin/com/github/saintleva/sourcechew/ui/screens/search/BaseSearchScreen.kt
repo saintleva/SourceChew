@@ -114,13 +114,13 @@ private fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundIte
         modifier = Modifier.fillMaxSize()
     ) {
         OutlinedTextField(
-            value = conditions.common.query,
+            value = conditions.query,
             onValueChange = viewModel::onQueryChange,
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = selectingEnabled,
             textStyle = TextStyle(fontSize = 16.sp),
             label = { Text(stringResource(Res.string.enter_search_text)) },
-            isError = conditions.common.query.isBlank()
+            isError = conditions.query.isBlank()
         )
 
         specificFilters(conditions, selectingEnabled)
@@ -129,7 +129,7 @@ private fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundIte
             SearchOrder.entries.forEach { order ->
                 RadioButtonWithText(
                     text = order.displayText(),
-                    selected = conditions.common.order == order,
+                    selected = conditions.order == order,
                     onClick = { viewModel.onOrderChange(order) },
                     enabled = selectingEnabled,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
