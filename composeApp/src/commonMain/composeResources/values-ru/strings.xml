@@ -84,4 +84,5 @@
     <string name="location">Местоположение</string>
     <string name="repos_count">Количество репозиториев</string>
     <string name="followers_count">Количество подписчиков</string>
+    <string name="clear_filter">Сбросить фильтр</string>
 </resources>

@@ -36,6 +36,7 @@ import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
+import com.github.saintleva.sourcechew.ui.common.IntFilterInput
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -43,12 +44,14 @@ import sourcechew.composeapp.generated.resources.additional_filters
 import sourcechew.composeapp.generated.resources.best_match
 import sourcechew.composeapp.generated.resources.email
 import sourcechew.composeapp.generated.resources.followers
+import sourcechew.composeapp.generated.resources.followers_count
 import sourcechew.composeapp.generated.resources.fullname
 import sourcechew.composeapp.generated.resources.joined_time
 import sourcechew.composeapp.generated.resources.location
 import sourcechew.composeapp.generated.resources.login
 import sourcechew.composeapp.generated.resources.organization
 import sourcechew.composeapp.generated.resources.owner_type
+import sourcechew.composeapp.generated.resources.repos_count
 import sourcechew.composeapp.generated.resources.repositories
 import sourcechew.composeapp.generated.resources.search_in
 import sourcechew.composeapp.generated.resources.sort_by
@@ -126,6 +129,20 @@ private fun OwnerSpecificFilters(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
+        )
+        IntFilterInput(
+            label = stringResource(Res.string.repos_count),
+            filter = conditions.repos,
+            onFilterChange = { viewModel.onReposFilterChange(it) },
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+        )
+        IntFilterInput(
+            label = stringResource(Res.string.followers_count),
+            filter = conditions.followers,
+            onFilterChange = { viewModel.onFollowersFilterChange(it) },
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         )
     }
     ExpandableSection(title = stringResource(Res.string.sort_by)) {

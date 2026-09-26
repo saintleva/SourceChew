@@ -85,4 +85,5 @@ Try changing your search terms.</string>
     <string name="location">Location</string>
     <string name="repos_count">Repositories count</string>
     <string name="followers_count">Followers count</string>
+    <string name="clear_filter">Clear filter</string>
 </resources>
