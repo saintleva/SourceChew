@@ -30,11 +30,22 @@ sealed interface Route : NavKey {
         @Serializable
         data object WorkRoot : Work
 
-        @Serializable
-        data object Search : Work
+        sealed interface Search : Work {
+            @Serializable
+            data object Repo : Search
 
-        @Serializable
-        data object Found : Work
+            @Serializable
+            data object Owner : Search
+        }
+
+        sealed interface Found : Work {
+
+            @Serializable
+            data object Repo : Found
+
+            @Serializable
+            data object Owner : Found
+        }
     }
 }
 
@@ -51,7 +62,9 @@ val rootSerializersModule = SerializersModule {
 val workSerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
         subclass(Route.Work.WorkRoot::class, Route.Work.WorkRoot.serializer())
-        subclass(Route.Work.Search::class, Route.Work.Search.serializer())
-        subclass(Route.Work.Found::class, Route.Work.Found.serializer())
+        subclass(Route.Work.Search.Repo::class, Route.Work.Search.Repo.serializer())
+        subclass(Route.Work.Search.Owner::class, Route.Work.Search.Owner.serializer())
+        subclass(Route.Work.Found.Repo::class, Route.Work.Found.Repo.serializer())
+        subclass(Route.Work.Found.Owner::class, Route.Work.Found.Owner.serializer())
     }
 }

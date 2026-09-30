@@ -65,9 +65,15 @@ import sourcechew.composeapp.generated.resources.retry_button
 
 
 @Composable
+fun <FoundItem: FoundBase> ContentWithMetadata(itemContent: @Composable (FoundItem) -> Unit) {
+
+}
+
+@Composable
 fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
     modifier: Modifier,
-    viewModel: FoundViewModel<ItemSearchConditions, FoundItem>
+    viewModel: FoundViewModel<ItemSearchConditions, FoundItem>,
+    itemContent: @Composable (FoundItem) -> Unit
 ) {
     val meta by viewModel.metadata.collectAsStateWithLifecycle()
 
@@ -78,30 +84,32 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
         loadingContent = { FullscreenLoading() },
         emptyContent = { EmptyState() },
         errorContent = { state -> ErrorState(cause = state.exception, onRetry = viewModel::restart) },
-        itemContent = { ItemContent(it) }
-    )
-
-    Napier.d(tag = "FoundScreen") { "uiState = ${ui?.let { it::class.simpleName }}" }
-
-    Box(modifier = modifier.fillMaxSize()) {
-        when (val state = ui) {
-            is PaginatorUiState.Idle,
-            is PaginatorUiState.Loading -> FullscreenLoading()
-
-            is PaginatorUiState.Empty -> EmptyState()
-
-            is PaginatorUiState.Error -> ErrorState(
-                cause = state.state.exception,
-                onRetry = viewModel::restart
-            )
-
-            is PaginatorUiState.Content -> ContentList(
-                state = state,
-                metadata = meta,
-                viewModel = viewModel
-            )
-        }
+    ) { item ->
+        itemContent(item)
     }
+
+        //TODO: Remove this
+//    Napier.d(tag = "FoundScreen") { "uiState = ${ui?.let { it::class.simpleName }}" }
+//
+//    Box(modifier = modifier.fillMaxSize()) {
+//        when (val state = ui) {
+//            is PaginatorUiState.Idle,
+//            is PaginatorUiState.Loading -> FullscreenLoading()
+//
+//            is PaginatorUiState.Empty -> EmptyState()
+//
+//            is PaginatorUiState.Error -> ErrorState(
+//                cause = state.state.exception,
+//                onRetry = viewModel::restart
+//            )
+//
+//            is PaginatorUiState.Content -> ContentList(
+//                state = state,
+//                metadata = meta,
+//                viewModel = viewModel
+//            )
+//        }
+//    }
 }
 
 @Composable
@@ -156,6 +164,59 @@ private fun ContentList(
         }
     }
 }
+
+//@Composable
+//private fun ContentList(
+//    state: PaginatorUiState.Content<FoundRepo>,
+//    metadata: SearchMetadata?,
+//    viewModel: FoundViewModel
+//) {
+//
+//    val paginator = viewModel.paginator ?: return
+//    val listState = remember(paginator) {
+//        val initial = viewModel.consumeInitialScroll()
+//        LazyListState(
+//            firstVisibleItemIndex = initial?.index ?: 0,
+//            firstVisibleItemScrollOffset = initial?.offset ?: 0,
+//        )
+//    }
+//
+//    DisposableEffect(paginator) {
+//        onDispose {
+//            viewModel.saveScroll(
+//                listState.firstVisibleItemIndex,
+//                listState.firstVisibleItemScrollOffset,
+//            )
+//        }
+//    }
+//
+//    val prefetch = paginator.rememberPrefetchController(
+//        prefetchDistance = PREFETCH_DISTANCE,
+//        silentlyLoading = false,
+//    )
+//    val headerCount = if (metadata != null) 1 else 0
+//    val footerCount = if (state.appendState != null) 1 else 0
+//
+//    prefetch.BindToLazyList(
+//        listState = listState,
+//        dataItemCount = state.items.size,
+//        headerCount = headerCount,
+//        footerCount = footerCount,
+//    )
+//
+//    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+//        if (metadata != null) {
+//            item(key = "metadata-header") { MetadataHeader(metadata) }
+//        }
+//        items(state.items, key = { it.id }) { ItemContent(it) }
+//        state.appendState?.let { appendState ->
+//            item(key = "append-indicator") {
+//                Napier.d(tag = "FoundScreen") { "Append indicator must be showed" }
+//                AppendIndicator(appendState, onRetry = viewModel::loadNext)
+//            }
+//        }
+//    }
+//}
 
 @Composable
 private fun MetadataHeader(metadata: SearchMetadata) {

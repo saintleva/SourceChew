@@ -75,7 +75,7 @@ fun WorkScreen(
     val scope = rememberCoroutineScope()
 
     //TODO: Remove this selection handling
-    val selectedMenuItem = remember { mutableStateOf<Route>(Route.Work.Search) }
+    val selectedMenuItem = remember { mutableStateOf<Route>(Route.Work.Search.Repo) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -83,7 +83,7 @@ fun WorkScreen(
             ModalDrawerSheet {
                 NavigationDrawerItem(
                     label = { Text(stringResource(Res.string.search)) },
-                    selected = selectedMenuItem.value == Route.Work.Search,
+                    selected = selectedMenuItem.value == Route.Work.Search.Repo,
                     icon = {
                         Icon(
                             Icons.Default.Search,
@@ -93,7 +93,7 @@ fun WorkScreen(
                     onClick = {
                         onSearchItemClick()
                         scope.launch { drawerState.close() }
-                        selectedMenuItem.value = Route.Work.Search
+                        selectedMenuItem.value = Route.Work.Search.Repo
                     }
                 )
                 HorizontalDivider()

@@ -56,7 +56,7 @@ import sourcechew.composeapp.generated.resources.template_only
 import sourcechew.composeapp.generated.resources.updated_time
 
 @Composable
-fun SearchScreen(
+fun RepoSearchScreen(
     modifier: Modifier = Modifier,
     viewModel: RepoSearchViewModel,
     onFound: () -> Unit,

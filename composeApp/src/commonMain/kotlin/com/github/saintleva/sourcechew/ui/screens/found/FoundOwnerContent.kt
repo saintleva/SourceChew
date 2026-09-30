@@ -1,0 +1,30 @@
+package com.github.saintleva.sourcechew.ui.screens.found
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.github.saintleva.sourcechew.domain.models.FoundOwner
+import com.github.saintleva.sourcechew.domain.models.FoundRepo
+
+
+@Composable
+fun FoundOwnerContent(owner: FoundOwner) {
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Login: ${owner.login}")
+            Text("Type: ${owner.type}")
+            Text("URL: ${owner.url}")
+        }
+    }
+}
