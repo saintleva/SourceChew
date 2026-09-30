@@ -129,7 +129,15 @@ fun WorkScreen(
                             )
                         }
                     },
-                    actions = actions
+                    actions = {
+                        IconButton(onClick = onSearchItemClick) {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = stringResource(Res.string.search)
+                            )
+                        }
+                        actions()
+                    }
                 )
             }
         ) { innerPadding ->

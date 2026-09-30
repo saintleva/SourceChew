@@ -2,9 +2,12 @@ package com.github.saintleva.sourcechew.ui.navigation
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -23,6 +26,7 @@ import com.github.saintleva.sourcechew.ui.screens.search.OwnerSearchScreen
 import com.github.saintleva.sourcechew.ui.screens.search.OwnerSearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.RepoSearchScreen
 import com.github.saintleva.sourcechew.ui.screens.search.RepoSearchViewModel
+import com.github.saintleva.sourcechew.ui.screens.search.SearchBottomSheet
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -31,18 +35,13 @@ import org.koin.compose.viewmodel.koinViewModel
  */
 @Composable
 fun WorkEntryContainer(
-    backStack: NavBackStack<NavKey>,
     onMenuItemClick: (Route.Menu) -> Unit,
     actions: @Composable RowScope.() -> Unit = {},
-    onSearchItemClick: (() -> Unit)? = null,
+    onSearchItemClick: () -> Unit = {},
     content: @Composable (Modifier) -> Unit
 ) {
     WorkScreen(
-        onSearchItemClick = onSearchItemClick ?: {
-            if (backStack.lastOrNull() != Route.Work.Search.Repo) {
-                backStack.add(Route.Work.Search.Repo)
-            }
-        },
+        onSearchItemClick = onSearchItemClick,
         onMenuItemClick = onMenuItemClick,
         actions = actions,
         content = content
@@ -59,6 +58,25 @@ fun WorkNavigation(
         },
         Route.Work.Search.Repo
     )
+    var showSearchSheet by rememberSaveable { mutableStateOf(false) }
+
+    if (showSearchSheet) {
+        SearchBottomSheet(
+            onDismissRequest = { showSearchSheet = false },
+            onFoundRepo = {
+                showSearchSheet = false
+                if (backStack.lastOrNull() != Route.Work.Found.Repo) {
+                    backStack.add(Route.Work.Found.Repo)
+                }
+            },
+            onFoundOwner = {
+                showSearchSheet = false
+                if (backStack.lastOrNull() != Route.Work.Found.Owner) {
+                    backStack.add(Route.Work.Found.Owner)
+                }
+            }
+        )
+    }
 
     NavDisplay(
         backStack = backStack,
@@ -69,8 +87,8 @@ fun WorkNavigation(
         entryProvider = entryProvider {
             entry<Route.Work.Search.Repo> {
                 WorkEntryContainer(
-                    backStack = backStack,
-                    onMenuItemClick = onMenuItemClick
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = { showSearchSheet = true }
                 ) { modifier ->
                     RepoSearchScreen(
                         modifier = modifier,
@@ -81,8 +99,8 @@ fun WorkNavigation(
             }
             entry<Route.Work.Search.Owner> {
                 WorkEntryContainer(
-                    backStack = backStack,
-                    onMenuItemClick = onMenuItemClick
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = { showSearchSheet = true }
                 ) { modifier ->
                     OwnerSearchScreen(
                         modifier = modifier,
@@ -94,13 +112,10 @@ fun WorkNavigation(
             entry<Route.Work.Found.Repo> {
                 val foundViewModel = koinViewModel<FoundViewModel<RepoSearchConditions, FoundRepo>>()
                 WorkEntryContainer(
-                    backStack = backStack,
                     onMenuItemClick = onMenuItemClick,
                     onSearchItemClick = {
                         foundViewModel.onNavigationBack()
-                        if (backStack.lastOrNull() != Route.Work.Search.Repo) {
-                            backStack.add(Route.Work.Search.Repo)
-                        }
+                        showSearchSheet = true
                     },
                     actions = {
                         BackIcon {
@@ -119,13 +134,10 @@ fun WorkNavigation(
             entry<Route.Work.Found.Owner> {
                 val foundViewModel = koinViewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>>()
                 WorkEntryContainer(
-                    backStack = backStack,
                     onMenuItemClick = onMenuItemClick,
                     onSearchItemClick = {
                         foundViewModel.onNavigationBack()
-                        if (backStack.lastOrNull() != Route.Work.Search.Owner) {
-                            backStack.add(Route.Work.Search.Owner)
-                        }
+                        showSearchSheet = true
                     },
                     actions = {
                         BackIcon {

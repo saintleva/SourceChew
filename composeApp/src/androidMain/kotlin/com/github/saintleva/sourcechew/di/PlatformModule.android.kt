@@ -74,7 +74,7 @@ fun createPlatformModule(externalContext: Context? = null) = module {
 //        DataStoreKeyValueStorage(dataStore = get(qualifier = SecureDataStoreQualifier))
 //    }
 
-    single<KSafe> { KSafe(context = get()) }
+    single<KSafe> { KSafe(get()) }
 
     single<SecureKeyValueStorage> {
         KSafeKeyValueStorage(ksafe = get())

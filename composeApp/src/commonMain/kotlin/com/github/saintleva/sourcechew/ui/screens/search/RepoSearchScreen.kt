@@ -55,6 +55,31 @@ import sourcechew.composeapp.generated.resources.stars
 import sourcechew.composeapp.generated.resources.template_only
 import sourcechew.composeapp.generated.resources.updated_time
 
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.saintleva.sourcechew.domain.usecase.SearchState
+
+@Composable
+fun RepoSearchForm(
+    modifier: Modifier = Modifier,
+    viewModel: RepoSearchViewModel,
+    onSearchClick: (() -> Unit)? = null,
+) {
+    val searchState by viewModel.searchState.collectAsStateWithLifecycle()
+    BaseSearchContent(
+        viewModel = viewModel,
+        selectingEnabled = searchState != SearchState.Searching,
+        onSearchClick = onSearchClick,
+        specificFilters = { conditions, selectingEnabled ->
+            RepoSpecificFilters(
+                viewModel = viewModel,
+                conditions = conditions,
+                selectingEnabled = selectingEnabled,
+            )
+        }
+    )
+}
+
 @Composable
 fun RepoSearchScreen(
     modifier: Modifier = Modifier,

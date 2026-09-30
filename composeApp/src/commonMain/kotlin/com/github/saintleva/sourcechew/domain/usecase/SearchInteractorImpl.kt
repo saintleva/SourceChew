@@ -24,7 +24,7 @@ class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
     override val searchState = _searchState.asStateFlow()
 
     private var previousConditions: ItemSearchConditions? = null
-    private var lastFound: Paginator<FoundItem>? = null
+    private var lastFound: Paginator<@UnsafeVariance FoundItem>? = null
 
     override var lastScrollPosition: ScrollPosition? = null
 

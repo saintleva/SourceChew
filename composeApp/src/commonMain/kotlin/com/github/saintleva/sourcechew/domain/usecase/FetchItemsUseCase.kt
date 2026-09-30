@@ -7,5 +7,5 @@ import com.jamal_aliev.paginator.offset.Paginator
 
 
 interface FetchItemsUseCase<ItemSearchConditions, out FoundItem: FoundBase> {
-    suspend operator fun invoke(conditions: ItemSearchConditions): Paginator<out FoundItem>
+    suspend operator fun invoke(conditions: ItemSearchConditions): Paginator<@UnsafeVariance FoundItem>
 }

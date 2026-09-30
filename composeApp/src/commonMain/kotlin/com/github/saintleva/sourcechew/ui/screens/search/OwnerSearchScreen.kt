@@ -57,6 +57,31 @@ import sourcechew.composeapp.generated.resources.search_in
 import sourcechew.composeapp.generated.resources.sort_by
 import sourcechew.composeapp.generated.resources.user
 
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.saintleva.sourcechew.domain.usecase.SearchState
+
+@Composable
+fun OwnerSearchForm(
+    modifier: Modifier = Modifier,
+    viewModel: OwnerSearchViewModel,
+    onSearchClick: (() -> Unit)? = null,
+) {
+    val searchState by viewModel.searchState.collectAsStateWithLifecycle()
+    BaseSearchContent(
+        viewModel = viewModel,
+        selectingEnabled = searchState != SearchState.Searching,
+        onSearchClick = onSearchClick,
+        specificFilters = { conditions, selectingEnabled ->
+            OwnerSpecificFilters(
+                viewModel = viewModel,
+                conditions = conditions,
+                selectingEnabled = selectingEnabled,
+            )
+        }
+    )
+}
+
 @Composable
 fun OwnerSearchScreen(
     modifier: Modifier = Modifier,
