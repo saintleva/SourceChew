@@ -50,7 +50,7 @@ class FoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
     }
 
     val paginator: Paginator<FoundItem>?
-        get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator as Paginator<FoundItem>?
+        get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator
 
     val metadata: StateFlow<SearchMetadata?> = searchInteractor.searchState
         .flatMapLatest { state ->
@@ -96,9 +96,10 @@ class FoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
         viewModelScope.launch { paginator?.restart() }
     }
 
-    fun loadNext() {
-        viewModelScope.launch { paginator?.goNextPage() }
-    }
+    //TODO: Remove this
+//    fun loadNext() {
+//        viewModelScope.launch { paginator?.goNextPage() }
+//    }
 
     fun onNavigationBack() {
         searchInteractor.switchToSelecting()

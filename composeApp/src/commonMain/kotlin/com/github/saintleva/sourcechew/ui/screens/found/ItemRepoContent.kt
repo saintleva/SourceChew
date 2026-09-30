@@ -12,7 +12,7 @@ import com.github.saintleva.sourcechew.domain.models.FoundRepo
 
 
 @Composable
-fun FoundRepoContent(repo: FoundRepo) {
+fun ItemRepoContent(repo: FoundRepo) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()

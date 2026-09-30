@@ -9,11 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
 
 
 @Composable
-fun FoundOwnerContent(owner: FoundOwner) {
+fun ItemOwnerContent(owner: FoundOwner) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()

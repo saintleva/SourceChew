@@ -30,7 +30,7 @@ sealed interface SearchState<out FoundItem: FoundBase> {
     data object Selecting : SearchState<Nothing>
     data object Searching : SearchState<Nothing>
     data class Found<out FoundItem: FoundBase>(
-        val paginator: Paginator<out FoundItem>
+        val paginator: Paginator<@UnsafeVariance FoundItem>
     ) : SearchState<FoundItem>
 
 }

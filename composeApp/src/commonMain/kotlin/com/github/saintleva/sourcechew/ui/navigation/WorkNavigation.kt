@@ -15,8 +15,8 @@ import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.ui.screens.found.FoundOwnerContent
-import com.github.saintleva.sourcechew.ui.screens.found.FoundRepoContent
+import com.github.saintleva.sourcechew.ui.screens.found.ItemOwnerContent
+import com.github.saintleva.sourcechew.ui.screens.found.ItemRepoContent
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.OwnerSearchScreen
@@ -112,7 +112,7 @@ fun WorkNavigation(
                     FoundScreen(
                         modifier = modifier,
                         viewModel = foundViewModel,
-                        itemContent = ::FoundRepoContent
+                        itemContent = ::ItemRepoContent
                     )
                 }
             }
@@ -137,7 +137,7 @@ fun WorkNavigation(
                     FoundScreen(
                         modifier = modifier,
                         viewModel = foundViewModel,
-                        itemContent = ::FoundOwnerContent
+                        itemContent = ::ItemOwnerContent
                     )
                 }
             }

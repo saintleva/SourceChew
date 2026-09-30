@@ -97,6 +97,7 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
     PaginatedLazyColumn<FoundItem>(
         paginator = paginator,
         modifier = modifier.fillMaxSize(),
+        state = listState,
         key = { it.id },
         loadingContent = { FullscreenLoading() },
         emptyContent = { EmptyState() },
@@ -128,6 +129,7 @@ private fun MetadataHeader(metadata: SearchMetadata) {
     )
 }
 
+//TODO: Replace with PaginatedLazyColumn-based solution when implemented
 @Composable
 private fun AppendIndicator(
     appendState: PageState<FoundRepo>,

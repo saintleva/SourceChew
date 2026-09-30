@@ -101,9 +101,10 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
 }
 
 @Composable
-private fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : FoundBase> BaseSearchContent(
+fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : FoundBase> BaseSearchContent(
     viewModel: BaseSearchViewModel<SearchConditions, FoundItem>,
     selectingEnabled: Boolean,
+    onSearchClick: (() -> Unit)? = null,
     specificFilters: @Composable (conditions: SearchConditions, selectingEnabled: Boolean) -> Unit
 ) {
     val conditions by viewModel.conditions.collectAsStateWithLifecycle()
@@ -144,7 +145,13 @@ private fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundIte
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
         Button(
-            onClick = viewModel::search,
+            onClick = {
+                if (onSearchClick != null) {
+                    onSearchClick()
+                } else {
+                    viewModel.search()
+                }
+            },
             modifier = Modifier.padding(8.dp).fillMaxWidth(),
             enabled = selectingEnabled && maySearch
         ) {
