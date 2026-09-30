@@ -36,7 +36,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -65,61 +68,15 @@ import sourcechew.composeapp.generated.resources.retry_button
 
 
 @Composable
-fun <FoundItem: FoundBase> ContentWithMetadata(itemContent: @Composable (FoundItem) -> Unit) {
-
-}
-
-@Composable
 fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
     modifier: Modifier,
     viewModel: FoundViewModel<ItemSearchConditions, FoundItem>,
     itemContent: @Composable (FoundItem) -> Unit
 ) {
-    val meta by viewModel.metadata.collectAsStateWithLifecycle()
-
-    PaginatedLazyColumn<FoundItem>(
-        paginator = viewModel.paginator!!,
-        modifier = modifier.fillMaxSize(),
-        key = { it.id },
-        loadingContent = { FullscreenLoading() },
-        emptyContent = { EmptyState() },
-        errorContent = { state -> ErrorState(cause = state.exception, onRetry = viewModel::restart) },
-    ) { item ->
-        itemContent(item)
-    }
-
-        //TODO: Remove this
-//    Napier.d(tag = "FoundScreen") { "uiState = ${ui?.let { it::class.simpleName }}" }
-//
-//    Box(modifier = modifier.fillMaxSize()) {
-//        when (val state = ui) {
-//            is PaginatorUiState.Idle,
-//            is PaginatorUiState.Loading -> FullscreenLoading()
-//
-//            is PaginatorUiState.Empty -> EmptyState()
-//
-//            is PaginatorUiState.Error -> ErrorState(
-//                cause = state.state.exception,
-//                onRetry = viewModel::restart
-//            )
-//
-//            is PaginatorUiState.Content -> ContentList(
-//                state = state,
-//                metadata = meta,
-//                viewModel = viewModel
-//            )
-//        }
-//    }
-}
-
-@Composable
-private fun ContentList(
-    state: PaginatorUiState.Content<FoundRepo>,
-    metadata: SearchMetadata?,
-    viewModel: FoundViewModel
-) {
-
     val paginator = viewModel.paginator ?: return
+    val meta by viewModel.metadata.collectAsStateWithLifecycle()
+    var headerShown by rememberSaveable { mutableStateOf(false) }
+
     val listState = remember(paginator) {
         val initial = viewModel.consumeInitialScroll()
         LazyListState(
@@ -137,86 +94,27 @@ private fun ContentList(
         }
     }
 
-    val prefetch = paginator.rememberPrefetchController(
-        prefetchDistance = PREFETCH_DISTANCE,
-        silentlyLoading = false,
-    )
-    val headerCount = if (metadata != null) 1 else 0
-    val footerCount = if (state.appendState != null) 1 else 0
-
-    prefetch.BindToLazyList(
-        listState = listState,
-        dataItemCount = state.items.size,
-        headerCount = headerCount,
-        footerCount = footerCount,
-    )
-
-    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-        if (metadata != null) {
-            item(key = "metadata-header") { MetadataHeader(metadata) }
+    PaginatedLazyColumn<FoundItem>(
+        paginator = paginator,
+        modifier = modifier.fillMaxSize(),
+        key = { it.id },
+        loadingContent = { FullscreenLoading() },
+        emptyContent = { EmptyState() },
+        errorContent = { state ->
+            ErrorState(
+                cause = state.exception,
+                onRetry = viewModel::restart
+            )
         }
-        items(state.items, key = { it.id }) { ItemContent(it) }
-        state.appendState?.let { appendState ->
-            item(key = "append-indicator") {
-                Napier.d(tag = "FoundScreen") { "Append indicator must be showed" }
-                AppendIndicator(appendState, onRetry = viewModel::loadNext)
-            }
+    ) { item ->
+        if (!headerShown && meta != null) {
+            MetadataHeader(meta!!)
+            headerShown = true
         }
+        itemContent(item)
     }
 }
 
-//@Composable
-//private fun ContentList(
-//    state: PaginatorUiState.Content<FoundRepo>,
-//    metadata: SearchMetadata?,
-//    viewModel: FoundViewModel
-//) {
-//
-//    val paginator = viewModel.paginator ?: return
-//    val listState = remember(paginator) {
-//        val initial = viewModel.consumeInitialScroll()
-//        LazyListState(
-//            firstVisibleItemIndex = initial?.index ?: 0,
-//            firstVisibleItemScrollOffset = initial?.offset ?: 0,
-//        )
-//    }
-//
-//    DisposableEffect(paginator) {
-//        onDispose {
-//            viewModel.saveScroll(
-//                listState.firstVisibleItemIndex,
-//                listState.firstVisibleItemScrollOffset,
-//            )
-//        }
-//    }
-//
-//    val prefetch = paginator.rememberPrefetchController(
-//        prefetchDistance = PREFETCH_DISTANCE,
-//        silentlyLoading = false,
-//    )
-//    val headerCount = if (metadata != null) 1 else 0
-//    val footerCount = if (state.appendState != null) 1 else 0
-//
-//    prefetch.BindToLazyList(
-//        listState = listState,
-//        dataItemCount = state.items.size,
-//        headerCount = headerCount,
-//        footerCount = footerCount,
-//    )
-//
-//    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-//        if (metadata != null) {
-//            item(key = "metadata-header") { MetadataHeader(metadata) }
-//        }
-//        items(state.items, key = { it.id }) { ItemContent(it) }
-//        state.appendState?.let { appendState ->
-//            item(key = "append-indicator") {
-//                Napier.d(tag = "FoundScreen") { "Append indicator must be showed" }
-//                AppendIndicator(appendState, onRetry = viewModel::loadNext)
-//            }
-//        }
-//    }
-//}
 
 @Composable
 private fun MetadataHeader(metadata: SearchMetadata) {
@@ -228,31 +126,6 @@ private fun MetadataHeader(metadata: SearchMetadata) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
     )
-}
-
-@Composable
-private fun ItemContent(foundRepo: FoundRepo) {
-    OutlinedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.surface)
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-        ) {
-            Text("Name: ${foundRepo.name}")
-            Text("Full name: ${foundRepo.fullName}")
-            Text("Owner login: ${foundRepo.ownerLogin}")
-            Text("Owner type: ${foundRepo.ownerType}")
-            Text("Description: ${foundRepo.description}")
-            Text("Language: ${foundRepo.language}")
-            Text("Stars: ${foundRepo.stars}")
-        }
-    }
 }
 
 @Composable
@@ -339,4 +212,5 @@ private fun ErrorState(cause: Throwable, onRetry: () -> Unit) {
     }
 }
 
-private const val PREFETCH_DISTANCE = 10
+//TODO: Remove this
+//private const val PREFETCH_DISTANCE = 10
