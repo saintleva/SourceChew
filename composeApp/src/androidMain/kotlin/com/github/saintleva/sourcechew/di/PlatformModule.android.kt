@@ -4,9 +4,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.okio.OkioStorage
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStoreFile
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.storage.AppPreferences
 import com.github.saintleva.sourcechew.data.storage.KSafeKeyValueStorage
@@ -15,8 +12,6 @@ import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import kotlin.io.path.toPath
-import kotlin.io.resolve
 
 
 //TODO: Use or remove this
