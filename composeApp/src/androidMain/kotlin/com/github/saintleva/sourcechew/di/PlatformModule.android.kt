@@ -13,6 +13,7 @@ import com.github.saintleva.sourcechew.data.storage.KSafeKeyValueStorage
 import eu.anifantakis.lib.ksafe.KSafe
 import okio.FileSystem
 import okio.Path.Companion.toOkioPath
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import kotlin.io.path.toPath
 import kotlin.io.resolve
@@ -25,17 +26,12 @@ import kotlin.io.resolve
 //
 //private const val secureDataStoreFileName = "secure.preferences_pb"
 
-fun createPlatformModule(externalContext: Context? = null) = module {
+actual val platformModule = module {
 
-    //TODO: Is it right?
-    externalContext?.let { context ->
-        single<Context> { context }
-    }
+    single<Context> { androidContext() }
 
     single<DataStore<AppPreferences>> {
         println("DATASTORE CREATED")
-
-        val context = get<Context>()
 
         DataStoreFactory.create(
             storage = OkioStorage(
@@ -44,7 +40,7 @@ fun createPlatformModule(externalContext: Context? = null) = module {
                 serializer = get(),
                 producePath = {
                     // Store in the app's internal files directory
-                    context.filesDir.resolve(PREFS_DATA_STORE_FILE_NAME).toOkioPath()
+                    get<Context>().filesDir.resolve(PREFS_DATA_STORE_FILE_NAME).toOkioPath()
                 }
             )
         )
@@ -81,4 +77,10 @@ fun createPlatformModule(externalContext: Context? = null) = module {
     }
 }
 
-actual val platformModule = createPlatformModule()
+// Module factory used in tests to inject a custom Context
+fun createPlatformModule(externalContext: Context? = null) = module {
+    includes(platformModule)
+    externalContext?.let { context ->
+        single<Context> { context }
+    }
+}
