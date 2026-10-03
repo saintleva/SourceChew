@@ -28,8 +28,6 @@ import kotlin.io.resolve
 
 actual val platformModule = module {
 
-    single<Context> { androidContext() }
-
     single<DataStore<AppPreferences>> {
         println("DATASTORE CREATED")
 
@@ -70,7 +68,7 @@ actual val platformModule = module {
 //        DataStoreKeyValueStorage(dataStore = get(qualifier = SecureDataStoreQualifier))
 //    }
 
-    single<KSafe> { KSafe(get()) }
+    single<KSafe> { KSafe(context = androidContext()) }
 
     single<SecureKeyValueStorage> {
         KSafeKeyValueStorage(ksafe = get())
@@ -78,9 +76,3 @@ actual val platformModule = module {
 }
 
 // Module factory used in tests to inject a custom Context
-fun createPlatformModule(externalContext: Context? = null) = module {
-    includes(platformModule)
-    externalContext?.let { context ->
-        single<Context> { context }
-    }
-}

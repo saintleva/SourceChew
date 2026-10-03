@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.data.network.utils
 import com.github.saintleva.sourcechew.domain.models.DateTimeFilter
 import com.github.saintleva.sourcechew.domain.models.Interval
 import kotlinx.datetime.LocalDate
+import kotlin.jvm.JvmName
 import kotlin.time.Instant
 
 
@@ -29,9 +30,12 @@ fun <T : Comparable<T>> Interval<T>.toGitHubQuery(
     return parts.joinToString(" ")
 }
 
+@JvmName("instantIntervalToGitHubQuery")
 fun Interval<Instant>.toGitHubQuery(qualifier: String): String =
     toGitHubQuery(qualifier) { formatInstant(it) }
 
+
+@JvmName("localDateIntervalToGitHubQuery")
 fun Interval<LocalDate>.toGitHubQuery(qualifier: String): String =
     toGitHubQuery(qualifier) { it.toString() }
 
