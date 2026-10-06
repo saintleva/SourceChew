@@ -1,0 +1,13 @@
+package com.github.saintleva.sourcechew.domain.repository
+
+import kotlinx.coroutines.flow.Flow
+
+interface AuthRepository {
+
+    val authToken: Flow<String?>
+    suspend fun getAccessToken(): String?
+    val isAuthorized: Flow<Boolean>
+
+    suspend fun saveToken(token: String)
+    suspend fun clearToken()
+}

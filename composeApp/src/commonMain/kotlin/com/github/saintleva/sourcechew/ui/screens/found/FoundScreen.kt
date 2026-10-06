@@ -80,6 +80,12 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
         modifier = modifier.fillMaxSize(),
         state = listState,
         key = { it.id },
+        prependErrorIndicator = { state ->
+            AppendIndicator(
+                errorState = state,
+                onRetry = viewModel::loadPrevious
+            )
+        },
         appendErrorIndicator = { state ->
             AppendIndicator(
                 errorState = state,
@@ -94,8 +100,8 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
                 onRetry = viewModel::restart
             )
         }
-    ) { item, _, indexInPage, _, page ->
-        if (indexInPage == 0) {
+    ) { item, globalIndex, _, _, page ->
+        if (globalIndex == 0) {
             val meta = page.metadata as? SearchMetadata
             meta?.let { MetadataHeader(meta) }
         }
@@ -129,6 +135,11 @@ private fun AppendIndicator(
         Text(
             text = stringResource(Res.string.loading_more_error),
             color = MaterialTheme.colorScheme.error,
+        )
+        Text(
+            text = getErrorMessage(errorState.exception),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 8.dp),
         )
         Button(onClick = onRetry) {
             Text(stringResource(Res.string.retry_button))

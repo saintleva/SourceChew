@@ -51,6 +51,10 @@ class FoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
         viewModelScope.launch { paginator?.restart() }
     }
 
+    fun loadPrevious() {
+        viewModelScope.launch { paginator?.goPreviousPage() }
+    }
+
     fun loadNext() {
         viewModelScope.launch { paginator?.goNextPage() }
     }
