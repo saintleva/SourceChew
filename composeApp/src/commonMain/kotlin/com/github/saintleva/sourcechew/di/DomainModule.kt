@@ -39,30 +39,13 @@ import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractorImpl
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
-import org.koin.core.qualifier.Qualifier
-import org.koin.core.qualifier.QualifierValue
+import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 
 
-object ConfigJsonQualifier : Qualifier {
-    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.ConfigJsonQualifier"
-}
-
-object AppSettingsStoreQualifier : Qualifier {
-    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.AppSettingsStoreQualifier"
-}
-
-object RepoSearchConditionsStoreQualifier : Qualifier {
-    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.RepoSearchConditionsStoreQualifier"
-}
-
-object OwnerSearchConditionsStoreQualifier : Qualifier {
-    override val value: QualifierValue = "com.github.saintleva.sourcechew.di.OwnerSearchConditionsStoreQualifier"
-}
-
 val domainModule = module {
 
-    single<StringFormat>(qualifier = ConfigJsonQualifier) {
+    single<StringFormat>(qualifier<AppPreferences>()) {
         Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
@@ -71,7 +54,7 @@ val domainModule = module {
 
     single<BytesCodec<AppPreferences>> {
         StringFormatCodec(
-            format = get(qualifier = ConfigJsonQualifier),
+            format = get(qualifier<AppPreferences>()),
             serializer = AppPreferences.serializer()
         )
     }
@@ -83,21 +66,21 @@ val domainModule = module {
         )
     }
 
-    single<ConfigStore<AppSettings>>(qualifier = AppSettingsStoreQualifier) {
+    single<ConfigStore<AppSettings>>(qualifier<AppSettings>()) {
         DataStoreConfigStore(
             dataStore = get(), // Provided by PlatformModule
             lens = AppPreferences.AppSettingsLens
         )
     }
 
-    single<ConfigStore<RepoSearchConditions>>(qualifier = RepoSearchConditionsStoreQualifier) {
+    single<ConfigStore<RepoSearchConditions>>(qualifier<RepoSearchConditions>()) {
         DataStoreConfigStore(
             dataStore = get(), // Provided by PlatformModule
             lens = AppPreferences.RepoSearchLens
         )
     }
 
-    single<ConfigStore<OwnerSearchConditions>>(qualifier = OwnerSearchConditionsStoreQualifier) {
+    single<ConfigStore<OwnerSearchConditions>>(qualifier<OwnerSearchConditions>()) {
         DataStoreConfigStore(
             dataStore = get(), // Provided by PlatformModule
             lens = AppPreferences.OwnerSearchLens
@@ -108,25 +91,25 @@ val domainModule = module {
 
     single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
 
-    factory<FetchItemsUseCase<RepoSearchConditions, FoundRepo>> {
+    factory<FetchItemsUseCase<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
         FetchItemsUseCaseImpl(
-            appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
-            searchApiService = get()
+            appSettingsStore = get(qualifier<AppSettings>()),
+            searchApiService = get(qualifier<FoundRepo>())
         )
     }
 
-    factory<FetchItemsUseCase<OwnerSearchConditions, FoundOwner>> {
+    factory<FetchItemsUseCase<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         FetchItemsUseCaseImpl(
-            appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
-            searchApiService = get()
+            appSettingsStore = get(qualifier<AppSettings>()),
+            searchApiService = get(qualifier<FoundOwner>())
         )
     }
 
-    single<SearchInteractor<RepoSearchConditions, FoundRepo>> {
-        SearchInteractorImpl(fetchItemsUseCase = get())
+    single<SearchInteractor<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
+        SearchInteractorImpl(fetchItemsUseCase = get(qualifier<FoundRepo>()))
     }
 
-    single<SearchInteractor<OwnerSearchConditions, FoundOwner>> {
-        SearchInteractorImpl(fetchItemsUseCase = get())
+    single<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
+        SearchInteractorImpl(fetchItemsUseCase = get(qualifier<FoundOwner>()))
     }
 }

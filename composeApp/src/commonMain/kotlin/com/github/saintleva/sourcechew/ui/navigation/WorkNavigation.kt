@@ -28,6 +28,7 @@ import com.github.saintleva.sourcechew.ui.screens.search.RepoSearchScreen
 import com.github.saintleva.sourcechew.ui.screens.search.RepoSearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.SearchBottomSheet
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.qualifier.qualifier
 
 /**
  * Reusable container wrapping [WorkScreen] to eliminate boilerplate
@@ -110,7 +111,9 @@ fun WorkNavigation(
                 }
             }
             entry<Route.Work.Found.Repo> {
-                val foundViewModel = koinViewModel<FoundViewModel<RepoSearchConditions, FoundRepo>>()
+                val foundViewModel = koinViewModel<FoundViewModel<RepoSearchConditions, FoundRepo>>(
+                    qualifier<FoundRepo>()
+                )
                 WorkEntryContainer(
                     onMenuItemClick = onMenuItemClick,
                     onSearchItemClick = {
@@ -132,7 +135,9 @@ fun WorkNavigation(
                 }
             }
             entry<Route.Work.Found.Owner> {
-                val foundViewModel = koinViewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>>()
+                val foundViewModel = koinViewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>>(
+                    qualifier<FoundOwner>()
+                )
                 WorkEntryContainer(
                     onMenuItemClick = onMenuItemClick,
                     onSearchItemClick = {

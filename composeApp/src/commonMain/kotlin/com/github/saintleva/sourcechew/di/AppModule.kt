@@ -17,6 +17,7 @@
 
 package com.github.saintleva.sourcechew.di
 
+import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
@@ -29,6 +30,7 @@ import com.github.saintleva.sourcechew.ui.screens.settings.SettingsViewModel
 import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
 import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManagerConfig
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 
 
@@ -38,12 +40,6 @@ val appModule = module {
         ClipboardManager(ClipboardManagerConfig(async = true) )
     }
 
-    //TODO: Migrate to this ord.koin.plugin.module.dsl.viewModel and use this and Koin Complier Plugin !
-//    viewModel<AuthViewModel>()
-//    viewModel<SettingsViewModel>()
-//    viewModel<SearchViewModel>()
-//    viewModel<FoundViewModel>()
-
     viewModel<AuthViewModel> {
         AuthViewModel(
             repository = get(),
@@ -52,34 +48,34 @@ val appModule = module {
     }
 
     viewModel<SettingsViewModel> {
-        SettingsViewModel(appSettingsStore = get(qualifier = AppSettingsStoreQualifier))
+        SettingsViewModel(appSettingsStore = get(qualifier<AppSettings>()))
     }
 
     viewModel<RepoSearchViewModel> {
         RepoSearchViewModel(
-            conditionsStore = get(qualifier = RepoSearchConditionsStoreQualifier),
-            appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
-            searchInteractor = get(),
+            conditionsStore = get(qualifier<RepoSearchConditions>()),
+            appSettingsStore = get(qualifier<AppSettings>()),
+            searchInteractor = get(qualifier<FoundRepo>()),
         )
     }
 
     viewModel<OwnerSearchViewModel> {
         OwnerSearchViewModel(
-            conditionsStore = get(qualifier = OwnerSearchConditionsStoreQualifier),
-            appSettingsStore = get(qualifier = AppSettingsStoreQualifier),
-            searchInteractor = get(),
+            conditionsStore = get(qualifier<OwnerSearchConditions>()),
+            appSettingsStore = get(qualifier<AppSettings>()),
+            searchInteractor = get(qualifier<FoundOwner>()),
         )
     }
 
-    viewModel<FoundViewModel<RepoSearchConditions, FoundRepo>> {
+    viewModel<FoundViewModel<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
         FoundViewModel(
-            searchInteractor = get()
+            searchInteractor = get(qualifier<FoundRepo>())
         )
     }
 
-    viewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>> {
+    viewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         FoundViewModel(
-            searchInteractor = get()
+            searchInteractor = get(qualifier<FoundOwner>())
         )
     }
 }

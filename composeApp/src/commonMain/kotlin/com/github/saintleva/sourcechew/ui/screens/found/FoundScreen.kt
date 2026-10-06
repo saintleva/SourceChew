@@ -40,6 +40,7 @@ import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
 import com.jamal_aliev.paginator.core.page.PageState
+import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.found_items
@@ -185,6 +186,7 @@ private fun ErrorContent(cause: Throwable, onRetry: () -> Unit) {
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.error,
         )
+        Napier.d(tag = "FoundScreen : ErrorContent") { "Error: $cause" }
         Text(
             text = getErrorMessage(cause),
             style = MaterialTheme.typography.bodyMedium,

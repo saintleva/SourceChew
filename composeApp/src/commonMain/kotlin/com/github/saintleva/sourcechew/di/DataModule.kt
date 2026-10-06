@@ -16,12 +16,13 @@ import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import io.ktor.client.HttpClient
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
+import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 
 
 val dataModule = module {
 
-    single<StringFormat>(qualifier = ConfigJsonQualifier) {
+    single<StringFormat>(qualifier<AppPreferences>()) {
         Json {
             ignoreUnknownKeys = true
             encodeDefaults = true
@@ -30,7 +31,7 @@ val dataModule = module {
 
     single<BytesCodec<AppPreferences>> {
         StringFormatCodec(
-            format = get(qualifier = ConfigJsonQualifier),
+            format = get(qualifier<AppPreferences>()),
             serializer = AppPreferences.serializer()
         )
     }
@@ -42,8 +43,6 @@ val dataModule = module {
         )
     }
 
-    //TODO: Do I need use qualifiers to avoid type erasing?
-
     single<HttpClient> {
         createHttpClient(
             authRepository = get(),
@@ -51,11 +50,11 @@ val dataModule = module {
         )
     }
 
-    single<SearchApiService<RepoSearchConditions, FoundRepo>> {
+    single<SearchApiService<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
         KtorRepoRestApiService(httpClient = get())
     }
 
-    single<SearchApiService<OwnerSearchConditions, FoundOwner>> {
+    single<SearchApiService<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         KtorOwnerRestApiService(httpClient = get())
     }
 }
