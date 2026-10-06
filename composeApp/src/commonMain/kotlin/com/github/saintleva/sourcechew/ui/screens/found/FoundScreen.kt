@@ -17,46 +17,29 @@
 
 package com.github.saintleva.sourcechew.ui.screens.found
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.FoundBase
-import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
-import com.jamal_aliev.paginator.compose.offset.BindToLazyList
 import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
-import com.jamal_aliev.paginator.compose.offset.rememberPrefetchController
-import com.jamal_aliev.paginator.core.extension.isErrorState
-import com.jamal_aliev.paginator.core.extension.isProgressState
 import com.jamal_aliev.paginator.core.page.PageState
-import com.jamal_aliev.paginator.core.page.PaginatorUiState
-import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.found_items
@@ -74,8 +57,6 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
     itemContent: @Composable (FoundItem) -> Unit
 ) {
     val paginator = viewModel.paginator ?: return
-    val meta by viewModel.metadata.collectAsStateWithLifecycle()
-    var headerShown by rememberSaveable { mutableStateOf(false) }
 
     val listState = remember(paginator) {
         val initial = viewModel.consumeInitialScroll()
@@ -99,18 +80,24 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
         modifier = modifier.fillMaxSize(),
         state = listState,
         key = { it.id },
+        appendErrorIndicator = { state ->
+            AppendIndicator(
+                errorState = state,
+                onRetry = viewModel::loadNext
+            )
+        },
         loadingContent = { FullscreenLoading() },
-        emptyContent = { EmptyState() },
+        emptyContent = { EmptyContent() },
         errorContent = { state ->
-            ErrorState(
+            ErrorContent(
                 cause = state.exception,
                 onRetry = viewModel::restart
             )
         }
-    ) { item ->
-        if (!headerShown && meta != null) {
-            MetadataHeader(meta!!)
-            headerShown = true
+    ) { item, _, indexInPage, _, page ->
+        if (indexInPage == 0) {
+            val meta = page.metadata as? SearchMetadata
+            meta?.let { MetadataHeader(meta) }
         }
         itemContent(item)
     }
@@ -129,39 +116,23 @@ private fun MetadataHeader(metadata: SearchMetadata) {
     )
 }
 
-//TODO: Replace with PaginatedLazyColumn-based solution when implemented
 @Composable
 private fun AppendIndicator(
-    appendState: PageState<FoundRepo>,
-    onRetry: () -> Unit,
+    errorState: PageState.ErrorState<FoundBase>,
+    onRetry: () -> Unit
 ) {
-    when {
-        appendState.isProgressState() -> {
-            Box(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = stringResource(Res.string.loading_more_error),
+            color = MaterialTheme.colorScheme.error,
+        )
+        Button(onClick = onRetry) {
+            Text(stringResource(Res.string.retry_button))
         }
-
-        appendState.isErrorState() -> {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text(
-                    text = stringResource(Res.string.loading_more_error),
-                    color = MaterialTheme.colorScheme.error,
-                )
-                Button(onClick = onRetry) {
-                    Text(stringResource(Res.string.retry_button))
-                }
-            }
-        }
-
-        else -> Unit
     }
 }
 
@@ -173,7 +144,7 @@ private fun FullscreenLoading() {
 }
 
 @Composable
-private fun EmptyState() {
+private fun EmptyContent() {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -192,7 +163,7 @@ private fun EmptyState() {
 }
 
 @Composable
-private fun ErrorState(cause: Throwable, onRetry: () -> Unit) {
+private fun ErrorContent(cause: Throwable, onRetry: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -213,6 +184,3 @@ private fun ErrorState(cause: Throwable, onRetry: () -> Unit) {
         }
     }
 }
-
-//TODO: Remove this
-//private const val PREFETCH_DISTANCE = 10

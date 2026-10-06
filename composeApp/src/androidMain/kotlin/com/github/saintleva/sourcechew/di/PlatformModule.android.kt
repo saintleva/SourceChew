@@ -24,8 +24,6 @@ import org.koin.dsl.module
 actual val platformModule = module {
 
     single<DataStore<AppPreferences>> {
-        println("DATASTORE CREATED")
-
         DataStoreFactory.create(
             storage = OkioStorage(
                 fileSystem = FileSystem.SYSTEM,
