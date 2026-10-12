@@ -22,7 +22,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -42,6 +46,7 @@ import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.additional_filters
 import sourcechew.composeapp.generated.resources.best_match
+import sourcechew.composeapp.generated.resources.clear_filter
 import sourcechew.composeapp.generated.resources.email
 import sourcechew.composeapp.generated.resources.followers
 import sourcechew.composeapp.generated.resources.followers_count
@@ -131,11 +136,11 @@ private fun OwnerSpecificFilters(
             }
         }
     }
-    ExpandableSection(title = stringResource(Res.string.additional_filters)) {
+    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
         Text(
             text = stringResource(Res.string.owner_type),
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(bottom = 4.dp),
         )
         OwnerType.entries.forEach { type ->
             CheckBoxWithText(
@@ -146,11 +151,27 @@ private fun OwnerSpecificFilters(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             )
         }
+    }
+    ExpandableSection(title = stringResource(Res.string.additional_filters)) {
         OutlinedTextField(
             value = conditions.location ?: "",
             onValueChange = { viewModel.onLocationChange(it.ifBlank { null }) },
             label = { Text(stringResource(Res.string.location)) },
             enabled = selectingEnabled,
+            singleLine = true,
+            trailingIcon = if (!conditions.location.isNullOrBlank()) {
+                {
+                    IconButton(
+                        onClick = { viewModel.onLocationChange(null) },
+                        enabled = selectingEnabled,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(Res.string.clear_filter),
+                        )
+                    }
+                }
+            } else null,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),

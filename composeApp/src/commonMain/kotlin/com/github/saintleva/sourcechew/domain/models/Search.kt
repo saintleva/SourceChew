@@ -99,6 +99,8 @@ interface BaseSearchConditions<T : BaseSearchConditions<T>> : HasCommonFilters<T
 @Serializable
 data class RepoSearchConditions(
     override val common: CommonFilters,
+    val stars: IntFilter?,
+    val topic: String,
     val inScope: Set<RepoSearchScope>,
     val onlyFlags: Set<RepoOnlyFlag>,
     val sort: RepoSearchSort
@@ -135,7 +137,7 @@ data class OwnerSearchConditions(
 ) : BaseSearchConditions<OwnerSearchConditions> {
 
     override fun maySearch(): Boolean {
-        return inScope.isNotEmpty()
+        return inScope.isNotEmpty() && types.isNotEmpty()
     }
 
     override fun withCommon(common: CommonFilters): OwnerSearchConditions {
