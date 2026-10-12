@@ -5,6 +5,7 @@
     <string name="logo">Логотип</string>
     <string name="repositories">Репозитории</string>
     <string name="users">Пользователи</string>
+    <string name="owners">Владельцы</string>
     <string name="groups">Группы</string>
     <string name="search_in">Искать в:</string>
     <string name="names">Названия</string>
@@ -75,7 +76,7 @@
     <string name="about">О приложении</string>
     <string name="login">Логин</string>
     <string name="fullname">Полное имя</string>
-    <string name="email">Электронная почта</string>
+    <string name="email">Почта</string>
     <string name="user">Пользователь</string>
     <string name="organization">Организация</string>
     <string name="joined_time">Времени регистрации</string>

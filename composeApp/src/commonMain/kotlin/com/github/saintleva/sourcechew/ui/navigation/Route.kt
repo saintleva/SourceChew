@@ -1,6 +1,7 @@
 package com.github.saintleva.sourcechew.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.github.saintleva.sourcechew.ui.screens.search.SearchTab
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -30,13 +31,8 @@ sealed interface Route : NavKey {
         @Serializable
         data object WorkRoot : Work
 
-        sealed interface Search : Work {
-            @Serializable
-            data object Repo : Search
-
-            @Serializable
-            data object Owner : Search
-        }
+        @Serializable
+        data class Search(val tab: SearchTab = SearchTab.REPO) : Work
 
         sealed interface Found : Work {
 
@@ -62,8 +58,7 @@ val rootSerializersModule = SerializersModule {
 val workSerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
         subclass(Route.Work.WorkRoot::class, Route.Work.WorkRoot.serializer())
-        subclass(Route.Work.Search.Repo::class, Route.Work.Search.Repo.serializer())
-        subclass(Route.Work.Search.Owner::class, Route.Work.Search.Owner.serializer())
+        subclass(Route.Work.Search::class, Route.Work.Search.serializer())
         subclass(Route.Work.Found.Repo::class, Route.Work.Found.Repo.serializer())
         subclass(Route.Work.Found.Owner::class, Route.Work.Found.Owner.serializer())
     }

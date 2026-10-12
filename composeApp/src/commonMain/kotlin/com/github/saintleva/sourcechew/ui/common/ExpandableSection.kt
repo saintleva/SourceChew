@@ -14,15 +14,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 
-
-//TODO: Remove this
-//Test for git
 
 @Composable
 fun ExpandableSection(
@@ -30,9 +27,12 @@ fun ExpandableSection(
     title: String,
     leadingIcon: (@Composable () -> Unit)? = null,
     initiallyExpanded: Boolean = false,
+    expanded: Boolean? = null,
+    onExpandedChange: ((Boolean) -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    var expanded by remember { mutableStateOf(initiallyExpanded) }
+    var internalExpanded by rememberSaveable(title) { mutableStateOf(initiallyExpanded) }
+    val currentExpanded = expanded ?: internalExpanded
 
     Column(modifier = modifier.fillMaxWidth()) {
         ListItem(
@@ -41,14 +41,21 @@ fun ExpandableSection(
             trailingContent = {
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = if (expanded) "Collapse" else "Expand",
-                    modifier = Modifier.rotate(if (expanded) 180f else 0f)
+                    contentDescription = if (currentExpanded) "Collapse" else "Expand",
+                    modifier = Modifier.rotate(if (currentExpanded) 180f else 0f)
                 )
             },
-            modifier = Modifier.clickable { expanded = !expanded }
+            modifier = Modifier.clickable {
+                val next = !currentExpanded
+                if (onExpandedChange != null) {
+                    onExpandedChange(next)
+                } else {
+                    internalExpanded = next
+                }
+            }
         )
 
-        AnimatedVisibility(visible = expanded) {
+        AnimatedVisibility(visible = currentExpanded) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -6,6 +6,7 @@
     <string name="logo">Logo</string>
     <string name="repositories">Repositories</string>
     <string name="users">Users</string>
+    <string name="owners">Owners</string>
     <string name="groups">Groups</string>
     <string name="search_in">Search in:</string>
     <string name="names">Names</string>
