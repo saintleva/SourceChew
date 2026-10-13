@@ -68,7 +68,7 @@ kotlin {
     sourceSets {
         getByName("commonMain") {
             dependencies {
-                implementation(libs.kotlinx.datetime)
+                api(libs.kotlinx.datetime)
 
                 //TODO: Use this implementations
 //                implementation(libs.androidx.compose.runtime)

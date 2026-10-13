@@ -40,7 +40,7 @@ import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
-import com.github.saintleva.sourcechew.ui.common.IntFilterInput
+import com.github.saintleva.sourcechew.ui.common.IntRangeInput
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -176,14 +176,14 @@ private fun OwnerSpecificFilters(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
         )
-        IntFilterInput(
+        IntRangeInput(
             label = stringResource(Res.string.repos_count),
             filter = conditions.repos,
             onFilterChange = { viewModel.onReposFilterChange(it) },
             enabled = selectingEnabled,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         )
-        IntFilterInput(
+        IntRangeInput(
             label = stringResource(Res.string.followers_count),
             filter = conditions.followers,
             onFilterChange = { viewModel.onFollowersFilterChange(it) },

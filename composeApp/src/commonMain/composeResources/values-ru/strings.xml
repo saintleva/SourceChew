@@ -86,4 +86,12 @@
     <string name="repos_count">Количество репозиториев</string>
     <string name="followers_count">Количество подписчиков</string>
     <string name="clear_filter">Сбросить фильтр</string>
+    <string name="filter_from">От</string>
+    <string name="filter_to">До</string>
+    <string name="filter_value">Значение</string>
+    <string name="range_mode_exact">Точно (=)</string>
+    <string name="range_mode_at_least">Не менее (&gt;=)</string>
+    <string name="range_mode_at_most">Не более (&lt;=)</string>
+    <string name="range_mode_between">Диапазон (..)</string>
+    <string name="range_error_order">Должно быть \u2265 начального</string>
 </resources>

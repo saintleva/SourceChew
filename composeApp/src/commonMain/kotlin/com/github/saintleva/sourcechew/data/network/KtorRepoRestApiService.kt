@@ -1,6 +1,7 @@
 package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.data.network.utils.appendCommonFilters
+import com.github.saintleva.sourcechew.data.network.utils.toGitHubValue
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
@@ -71,6 +72,12 @@ class KtorRepoRestApiService(
                         }
                         if (conditions.onlyFlags.isNotEmpty()) {
                             append(" ${conditions.onlyFlags.toFlagsApiValue()}")
+                        }
+                        conditions.stars?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
+                            append(" stars:$it")
+                        }
+                        conditions.topic.takeIf { it.isNotBlank() }?.let {
+                            append(" topic:\"$it\"")
                         }
                     }.also { finalQuery ->
                         Napier.d(tag = "KtorRepoRestApiService") { "Query: \"$finalQuery\"" }

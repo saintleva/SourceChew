@@ -87,4 +87,12 @@ Try changing your search terms.</string>
     <string name="repos_count">Repositories count</string>
     <string name="followers_count">Followers count</string>
     <string name="clear_filter">Clear filter</string>
+    <string name="filter_from">From</string>
+    <string name="filter_to">To</string>
+    <string name="filter_value">Value</string>
+    <string name="range_mode_exact">Exact (=)</string>
+    <string name="range_mode_at_least">At least (&gt;=)</string>
+    <string name="range_mode_at_most">At most (&lt;=)</string>
+    <string name="range_mode_between">Range (..)</string>
+    <string name="range_error_order">Must be \u2265 start</string>
 </resources>

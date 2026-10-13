@@ -99,7 +99,7 @@ interface BaseSearchConditions<T : BaseSearchConditions<T>> : HasCommonFilters<T
 @Serializable
 data class RepoSearchConditions(
     override val common: CommonFilters,
-    val stars: IntFilter?,
+    val stars: Range<Int>?,
     val topic: String,
     val inScope: Set<RepoSearchScope>,
     val onlyFlags: Set<RepoOnlyFlag>,
@@ -118,6 +118,8 @@ data class RepoSearchConditions(
     companion object {
         val default = RepoSearchConditions(
             common = CommonFilters.default,
+            stars = null,
+            topic = "",
             inScope = setOf(RepoSearchScope.NAME),
             onlyFlags = emptySet(),
             sort = RepoSearchSort.BEST_MATCH
@@ -131,8 +133,8 @@ data class OwnerSearchConditions(
     val inScope: Set<OwnerSearchScope>,
     val types: Set<OwnerType>,
     val sort: OwnerSearchSort,
-    val repos: IntFilter?,
-    val followers: IntFilter?,
+    val repos: Range<Int>?,
+    val followers: Range<Int>?,
     val location: String?
 ) : BaseSearchConditions<OwnerSearchConditions> {
 

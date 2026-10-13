@@ -19,11 +19,11 @@ package com.github.saintleva.sourcechew.ui.screens.search
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
-import com.github.saintleva.sourcechew.domain.models.IntFilter
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchScope
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
 import com.github.saintleva.sourcechew.domain.models.OwnerType
+import com.github.saintleva.sourcechew.domain.models.Range
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import kotlinx.coroutines.flow.update
@@ -66,11 +66,11 @@ class OwnerSearchViewModel(
         }
     }
 
-    fun onReposFilterChange(filter: IntFilter?) {
+    fun onReposFilterChange(filter: Range<Int>?) {
         _conditions.update { it.copy(repos = filter) }
     }
 
-    fun onFollowersFilterChange(filter: IntFilter?) {
+    fun onFollowersFilterChange(filter: Range<Int>?) {
         _conditions.update { it.copy(followers = filter) }
     }
 

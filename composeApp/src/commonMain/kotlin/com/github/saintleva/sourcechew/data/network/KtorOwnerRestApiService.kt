@@ -1,8 +1,8 @@
 package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.data.network.utils.appendCommonFilters
+import com.github.saintleva.sourcechew.data.network.utils.toGitHubValue
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
-import com.github.saintleva.sourcechew.domain.models.IntFilter
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchScope
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
@@ -47,14 +47,6 @@ class KtorOwnerRestApiService(
             return joinToString(" ") { "type:${it.toApiValue()}" }
         }
 
-        private fun IntFilter.toApiValue(): String = when (operator) {
-            IntFilter.Operator.EQ -> "$value"
-            IntFilter.Operator.GT -> ">$value"
-            IntFilter.Operator.LT -> "<$value"
-            IntFilter.Operator.GTE -> ">=$value"
-            IntFilter.Operator.LTE -> "<=$value"
-        }
-
         private fun OwnerSearchSort.toApiValue(): String? = when (this) {
             OwnerSearchSort.BEST_MATCH -> null
             OwnerSearchSort.FOLLOWERS -> "followers"
@@ -82,11 +74,11 @@ class KtorOwnerRestApiService(
                         conditions.types.toTypesApiValue()?.let {
                             append(" $it")
                         }
-                        conditions.repos?.let {
-                            append(" repos:${it.toApiValue()}")
+                        conditions.repos?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
+                            append(" repos:$it")
                         }
-                        conditions.followers?.let {
-                            append(" followers:${it.toApiValue()}")
+                        conditions.followers?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
+                            append(" followers:$it")
                         }
                         conditions.location?.takeIf { it.isNotBlank() }?.let {
                             append(" location:\"$it\"")
