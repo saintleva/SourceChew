@@ -80,8 +80,8 @@ class KtorOwnerRestApiService(
                         conditions.followers?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
                             append(" followers:$it")
                         }
-                        conditions.location?.takeIf { it.isNotBlank() }?.let {
-                            append(" location:\"$it\"")
+                        conditions.locations.filter { it.isNotBlank() }.forEach {
+                            append(" location:\"${it.trim()}\"")
                         }
                     }.also { finalQuery ->
                         Napier.d(tag = "KtorOwnerRestApiService") { "Query: \"$finalQuery\"" }
@@ -89,8 +89,11 @@ class KtorOwnerRestApiService(
                 }
             )
 
+            // Append Owner-specific sort parameter (not in CommonFilters)
             conditions.sort.toApiValue()?.let { parameter("sort", it) }
 
+            // Important: Disable the default exception throwing for 4xx and 5xx statuses
+            // so we can handle them manually.
             expectSuccess = false
         }
 

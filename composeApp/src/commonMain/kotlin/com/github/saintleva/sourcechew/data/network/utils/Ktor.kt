@@ -16,7 +16,13 @@ fun HttpRequestBuilder.appendCommonFilters(
     buildFinalQuery: (String) -> String = { it }
 ) {
     // Construct the final 'q' parameter (base query + scopes/flags if needed)
-    parameter("q", buildFinalQuery(common.query))
+    val baseQueryWithCreated = buildString {
+        append(common.query)
+        common.created?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
+            append(" created:$it")
+        }
+    }
+    parameter("q", buildFinalQuery(baseQueryWithCreated))
 
     // Mapping SearchOrder domain enum to GitHub API string values ("asc" / "desc")
     val orderValue = when (common.order) {

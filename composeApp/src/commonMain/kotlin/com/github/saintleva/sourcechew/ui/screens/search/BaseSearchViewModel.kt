@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.models.BaseSearchConditions
+import com.github.saintleva.sourcechew.domain.models.Range
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.models.updateCommonFilters
+import kotlinx.datetime.LocalDate
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.utils.Lens
@@ -77,6 +79,10 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
 
     fun onQueryChange(query: String) {
         _conditions.updateCommonFilters { it.copy(query = query) }
+    }
+
+    fun onCreatedFilterChange(created: Range<LocalDate>?) {
+        _conditions.updateCommonFilters { it.copy(created = created) }
     }
 
     fun onOrderChange(order: SearchOrder) {

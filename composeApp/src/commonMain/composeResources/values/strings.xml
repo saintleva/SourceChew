@@ -95,4 +95,10 @@ Try changing your search terms.</string>
     <string name="range_mode_at_most">At most (&lt;=)</string>
     <string name="range_mode_between">Range (..)</string>
     <string name="range_error_order">Must be \u2265 start</string>
+    <string name="created_date">Created date</string>
+    <string name="select_date">Select date</string>
+    <string name="select_date_range">Select date range</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="date_error_format">Invalid date (YYYY-MM-DD)</string>
 </resources>

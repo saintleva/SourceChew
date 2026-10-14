@@ -94,4 +94,10 @@
     <string name="range_mode_at_most">Не более (&lt;=)</string>
     <string name="range_mode_between">Диапазон (..)</string>
     <string name="range_error_order">Должно быть \u2265 начального</string>
+    <string name="created_date">Дата создания</string>
+    <string name="select_date">Выберите дату</string>
+    <string name="select_date_range">Выберите диапазон дат</string>
+    <string name="dialog_ok">ОК</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="date_error_format">Неверная дата (ГГГГ-ММ-ДД)</string>
 </resources>

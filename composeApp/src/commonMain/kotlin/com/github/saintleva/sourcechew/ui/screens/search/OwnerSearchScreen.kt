@@ -63,6 +63,9 @@ import sourcechew.composeapp.generated.resources.sort_by
 import sourcechew.composeapp.generated.resources.user
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
 
@@ -153,16 +156,29 @@ private fun OwnerSpecificFilters(
         }
     }
     ExpandableSection(title = stringResource(Res.string.additional_filters)) {
+        var locationText by remember(conditions.locations) {
+            mutableStateOf(conditions.locations.joinToString(", "))
+        }
         OutlinedTextField(
-            value = conditions.location ?: "",
-            onValueChange = { viewModel.onLocationChange(it.ifBlank { null }) },
+            value = locationText,
+            onValueChange = { newText ->
+                locationText = newText
+                val parsed = newText.split(",")
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                    .toSet()
+                viewModel.onLocationsChange(parsed)
+            },
             label = { Text(stringResource(Res.string.location)) },
             enabled = selectingEnabled,
             singleLine = true,
-            trailingIcon = if (!conditions.location.isNullOrBlank()) {
+            trailingIcon = if (locationText.isNotBlank()) {
                 {
                     IconButton(
-                        onClick = { viewModel.onLocationChange(null) },
+                        onClick = {
+                            locationText = ""
+                            viewModel.onLocationsChange(emptySet())
+                        },
                         enabled = selectingEnabled,
                     ) {
                         Icon(

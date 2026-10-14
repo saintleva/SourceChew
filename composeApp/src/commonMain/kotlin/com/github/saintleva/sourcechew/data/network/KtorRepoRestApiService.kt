@@ -8,7 +8,6 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.repository.FoundItemsBlock
-import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -76,8 +75,26 @@ class KtorRepoRestApiService(
                         conditions.stars?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
                             append(" stars:$it")
                         }
-                        conditions.topic.takeIf { it.isNotBlank() }?.let {
-                            append(" topic:\"$it\"")
+                        conditions.forks?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
+                            append(" forks:$it")
+                        }
+                        conditions.size?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
+                            append(" size:$it")
+                        }
+                        conditions.pushed?.toGitHubValue()?.takeIf { it.isNotEmpty() }?.let {
+                            append(" pushed:$it")
+                        }
+                        conditions.owners.filter { it.isNotBlank() }.forEach {
+                            append(" user:\"${it.trim()}\"")
+                        }
+                        conditions.languages.filter { it.isNotBlank() }.forEach {
+                            append(" language:\"${it.trim()}\"")
+                        }
+                        conditions.topics.filter { it.isNotBlank() }.forEach {
+                            append(" topic:\"${it.trim()}\"")
+                        }
+                        conditions.licenses.filter { it.isNotBlank() }.forEach {
+                            append(" license:\"${it.trim()}\"")
                         }
                     }.also { finalQuery ->
                         Napier.d(tag = "KtorRepoRestApiService") { "Query: \"$finalQuery\"" }

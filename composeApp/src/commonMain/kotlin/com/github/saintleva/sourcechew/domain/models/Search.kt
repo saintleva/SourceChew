@@ -19,6 +19,7 @@ package com.github.saintleva.sourcechew.domain.models
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 
 
@@ -70,14 +71,12 @@ enum class SearchOrder {
 
 @Serializable
 data class CommonFilters(
-    val query: String,
-    val order: SearchOrder
+    val query: String = "",
+    val created: Range<LocalDate>? = null,
+    val order: SearchOrder = SearchOrder.default
 ) {
     companion object {
-        val default = CommonFilters(
-            query = "",
-            order = SearchOrder.default
-        )
+        val default = CommonFilters()
     }
 }
 
@@ -87,6 +86,9 @@ interface HasCommonFilters<T: HasCommonFilters<T>> {
 
     val query: String
         get() = common.query
+
+    val created: Range<LocalDate>?
+        get() = common.created
 
     val order: SearchOrder
         get() = common.order
@@ -98,12 +100,18 @@ interface BaseSearchConditions<T : BaseSearchConditions<T>> : HasCommonFilters<T
 
 @Serializable
 data class RepoSearchConditions(
-    override val common: CommonFilters,
-    val stars: Range<Int>?,
-    val topic: String,
-    val inScope: Set<RepoSearchScope>,
-    val onlyFlags: Set<RepoOnlyFlag>,
-    val sort: RepoSearchSort
+    override val common: CommonFilters = CommonFilters.default,
+    val inScope: Set<RepoSearchScope> = setOf(RepoSearchScope.NAME),
+    val onlyFlags: Set<RepoOnlyFlag> = emptySet(),
+    val sort: RepoSearchSort = RepoSearchSort.default,
+    val stars: Range<Int>? = null,
+    val forks: Range<Int>? = null,
+    val size: Range<Int>? = null,
+    val pushed: Range<LocalDate>? = null,
+    val owners: Set<String> = emptySet(),
+    val languages: Set<String> = emptySet(),
+    val topics: Set<String> = emptySet(),
+    val licenses: Set<String> = emptySet()
 ) : BaseSearchConditions<RepoSearchConditions> {
 
     override fun maySearch(): Boolean {
@@ -116,26 +124,19 @@ data class RepoSearchConditions(
     }
 
     companion object {
-        val default = RepoSearchConditions(
-            common = CommonFilters.default,
-            stars = null,
-            topic = "",
-            inScope = setOf(RepoSearchScope.NAME),
-            onlyFlags = emptySet(),
-            sort = RepoSearchSort.BEST_MATCH
-        )
+        val default = RepoSearchConditions()
     }
 }
 
 @Serializable
 data class OwnerSearchConditions(
-    override val common: CommonFilters,
-    val inScope: Set<OwnerSearchScope>,
-    val types: Set<OwnerType>,
-    val sort: OwnerSearchSort,
-    val repos: Range<Int>?,
-    val followers: Range<Int>?,
-    val location: String?
+    override val common: CommonFilters = CommonFilters.default,
+    val inScope: Set<OwnerSearchScope> = setOf(OwnerSearchScope.LOGIN),
+    val types: Set<OwnerType> = setOf(OwnerType.USER, OwnerType.ORGANIZATION),
+    val sort: OwnerSearchSort = OwnerSearchSort.default,
+    val repos: Range<Int>? = null,
+    val followers: Range<Int>? = null,
+    val locations: Set<String> = emptySet()
 ) : BaseSearchConditions<OwnerSearchConditions> {
 
     override fun maySearch(): Boolean {
@@ -147,15 +148,7 @@ data class OwnerSearchConditions(
     }
 
     companion object {
-        val default = OwnerSearchConditions(
-            common = CommonFilters.default,
-            inScope = setOf(OwnerSearchScope.LOGIN),
-            types = setOf(OwnerType.USER, OwnerType.ORGANIZATION),
-            sort = OwnerSearchSort.BEST_MATCH,
-            repos = null,
-            followers = null,
-            location = null
-        )
+        val default = OwnerSearchConditions()
     }
 }
 

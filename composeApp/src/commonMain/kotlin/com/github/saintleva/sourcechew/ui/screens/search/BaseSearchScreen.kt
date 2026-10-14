@@ -32,11 +32,13 @@ import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
+import com.github.saintleva.sourcechew.ui.common.DateRangeInput
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.ascending
+import sourcechew.composeapp.generated.resources.created_date
 import sourcechew.composeapp.generated.resources.descending
 import sourcechew.composeapp.generated.resources.enter_search_text
 import sourcechew.composeapp.generated.resources.order
@@ -122,6 +124,14 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
             textStyle = TextStyle(fontSize = 16.sp),
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = conditions.query.isBlank()
+        )
+
+        DateRangeInput(
+            label = stringResource(Res.string.created_date),
+            filter = conditions.created,
+            onFilterChange = viewModel::onCreatedFilterChange,
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
 
         specificFilters(conditions, selectingEnabled)

@@ -74,7 +74,7 @@ class OwnerSearchViewModel(
         _conditions.update { it.copy(followers = filter) }
     }
 
-    fun onLocationChange(location: String?) {
-        _conditions.update { it.copy(location = location) }
+    fun onLocationsChange(locations: Set<String>) {
+        _conditions.update { it.copy(locations = locations) }
     }
 }
