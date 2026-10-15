@@ -34,25 +34,39 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
+import com.github.saintleva.sourcechew.ui.common.DateRangeInput
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
+import com.github.saintleva.sourcechew.ui.common.IntRangeInput
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
+import com.github.saintleva.sourcechew.ui.common.StringSetInput
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.additional_filters
 import sourcechew.composeapp.generated.resources.archived_only
 import sourcechew.composeapp.generated.resources.best_match
+import sourcechew.composeapp.generated.resources.created_date
 import sourcechew.composeapp.generated.resources.descriptions
 import sourcechew.composeapp.generated.resources.fork_only
 import sourcechew.composeapp.generated.resources.forks
+import sourcechew.composeapp.generated.resources.forks_count
+import sourcechew.composeapp.generated.resources.languages
+import sourcechew.composeapp.generated.resources.licenses
+import sourcechew.composeapp.generated.resources.metadata_and_tags
+import sourcechew.composeapp.generated.resources.metrics_and_activity
 import sourcechew.composeapp.generated.resources.mirror_only
 import sourcechew.composeapp.generated.resources.names
+import sourcechew.composeapp.generated.resources.owners
 import sourcechew.composeapp.generated.resources.private_only
 import sourcechew.composeapp.generated.resources.public_only
+import sourcechew.composeapp.generated.resources.pushed_date
 import sourcechew.composeapp.generated.resources.readme
+import sourcechew.composeapp.generated.resources.repo_size
+import sourcechew.composeapp.generated.resources.repository_flags
 import sourcechew.composeapp.generated.resources.search_in
 import sourcechew.composeapp.generated.resources.sort_by
 import sourcechew.composeapp.generated.resources.stars
+import sourcechew.composeapp.generated.resources.stars_count
 import sourcechew.composeapp.generated.resources.template_only
+import sourcechew.composeapp.generated.resources.topics
 import sourcechew.composeapp.generated.resources.updated_time
 
 import androidx.compose.runtime.getValue
@@ -67,6 +81,7 @@ fun RepoSearchForm(
 ) {
     val searchState by viewModel.searchState.collectAsStateWithLifecycle()
     BaseSearchContent(
+        modifier = modifier,
         viewModel = viewModel,
         selectingEnabled = searchState != SearchState.Searching,
         onSearchClick = onSearchClick,
@@ -129,17 +144,95 @@ private fun RepoSpecificFilters(
             }
         }
     }
-    ExpandableSection(title = stringResource(Res.string.additional_filters)) {
+    val flagsCount = conditions.onlyFlags.size
+    val flagsTitle = stringResource(Res.string.repository_flags) + if (flagsCount > 0) " ($flagsCount)" else ""
+    ExpandableSection(title = flagsTitle) {
         RepoOnlyFlag.entries.forEach { flag ->
             CheckBoxWithText(
                 text = flag.displayText(),
                 checked = flag in conditions.onlyFlags,
                 onCheckedChange = { viewModel.toggleOnlyFlag(flag) },
                 enabled = selectingEnabled,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.padding(horizontal = 8.dp),
             )
         }
     }
+
+    val metadataCount = conditions.owners.size + conditions.languages.size + conditions.topics.size + conditions.licenses.size
+    val metadataTitle = stringResource(Res.string.metadata_and_tags) + if (metadataCount > 0) " ($metadataCount)" else ""
+    ExpandableSection(title = metadataTitle) {
+        StringSetInput(
+            label = stringResource(Res.string.owners),
+            values = conditions.owners,
+            onValuesChange = { viewModel.onOwnersChange(it) },
+            enabled = selectingEnabled,
+        )
+        StringSetInput(
+            label = stringResource(Res.string.languages),
+            values = conditions.languages,
+            onValuesChange = { viewModel.onLanguagesChange(it) },
+            enabled = selectingEnabled,
+        )
+        StringSetInput(
+            label = stringResource(Res.string.topics),
+            values = conditions.topics,
+            onValuesChange = { viewModel.onTopicsChange(it) },
+            enabled = selectingEnabled,
+        )
+        StringSetInput(
+            label = stringResource(Res.string.licenses),
+            values = conditions.licenses,
+            onValuesChange = { viewModel.onLicensesChange(it) },
+            enabled = selectingEnabled,
+        )
+    }
+
+    val metricsCount = listOfNotNull(
+        conditions.stars,
+        conditions.forks,
+        conditions.size,
+        conditions.pushed,
+        conditions.created
+    ).size
+    val metricsTitle = stringResource(Res.string.metrics_and_activity) + if (metricsCount > 0) " ($metricsCount)" else ""
+    ExpandableSection(title = metricsTitle) {
+        IntRangeInput(
+            label = stringResource(Res.string.stars_count),
+            filter = conditions.stars,
+            onFilterChange = { viewModel.onStarsFilterChange(it) },
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+        IntRangeInput(
+            label = stringResource(Res.string.forks_count),
+            filter = conditions.forks,
+            onFilterChange = { viewModel.onForksFilterChange(it) },
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+        IntRangeInput(
+            label = stringResource(Res.string.repo_size),
+            filter = conditions.size,
+            onFilterChange = { viewModel.onSizeFilterChange(it) },
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+        DateRangeInput(
+            label = stringResource(Res.string.pushed_date),
+            filter = conditions.pushed,
+            onFilterChange = { viewModel.onPushedFilterChange(it) },
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+        DateRangeInput(
+            label = stringResource(Res.string.created_date),
+            filter = conditions.created,
+            onFilterChange = { viewModel.onCreatedFilterChange(it) },
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+    }
+
     ExpandableSection(title = stringResource(Res.string.sort_by)) {
         RepoSearchSort.entries.forEach { sort ->
             RadioButtonWithText(
@@ -147,7 +240,7 @@ private fun RepoSpecificFilters(
                 selected = conditions.sort == sort,
                 onClick = { viewModel.onSortChange(sort) },
                 enabled = selectingEnabled,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.padding(horizontal = 8.dp),
             )
         }
     }

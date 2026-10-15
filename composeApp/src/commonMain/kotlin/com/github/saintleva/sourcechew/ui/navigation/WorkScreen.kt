@@ -1,7 +1,11 @@
 package com.github.saintleva.sourcechew.ui.navigation
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Menu
@@ -77,6 +81,8 @@ fun WorkScreen(
     //TODO: Remove this selection handling
     val selectedMenuItem = remember { mutableStateOf<Route>(Route.Work.Search()) }
 
+    val layoutDirection = LocalLayoutDirection.current
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -142,7 +148,12 @@ fun WorkScreen(
             }
         ) { innerPadding ->
             content(
-                Modifier.padding(innerPadding)
+                Modifier.padding(
+                    start = innerPadding.calculateStartPadding(layoutDirection),
+                    end = innerPadding.calculateEndPadding(layoutDirection),
+                    top = (innerPadding.calculateTopPadding() - 8.dp).coerceAtLeast(0.dp),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
             )
         }
     }

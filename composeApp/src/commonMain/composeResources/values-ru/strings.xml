@@ -100,4 +100,16 @@
     <string name="dialog_ok">ОК</string>
     <string name="dialog_cancel">Отмена</string>
     <string name="date_error_format">Неверная дата (ГГГГ-ММ-ДД)</string>
+    <string name="repository_flags">Флаги репозиториев</string>
+    <string name="metadata_and_tags">Метки и метаданные</string>
+    <string name="metrics_and_activity">Метрики и активность</string>
+    <string name="stars_count">Количество звёзд</string>
+    <string name="forks_count">Количество форков</string>
+    <string name="repo_size">Размер репозитория (КБ)</string>
+    <string name="pushed_date">Дата последнего коммита</string>
+    <string name="languages">Языки</string>
+    <string name="topics">Темы</string>
+    <string name="licenses">Лицензии</string>
+    <string name="add">Добавить</string>
+    <string name="enter_value_hint">Введите и нажмите Ввод или запятую</string>
 </resources>

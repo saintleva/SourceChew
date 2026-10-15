@@ -19,6 +19,7 @@ package com.github.saintleva.sourcechew.ui.screens.search
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
+import com.github.saintleva.sourcechew.domain.models.Range
 import com.github.saintleva.sourcechew.domain.models.RepoOnlyFlag
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
@@ -26,6 +27,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.LocalDate
 
 class RepoSearchViewModel(
     conditionsStore: ConfigStore<RepoSearchConditions>,
@@ -63,5 +65,37 @@ class RepoSearchViewModel(
             }
             current.copy(onlyFlags = newFlags)
         }
+    }
+
+    fun onStarsFilterChange(filter: Range<Int>?) {
+        _conditions.update { it.copy(stars = filter) }
+    }
+
+    fun onForksFilterChange(filter: Range<Int>?) {
+        _conditions.update { it.copy(forks = filter) }
+    }
+
+    fun onSizeFilterChange(filter: Range<Int>?) {
+        _conditions.update { it.copy(size = filter) }
+    }
+
+    fun onPushedFilterChange(filter: Range<LocalDate>?) {
+        _conditions.update { it.copy(pushed = filter) }
+    }
+
+    fun onOwnersChange(owners: Set<String>) {
+        _conditions.update { it.copy(owners = owners) }
+    }
+
+    fun onLanguagesChange(languages: Set<String>) {
+        _conditions.update { it.copy(languages = languages) }
+    }
+
+    fun onTopicsChange(topics: Set<String>) {
+        _conditions.update { it.copy(topics = topics) }
+    }
+
+    fun onLicensesChange(licenses: Set<String>) {
+        _conditions.update { it.copy(licenses = licenses) }
     }
 }

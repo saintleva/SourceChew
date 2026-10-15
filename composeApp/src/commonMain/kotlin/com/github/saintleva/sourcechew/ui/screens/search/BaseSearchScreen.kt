@@ -3,8 +3,10 @@ package com.github.saintleva.sourcechew.ui.screens.search
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -32,13 +34,11 @@ import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.models.SearchOrder
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
-import com.github.saintleva.sourcechew.ui.common.DateRangeInput
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.ascending
-import sourcechew.composeapp.generated.resources.created_date
 import sourcechew.composeapp.generated.resources.descending
 import sourcechew.composeapp.generated.resources.enter_search_text
 import sourcechew.composeapp.generated.resources.order
@@ -73,6 +73,7 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -104,6 +105,7 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
 
 @Composable
 fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : FoundBase> BaseSearchContent(
+    modifier: Modifier = Modifier,
     viewModel: BaseSearchViewModel<SearchConditions, FoundItem>,
     selectingEnabled: Boolean,
     onSearchClick: (() -> Unit)? = null,
@@ -114,24 +116,17 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
     val maySearch by viewModel.maySearch.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         OutlinedTextField(
             value = conditions.query,
             onValueChange = viewModel::onQueryChange,
-            modifier = Modifier.padding(8.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             enabled = selectingEnabled,
             textStyle = TextStyle(fontSize = 16.sp),
             label = { Text(stringResource(Res.string.enter_search_text)) },
             isError = conditions.query.isBlank()
-        )
-
-        DateRangeInput(
-            label = stringResource(Res.string.created_date),
-            filter = conditions.created,
-            onFilterChange = viewModel::onCreatedFilterChange,
-            enabled = selectingEnabled,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
 
         specificFilters(conditions, selectingEnabled)
@@ -143,7 +138,7 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
                     selected = conditions.order == order,
                     onClick = { viewModel.onOrderChange(order) },
                     enabled = selectingEnabled,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 )
             }
         }
@@ -152,8 +147,9 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
             checked = usePreviousSearch,
             onCheckedChange = viewModel::usePreviousSearchChange,
             enabled = selectingEnabled && viewModel.canUsePreviousConditions(),
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
+        Spacer(modifier = Modifier.height(4.dp))
         Button(
             onClick = {
                 if (onSearchClick != null) {
@@ -162,7 +158,7 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
                     viewModel.search()
                 }
             },
-            modifier = Modifier.padding(8.dp).fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             enabled = selectingEnabled && maySearch
         ) {
             Text(stringResource(Res.string.search))

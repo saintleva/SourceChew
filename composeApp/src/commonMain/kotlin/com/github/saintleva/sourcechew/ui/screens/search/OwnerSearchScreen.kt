@@ -39,6 +39,7 @@ import com.github.saintleva.sourcechew.domain.models.OwnerSearchScope
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
+import com.github.saintleva.sourcechew.ui.common.DateRangeInput
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.IntRangeInput
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
@@ -47,6 +48,7 @@ import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.additional_filters
 import sourcechew.composeapp.generated.resources.best_match
 import sourcechew.composeapp.generated.resources.clear_filter
+import sourcechew.composeapp.generated.resources.created_date
 import sourcechew.composeapp.generated.resources.email
 import sourcechew.composeapp.generated.resources.followers
 import sourcechew.composeapp.generated.resources.followers_count
@@ -77,6 +79,7 @@ fun OwnerSearchForm(
 ) {
     val searchState by viewModel.searchState.collectAsStateWithLifecycle()
     BaseSearchContent(
+        modifier = modifier,
         viewModel = viewModel,
         selectingEnabled = searchState != SearchState.Searching,
         onSearchClick = onSearchClick,
@@ -139,7 +142,7 @@ private fun OwnerSpecificFilters(
             }
         }
     }
-    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
         Text(
             text = stringResource(Res.string.owner_type),
             style = MaterialTheme.typography.titleSmall,
@@ -151,7 +154,7 @@ private fun OwnerSpecificFilters(
                 checked = type in conditions.types,
                 onCheckedChange = { viewModel.toggleType(type) },
                 enabled = selectingEnabled,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.padding(horizontal = 8.dp),
             )
         }
     }
@@ -197,14 +200,21 @@ private fun OwnerSpecificFilters(
             filter = conditions.repos,
             onFilterChange = { viewModel.onReposFilterChange(it) },
             enabled = selectingEnabled,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
         )
         IntRangeInput(
             label = stringResource(Res.string.followers_count),
             filter = conditions.followers,
             onFilterChange = { viewModel.onFollowersFilterChange(it) },
             enabled = selectingEnabled,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+        DateRangeInput(
+            label = stringResource(Res.string.created_date),
+            filter = conditions.created,
+            onFilterChange = { viewModel.onCreatedFilterChange(it) },
+            enabled = selectingEnabled,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
         )
     }
     ExpandableSection(title = stringResource(Res.string.sort_by)) {
@@ -214,7 +224,7 @@ private fun OwnerSpecificFilters(
                 selected = conditions.sort == sort,
                 onClick = { viewModel.onSortChange(sort) },
                 enabled = selectingEnabled,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier = Modifier.padding(horizontal = 8.dp),
             )
         }
     }

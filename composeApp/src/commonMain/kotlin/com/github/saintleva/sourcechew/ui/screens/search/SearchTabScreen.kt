@@ -93,14 +93,14 @@ fun SearchTabScreen(
     ) {
         PrimaryTabRow(
             selectedTabIndex = selectedTabIndex,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Tab(
                 selected = selectedTabIndex == 0,
                 onClick = { selectedTabIndex = 0 }
             ) {
                 Row(
-                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
@@ -117,7 +117,7 @@ fun SearchTabScreen(
                 onClick = { selectedTabIndex = 1 }
             ) {
                 Row(
-                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
