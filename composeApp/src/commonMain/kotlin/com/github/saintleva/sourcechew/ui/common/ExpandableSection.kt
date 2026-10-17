@@ -24,7 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
+fun titleWithCount(title: String, count: Int): String =
+    if (count > 0) "$title ($count)" else title
+
+@Composable
+fun titleWithCount(titleRes: StringResource, count: Int): String =
+    titleWithCount(stringResource(titleRes), count)
 
 @Composable
 fun ExpandableSection(
@@ -32,28 +40,18 @@ fun ExpandableSection(
     title: String,
     leadingIcon: (@Composable () -> Unit)? = null,
     initiallyExpanded: Boolean = false,
-    expanded: Boolean? = null,
-    onExpandedChange: ((Boolean) -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-    var internalExpanded by rememberSaveable(title) { mutableStateOf(initiallyExpanded) }
-    val currentExpanded = expanded ?: internalExpanded
+    var isExpanded by rememberSaveable { mutableStateOf(initiallyExpanded) }
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.small)
-                .clickable {
-                    val next = !currentExpanded
-                    if (onExpandedChange != null) {
-                        onExpandedChange(next)
-                    } else {
-                        internalExpanded = next
-                    }
-                }
+                .clickable { isExpanded = !isExpanded }
                 .padding(horizontal = 8.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (leadingIcon != null) {
                 leadingIcon()
@@ -66,17 +64,17 @@ fun ExpandableSection(
             )
             Icon(
                 imageVector = Icons.Filled.ArrowDropDown,
-                contentDescription = if (currentExpanded) "Collapse" else "Expand",
-                modifier = Modifier.rotate(if (currentExpanded) 180f else 0f)
+                contentDescription = if (isExpanded) "Collapse" else "Expand",
+                modifier = Modifier.rotate(if (isExpanded) 180f else 0f),
             )
         }
 
-        AnimatedVisibility(visible = currentExpanded) {
+        AnimatedVisibility(visible = isExpanded) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 8.dp, end = 8.dp, top = 2.dp, bottom = 4.dp),
-                content = content
+                content = content,
             )
         }
     }

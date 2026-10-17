@@ -20,8 +20,9 @@ package com.github.saintleva.sourcechew.ui.common
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -30,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -126,22 +128,47 @@ fun IntRangeInput(
                 enabled = enabled
             )
 
-            if (filter != null) {
+            Text(
+                text = label,
+                style = if (isEnabled) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium,
+                color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                modifier = Modifier.weight(1f)
+            )
+
+            if (isEnabled) {
+                IconButton(
+                    onClick = { onFilterChange(null) },
+                    enabled = enabled
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = stringResource(Res.string.clear_filter)
+                    )
+                }
+            }
+        }
+
+        if (filter != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 var menuExpanded by remember { mutableStateOf(false) }
 
                 ExposedDropdownMenuBox(
                     expanded = menuExpanded,
-                    onExpandedChange = { if (enabled) menuExpanded = !menuExpanded },
-                    modifier = Modifier.width(95.dp)
+                    onExpandedChange = { if (enabled) menuExpanded = !menuExpanded }
                 ) {
-                    OutlinedTextField(
-                        value = selectedMode.symbol,
-                        onValueChange = {},
-                        readOnly = true,
-                        enabled = enabled,
+                    FilterChip(
+                        selected = true,
+                        onClick = {},
+                        label = { Text(selectedMode.symbol, style = MaterialTheme.typography.titleMedium) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuExpanded) },
-                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled),
-                        singleLine = true
+                        enabled = enabled,
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled)
                     )
 
                     ExposedDropdownMenu(
@@ -195,7 +222,10 @@ fun IntRangeInput(
                             isError = hasOrderError,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             singleLine = true,
-                            modifier = Modifier.weight(1f)
+                            textStyle = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier
+                                .weight(1f)
+                                .defaultMinSize(minHeight = 40.dp)
                         )
 
                         OutlinedTextField(
@@ -217,18 +247,10 @@ fun IntRangeInput(
                             isError = hasOrderError,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             singleLine = true,
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = { onFilterChange(null) },
-                                    enabled = enabled
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Clear,
-                                        contentDescription = stringResource(Res.string.clear_filter)
-                                    )
-                                }
-                            },
-                            modifier = Modifier.weight(1f)
+                            textStyle = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier
+                                .weight(1f)
+                                .defaultMinSize(minHeight = 40.dp)
                         )
                     }
                 } else {
@@ -259,25 +281,12 @@ fun IntRangeInput(
                         enabled = enabled,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
-                        trailingIcon = {
-                            IconButton(
-                                onClick = { onFilterChange(null) },
-                                enabled = enabled
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = stringResource(Res.string.clear_filter)
-                                )
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier
+                            .weight(1f)
+                            .defaultMinSize(minHeight = 40.dp)
                     )
                 }
-            } else {
-                Text(
-                    text = label,
-                    modifier = Modifier.weight(1f)
-                )
             }
         }
 
@@ -286,8 +295,11 @@ fun IntRangeInput(
                 text = stringResource(Res.string.range_error_order),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, top = 2.dp)
             )
         }
     }
 }
+

@@ -36,6 +36,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.common.DateRangeInput
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
+import com.github.saintleva.sourcechew.ui.common.titleWithCount
 import com.github.saintleva.sourcechew.ui.common.IntRangeInput
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
 import com.github.saintleva.sourcechew.ui.common.StringSetInput
@@ -96,25 +97,6 @@ fun RepoSearchForm(
 }
 
 @Composable
-fun RepoSearchScreen(
-    modifier: Modifier = Modifier,
-    viewModel: RepoSearchViewModel,
-    onFound: () -> Unit,
-) {
-    BaseSearchScreen(
-        modifier = modifier,
-        viewModel = viewModel,
-        onFound = onFound,
-    ) { conditions, selectingEnabled ->
-        RepoSpecificFilters(
-            viewModel = viewModel,
-            conditions = conditions,
-            selectingEnabled = selectingEnabled,
-        )
-    }
-}
-
-@Composable
 private fun RepoSpecificFilters(
     viewModel: RepoSearchViewModel,
     conditions: RepoSearchConditions,
@@ -144,9 +126,9 @@ private fun RepoSpecificFilters(
             }
         }
     }
-    val flagsCount = conditions.onlyFlags.size
-    val flagsTitle = stringResource(Res.string.repository_flags) + if (flagsCount > 0) " ($flagsCount)" else ""
-    ExpandableSection(title = flagsTitle) {
+    ExpandableSection(
+        title = titleWithCount(Res.string.repository_flags, conditions.onlyFlags.size),
+    ) {
         RepoOnlyFlag.entries.forEach { flag ->
             CheckBoxWithText(
                 text = flag.displayText(),
@@ -159,8 +141,9 @@ private fun RepoSpecificFilters(
     }
 
     val metadataCount = conditions.owners.size + conditions.languages.size + conditions.topics.size + conditions.licenses.size
-    val metadataTitle = stringResource(Res.string.metadata_and_tags) + if (metadataCount > 0) " ($metadataCount)" else ""
-    ExpandableSection(title = metadataTitle) {
+    ExpandableSection(
+        title = titleWithCount(Res.string.metadata_and_tags, metadataCount),
+    ) {
         StringSetInput(
             label = stringResource(Res.string.owners),
             values = conditions.owners,
@@ -192,10 +175,11 @@ private fun RepoSpecificFilters(
         conditions.forks,
         conditions.size,
         conditions.pushed,
-        conditions.created
+        conditions.created,
     ).size
-    val metricsTitle = stringResource(Res.string.metrics_and_activity) + if (metricsCount > 0) " ($metricsCount)" else ""
-    ExpandableSection(title = metricsTitle) {
+    ExpandableSection(
+        title = titleWithCount(Res.string.metrics_and_activity, metricsCount),
+    ) {
         IntRangeInput(
             label = stringResource(Res.string.stars_count),
             filter = conditions.stars,

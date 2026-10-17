@@ -22,32 +22,30 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchScope
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
 import com.github.saintleva.sourcechew.domain.models.OwnerType
+import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.common.CheckBoxWithText
 import com.github.saintleva.sourcechew.ui.common.DateRangeInput
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.IntRangeInput
 import com.github.saintleva.sourcechew.ui.common.RadioButtonWithText
+import com.github.saintleva.sourcechew.ui.common.StringSetInput
+import com.github.saintleva.sourcechew.ui.common.titleWithCount
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.additional_filters
 import sourcechew.composeapp.generated.resources.best_match
-import sourcechew.composeapp.generated.resources.clear_filter
 import sourcechew.composeapp.generated.resources.created_date
 import sourcechew.composeapp.generated.resources.email
 import sourcechew.composeapp.generated.resources.followers
@@ -56,6 +54,8 @@ import sourcechew.composeapp.generated.resources.fullname
 import sourcechew.composeapp.generated.resources.joined_time
 import sourcechew.composeapp.generated.resources.location
 import sourcechew.composeapp.generated.resources.login
+import sourcechew.composeapp.generated.resources.metadata_and_tags
+import sourcechew.composeapp.generated.resources.metrics_and_activity
 import sourcechew.composeapp.generated.resources.organization
 import sourcechew.composeapp.generated.resources.owner_type
 import sourcechew.composeapp.generated.resources.repos_count
@@ -63,13 +63,6 @@ import sourcechew.composeapp.generated.resources.repositories
 import sourcechew.composeapp.generated.resources.search_in
 import sourcechew.composeapp.generated.resources.sort_by
 import sourcechew.composeapp.generated.resources.user
-
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.usecase.SearchState
 
 @Composable
 fun OwnerSearchForm(
@@ -89,27 +82,8 @@ fun OwnerSearchForm(
                 conditions = conditions,
                 selectingEnabled = selectingEnabled,
             )
-        }
+        },
     )
-}
-
-@Composable
-fun OwnerSearchScreen(
-    modifier: Modifier = Modifier,
-    viewModel: OwnerSearchViewModel,
-    onFound: () -> Unit,
-) {
-    BaseSearchScreen(
-        modifier = modifier,
-        viewModel = viewModel,
-        onFound = onFound,
-    ) { conditions, selectingEnabled ->
-        OwnerSpecificFilters(
-            viewModel = viewModel,
-            conditions = conditions,
-            selectingEnabled = selectingEnabled,
-        )
-    }
 }
 
 @Composable
@@ -142,12 +116,10 @@ private fun OwnerSpecificFilters(
             }
         }
     }
-    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
-        Text(
-            text = stringResource(Res.string.owner_type),
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(bottom = 4.dp),
-        )
+
+    ExpandableSection(
+        title = titleWithCount(Res.string.owner_type, conditions.types.size),
+    ) {
         OwnerType.entries.forEach { type ->
             CheckBoxWithText(
                 text = type.displayText(),
@@ -158,43 +130,26 @@ private fun OwnerSpecificFilters(
             )
         }
     }
-    ExpandableSection(title = stringResource(Res.string.additional_filters)) {
-        var locationText by remember(conditions.locations) {
-            mutableStateOf(conditions.locations.joinToString(", "))
-        }
-        OutlinedTextField(
-            value = locationText,
-            onValueChange = { newText ->
-                locationText = newText
-                val parsed = newText.split(",")
-                    .map { it.trim() }
-                    .filter { it.isNotEmpty() }
-                    .toSet()
-                viewModel.onLocationsChange(parsed)
-            },
-            label = { Text(stringResource(Res.string.location)) },
+
+    ExpandableSection(
+        title = titleWithCount(Res.string.metadata_and_tags, conditions.locations.size),
+    ) {
+        StringSetInput(
+            label = stringResource(Res.string.location),
+            values = conditions.locations,
+            onValuesChange = { viewModel.onLocationsChange(it) },
             enabled = selectingEnabled,
-            singleLine = true,
-            trailingIcon = if (locationText.isNotBlank()) {
-                {
-                    IconButton(
-                        onClick = {
-                            locationText = ""
-                            viewModel.onLocationsChange(emptySet())
-                        },
-                        enabled = selectingEnabled,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = stringResource(Res.string.clear_filter),
-                        )
-                    }
-                }
-            } else null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
         )
+    }
+
+    val metricsCount = listOfNotNull(
+        conditions.repos,
+        conditions.followers,
+        conditions.created,
+    ).size
+    ExpandableSection(
+        title = titleWithCount(Res.string.metrics_and_activity, metricsCount),
+    ) {
         IntRangeInput(
             label = stringResource(Res.string.repos_count),
             filter = conditions.repos,
@@ -217,6 +172,7 @@ private fun OwnerSpecificFilters(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
         )
     }
+
     ExpandableSection(title = stringResource(Res.string.sort_by)) {
         OwnerSearchSort.entries.forEach { sort ->
             RadioButtonWithText(
