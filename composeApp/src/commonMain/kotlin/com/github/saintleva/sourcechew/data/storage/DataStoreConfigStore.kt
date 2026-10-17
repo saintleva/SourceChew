@@ -21,6 +21,7 @@ import androidx.datastore.core.DataStore
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.utils.Lens
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 
@@ -29,7 +30,9 @@ class DataStoreConfigStore<T>(
     private val lens: Lens<AppPreferences, T>
 ) : ConfigStore<T> {
 
-    override val config: Flow<T> = dataStore.data.map { lens.get(it) }
+    override val config: Flow<T> = dataStore.data
+        .map { lens.get(it) }
+        .distinctUntilChanged()
 
     override suspend fun update(updaterBlock: (T) -> T) {
         dataStore.updateData { currentPrefs ->
