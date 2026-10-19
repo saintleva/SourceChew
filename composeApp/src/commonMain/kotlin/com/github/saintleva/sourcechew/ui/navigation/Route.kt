@@ -42,6 +42,12 @@ sealed interface Route : NavKey {
             @Serializable
             data object Owner : Found
         }
+
+        @Serializable
+        data class RepositoryDetails(val owner: String, val name: String) : Work
+
+        @Serializable
+        data class OwnerDetails(val login: String) : Work
     }
 }
 
@@ -61,5 +67,7 @@ val workSerializersModule = SerializersModule {
         subclass(Route.Work.Search::class, Route.Work.Search.serializer())
         subclass(Route.Work.Found.Repo::class, Route.Work.Found.Repo.serializer())
         subclass(Route.Work.Found.Owner::class, Route.Work.Found.Owner.serializer())
+        subclass(Route.Work.RepositoryDetails::class, Route.Work.RepositoryDetails.serializer())
+        subclass(Route.Work.OwnerDetails::class, Route.Work.OwnerDetails.serializer())
     }
 }

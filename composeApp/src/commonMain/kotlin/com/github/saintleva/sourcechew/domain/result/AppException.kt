@@ -28,3 +28,5 @@ class UnknownInfrastructureException(cause: Throwable) : AppException(cause)
 class InvalidTokenException : AppException(null)
 
 class PagingSearchException(val error: SearchError): AppException(null)
+
+class ApiCallException(val error: SearchError): AppException(null)

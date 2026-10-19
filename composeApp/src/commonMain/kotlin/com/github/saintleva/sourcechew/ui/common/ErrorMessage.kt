@@ -1,6 +1,7 @@
 package com.github.saintleva.sourcechew.ui.common
 
 import androidx.compose.runtime.Composable
+import com.github.saintleva.sourcechew.domain.result.ApiCallException
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.InvalidTokenException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
@@ -27,19 +28,11 @@ import sourcechew.composeapp.generated.resources.unknown_error
 fun getErrorMessage(error: Throwable): String {
     // This 'when' block inspects the exception type to provide a specific, user-friendly, and localized error message.
     return when (error) {
-        // Unpack our custom PagingDomainException to access the underlying business error.
+        // Unpack our custom PagingDomainException or ApiCallException to access the underlying business error.
         is PagingSearchException ->
-            when (val searchError = error.error) {
-                is SearchError.CommonAccessError -> stringResource(Res.string.error_common_access)
-                is SearchError.Unauthorized -> stringResource(Res.string.error_unauthorized)
-                is SearchError.RateLimitExceeded -> stringResource(Res.string.error_rate_limit_exceeded)
-                is SearchError.ServerError -> stringResource(Res.string.error_server)
-                is SearchError.Validation -> stringResource(Res.string.error_validation,
-                    searchError.reason)
-                is SearchError.UnknownApiError -> stringResource(Res.string.error_unknown_api,
-                    searchError.statusCode)
-                is SearchError.NotFound -> stringResource(Res.string.error_not_found)
-            }
+            renderSearchError(error.error)
+        is ApiCallException ->
+            renderSearchError(error.error)
         // Handle infrastructure errors.
         is NetworkException -> stringResource(Res.string.error_network)
         is DeserializationException -> stringResource(Res.string.error_deserialization)
@@ -48,4 +41,15 @@ fun getErrorMessage(error: Throwable): String {
         // A final fallback for any other unexpected exceptions.
         else -> stringResource(Res.string.unknown_error)
     }
+}
+
+@Composable
+private fun renderSearchError(searchError: SearchError): String = when (searchError) {
+    is SearchError.CommonAccessError -> stringResource(Res.string.error_common_access)
+    is SearchError.Unauthorized -> stringResource(Res.string.error_unauthorized)
+    is SearchError.RateLimitExceeded -> stringResource(Res.string.error_rate_limit_exceeded)
+    is SearchError.ServerError -> stringResource(Res.string.error_server)
+    is SearchError.Validation -> stringResource(Res.string.error_validation, searchError.reason)
+    is SearchError.UnknownApiError -> stringResource(Res.string.error_unknown_api, searchError.statusCode)
+    is SearchError.NotFound -> stringResource(Res.string.error_not_found)
 }

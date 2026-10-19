@@ -1,6 +1,10 @@
 package com.github.saintleva.sourcechew.ui.navigation
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -13,13 +17,21 @@ import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.ui.screens.found.ItemOwnerContent
-import com.github.saintleva.sourcechew.ui.screens.found.ItemRepoContent
+import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsScreen
+import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
+import com.github.saintleva.sourcechew.ui.screens.details.repo.RepositoryDetailsScreen
+import com.github.saintleva.sourcechew.ui.screens.details.repo.RepositoryDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
+import com.github.saintleva.sourcechew.ui.screens.found.ItemOwnerContent
+import com.github.saintleva.sourcechew.ui.screens.found.ItemRepoContent
 import com.github.saintleva.sourcechew.ui.screens.search.SearchTabScreen
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.qualifier
+import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.refresh_button
 
 /**
  * Reusable container wrapping [WorkScreen] to eliminate boilerplate
@@ -105,7 +117,11 @@ fun WorkNavigation(
                     FoundScreen(
                         modifier = modifier,
                         viewModel = foundViewModel,
-                        itemContent = ::ItemRepoContent
+                        itemContent = { repo ->
+                            ItemRepoContent(repo) {
+                                backStack.add(Route.Work.RepositoryDetails(repo.owner.login, repo.name))
+                            }
+                        }
                     )
                 }
             }
@@ -129,7 +145,58 @@ fun WorkNavigation(
                     FoundScreen(
                         modifier = modifier,
                         viewModel = foundViewModel,
-                        itemContent = ::ItemOwnerContent
+                        itemContent = { owner ->
+                            ItemOwnerContent(owner) {
+                                backStack.add(Route.Work.OwnerDetails(owner.login))
+                            }
+                        }
+                    )
+                }
+            }
+            entry<Route.Work.RepositoryDetails> { key ->
+                val detailsViewModel = koinViewModel<RepositoryDetailsViewModel>(
+                    parameters = { parametersOf(key.owner, key.name) }
+                )
+                WorkEntryContainer(
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = ::navigateToSearch,
+                    actions = {
+                        IconButton(onClick = detailsViewModel::refresh) {
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(Res.string.refresh_button))
+                        }
+                        BackIcon {
+                            backStack.pop()
+                        }
+                    }
+                ) { modifier ->
+                    RepositoryDetailsScreen(
+                        modifier = modifier,
+                        viewModel = detailsViewModel,
+                        onOwnerClick = { ownerLogin ->
+                            backStack.add(Route.Work.OwnerDetails(ownerLogin))
+                        }
+                    )
+                }
+            }
+            entry<Route.Work.OwnerDetails> { key ->
+                val detailsViewModel = koinViewModel<OwnerDetailsViewModel>(
+                    parameters = { parametersOf(key.login) }
+                )
+                WorkEntryContainer(
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = ::navigateToSearch,
+                    actions = {
+                        IconButton(onClick = detailsViewModel::refresh) {
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(Res.string.refresh_button))
+                        }
+                        BackIcon {
+                            backStack.pop()
+                        }
+                    }
+                ) { modifier ->
+                    OwnerDetailsScreen(
+                        modifier = modifier,
+                        viewModel = detailsViewModel
                     )
                 }
             }

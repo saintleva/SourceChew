@@ -23,6 +23,8 @@ import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.ui.screens.auth.AuthViewModel
+import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
+import com.github.saintleva.sourcechew.ui.screens.details.repo.RepositoryDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.OwnerSearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.RepoSearchViewModel
@@ -76,6 +78,21 @@ val appModule = module {
     viewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         FoundViewModel(
             searchInteractor = get(qualifier<FoundOwner>())
+        )
+    }
+
+    viewModel<RepositoryDetailsViewModel> { (owner: String, name: String) ->
+        RepositoryDetailsViewModel(
+            owner = owner,
+            name = name,
+            getRepoDetailsUseCase = get()
+        )
+    }
+
+    viewModel<OwnerDetailsViewModel> { (login: String) ->
+        OwnerDetailsViewModel(
+            login = login,
+            getOwnerDetailsUseCase = get()
         )
     }
 }

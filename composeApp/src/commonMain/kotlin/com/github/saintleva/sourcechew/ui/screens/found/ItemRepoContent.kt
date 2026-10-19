@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.ui.screens.found
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,11 +13,15 @@ import com.github.saintleva.sourcechew.domain.models.FoundRepo
 
 
 @Composable
-fun ItemRepoContent(repo: FoundRepo) {
+fun ItemRepoContent(
+    repo: FoundRepo,
+    onClick: () -> Unit = {}
+) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable(onClick = onClick)
     ) {
         Column(
             modifier = Modifier.padding(8.dp)

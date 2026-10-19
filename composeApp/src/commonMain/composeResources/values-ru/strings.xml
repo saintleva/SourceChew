@@ -112,4 +112,21 @@
     <string name="licenses">Лицензии</string>
     <string name="add">Добавить</string>
     <string name="enter_value_hint">Введите и нажмите Ввод или запятую</string>
+    <string name="repository_details">Детали репозитория</string>
+    <string name="owner_details">Детали владельца</string>
+    <string name="open_in_browser">Открыть в браузере</string>
+    <string name="watchers">Наблюдатели</string>
+    <string name="open_issues">Открытые задачи</string>
+    <string name="default_branch">Ветка по умолчанию</string>
+    <string name="license">Лицензия</string>
+    <string name="created">Создан</string>
+    <string name="updated">Обновлен</string>
+    <string name="pushed">Последний коммит</string>
+    <string name="following">Подписки</string>
+    <string name="public_repos">Публичные репозитории</string>
+    <string name="public_gists">Публичные gists</string>
+    <string name="bio">О себе</string>
+    <string name="company">Компания</string>
+    <string name="website">Веб-сайт</string>
+    <string name="owner">Владелец</string>
 </resources>
