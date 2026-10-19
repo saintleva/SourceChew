@@ -45,27 +45,6 @@ import org.koin.dsl.module
 
 val domainModule = module {
 
-    single<StringFormat>(qualifier<AppPreferences>()) {
-        Json {
-            ignoreUnknownKeys = true
-            encodeDefaults = true
-        }
-    }
-
-    single<BytesCodec<AppPreferences>> {
-        StringFormatCodec(
-            format = get(qualifier<AppPreferences>()),
-            serializer = AppPreferences.serializer()
-        )
-    }
-
-    single<OkioSerializer<AppPreferences>> {
-        CodecOkioSerializer(
-            defaultValue = AppPreferences(),
-            codec = get()
-        )
-    }
-
     single<ConfigStore<AppSettings>>(qualifier<AppSettings>()) {
         DataStoreConfigStore(
             dataStore = get(), // Provided by PlatformModule
