@@ -83,7 +83,14 @@ fun OwnerDetailsScreen(
             is DetailsUiState.Error -> {
                 ErrorContent(
                     modifier = Modifier.align(Alignment.Center),
-                    cause = currentState.cause,
+                    message = getErrorMessage(currentState.error),
+                    onRetry = viewModel::refresh,
+                )
+            }
+            is DetailsUiState.InfrastructureError -> {
+                ErrorContent(
+                    modifier = Modifier.align(Alignment.Center),
+                    message = getErrorMessage(currentState.cause),
                     onRetry = viewModel::refresh,
                 )
             }
@@ -332,7 +339,7 @@ private fun DetailRow(
 @Composable
 private fun ErrorContent(
     modifier: Modifier = Modifier,
-    cause: Throwable,
+    message: String,
     onRetry: () -> Unit,
 ) {
     Column(
@@ -346,7 +353,7 @@ private fun ErrorContent(
             color = MaterialTheme.colorScheme.error,
         )
         Text(
-            text = getErrorMessage(cause),
+            text = message,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 8.dp),
         )

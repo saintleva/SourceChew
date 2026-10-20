@@ -1,9 +1,9 @@
 package com.github.saintleva.sourcechew.data.repository
 
-import com.github.saintleva.sourcechew.data.network.RepoDetailsApiService
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
+import com.github.saintleva.sourcechew.domain.repository.RepoDetailsApiService
 import com.github.saintleva.sourcechew.domain.repository.RepoDetailsRepository
-import com.github.saintleva.sourcechew.domain.result.AppException
+import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -19,7 +19,7 @@ class RepoDetailsRepositoryImpl(
         owner: String,
         name: String,
         forceRefresh: Boolean
-    ): Result<RepoDetails, AppException> {
+    ): Result<RepoDetails, DetailsError> {
         val cacheKey = "${owner.lowercase()}/${name.lowercase()}"
         if (!forceRefresh) {
             mutex.withLock {

@@ -2,11 +2,11 @@ package com.github.saintleva.sourcechew.di
 
 import androidx.datastore.core.okio.OkioSerializer
 import com.github.saintleva.sourcechew.data.network.KtorOwnerDetailsApiService
-import com.github.saintleva.sourcechew.data.network.KtorOwnerRestApiService
+import com.github.saintleva.sourcechew.data.network.KtorSearchInOwnersRestApiService
 import com.github.saintleva.sourcechew.data.network.KtorRepoDetailsApiService
-import com.github.saintleva.sourcechew.data.network.KtorRepoRestApiService
-import com.github.saintleva.sourcechew.data.network.OwnerDetailsApiService
-import com.github.saintleva.sourcechew.data.network.RepoDetailsApiService
+import com.github.saintleva.sourcechew.data.network.KtorSearchInReposRestApiService
+import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsApiService
+import com.github.saintleva.sourcechew.domain.repository.RepoDetailsApiService
 import com.github.saintleva.sourcechew.data.network.createHttpClient
 import com.github.saintleva.sourcechew.data.repository.OwnerDetailsRepositoryImpl
 import com.github.saintleva.sourcechew.data.repository.RepoDetailsRepositoryImpl
@@ -59,11 +59,11 @@ val dataModule = module {
     }
 
     single<SearchApiService<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
-        KtorRepoRestApiService(httpClient = get())
+        KtorSearchInReposRestApiService(httpClient = get())
     }
 
     single<SearchApiService<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
-        KtorOwnerRestApiService(httpClient = get())
+        KtorSearchInOwnersRestApiService(httpClient = get())
     }
 
     single<RepoDetailsApiService> {

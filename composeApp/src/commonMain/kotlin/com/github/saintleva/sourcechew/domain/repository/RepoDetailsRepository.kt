@@ -1,7 +1,7 @@
 package com.github.saintleva.sourcechew.domain.repository
 
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
-import com.github.saintleva.sourcechew.domain.result.AppException
+import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
 
 interface RepoDetailsRepository {
@@ -9,5 +9,5 @@ interface RepoDetailsRepository {
         owner: String,
         name: String,
         forceRefresh: Boolean = false
-    ): Result<RepoDetails, AppException>
+    ): Result<RepoDetails, DetailsError>
 }

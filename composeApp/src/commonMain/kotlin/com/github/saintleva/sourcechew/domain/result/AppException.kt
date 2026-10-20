@@ -1,7 +1,7 @@
 package com.github.saintleva.sourcechew.domain.result
 
-
-/** * The base class for all exceptions related to the application's infrastructure (network, serialization, etc.).
+/**
+ * The base class for all exceptions related to the application's infrastructure (network, serialization, etc.).
  * It MUST NOT contain localized messages.
  */
 open class AppException(cause: Throwable? = null) : RuntimeException(cause)
@@ -27,6 +27,7 @@ class UnknownInfrastructureException(cause: Throwable) : AppException(cause)
  */
 class InvalidTokenException : AppException(null)
 
-class PagingSearchException(val error: SearchError): AppException(null)
-
-class ApiCallException(val error: SearchError): AppException(null)
+/**
+ * Thrown by Paginator's load lambda when a search query returns an expected business error.
+ */
+class PagingSearchException(val error: SearchError) : AppException(null)

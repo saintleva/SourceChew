@@ -6,7 +6,6 @@ import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.domain.repository.FoundItemsBlock
-import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

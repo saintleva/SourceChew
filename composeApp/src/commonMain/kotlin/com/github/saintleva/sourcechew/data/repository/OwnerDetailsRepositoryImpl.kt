@@ -1,9 +1,9 @@
 package com.github.saintleva.sourcechew.data.repository
 
-import com.github.saintleva.sourcechew.data.network.OwnerDetailsApiService
 import com.github.saintleva.sourcechew.domain.models.OwnerDetails
+import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsApiService
 import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsRepository
-import com.github.saintleva.sourcechew.domain.result.AppException
+import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -18,7 +18,7 @@ class OwnerDetailsRepositoryImpl(
     override suspend fun getOwnerDetails(
         login: String,
         forceRefresh: Boolean
-    ): Result<OwnerDetails, AppException> {
+    ): Result<OwnerDetails, DetailsError> {
         val cacheKey = login.lowercase()
         if (!forceRefresh) {
             mutex.withLock {

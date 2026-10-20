@@ -3,9 +3,11 @@ package com.github.saintleva.sourcechew.ui.screens.details.repo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
+import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.usecase.GetRepoDetailsUseCase
 import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,13 +31,19 @@ class RepositoryDetailsViewModel(
             if (forceRefresh || _uiState.value !is DetailsUiState.Success) {
                 _uiState.value = DetailsUiState.Loading
             }
-            when (val result = getRepoDetailsUseCase(owner, name, forceRefresh)) {
-                is Result.Success -> {
-                    _uiState.value = DetailsUiState.Success(result.value)
+            try {
+                when (val result = getRepoDetailsUseCase(owner, name, forceRefresh)) {
+                    is Result.Success -> {
+                        _uiState.value = DetailsUiState.Success(result.value)
+                    }
+                    is Result.Failure -> {
+                        _uiState.value = DetailsUiState.Error(result.error)
+                    }
                 }
-                is Result.Failure -> {
-                    _uiState.value = DetailsUiState.Error(result.error)
-                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: AppException) {
+                _uiState.value = DetailsUiState.InfrastructureError(e)
             }
         }
     }

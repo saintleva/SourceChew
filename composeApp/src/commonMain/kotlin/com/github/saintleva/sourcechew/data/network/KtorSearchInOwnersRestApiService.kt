@@ -17,9 +17,8 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 
 
-class KtorOwnerRestApiService(
-    private val httpClient: HttpClient
-): BaseKtorRestApiService<OwnerSearchConditions, FoundOwner> {
+class KtorSearchInOwnersRestApiService(httpClient: HttpClient):
+    BaseKtorSearchRestApiService<OwnerSearchConditions, FoundOwner>(httpClient) {
 
     companion object {
         const val SEARCH_OWNERS_ENDPOINT = "/search/users"
@@ -84,7 +83,7 @@ class KtorOwnerRestApiService(
                             append(" location:\"${it.trim()}\"")
                         }
                     }.also { finalQuery ->
-                        Napier.d(tag = "KtorOwnerRestApiService") { "Query: \"$finalQuery\"" }
+                        Napier.d(tag = "KtorSearchInOwnersRestApiService") { "Query: \"$finalQuery\"" }
                     }
                 }
             )
