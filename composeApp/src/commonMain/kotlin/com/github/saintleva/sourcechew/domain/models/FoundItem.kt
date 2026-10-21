@@ -26,8 +26,3 @@ data class FoundOwner(
     override val url: String,
     val avatarUrl: String
 ) : FoundBase
-
-sealed class FoundResult<out FoundItem: FoundBase> {
-    data class Success<out FoundItem: FoundBase>(val value: FoundItem) : FoundResult<FoundItem>()
-    data class Error(val code: HttpStatusCode, val body: String) : FoundResult<Nothing>()
-}
