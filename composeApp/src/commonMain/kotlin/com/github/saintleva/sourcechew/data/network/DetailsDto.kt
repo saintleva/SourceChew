@@ -1,8 +1,10 @@
 package com.github.saintleva.sourcechew.data.network
 
+import com.github.saintleva.sourcechew.domain.models.License
+import com.github.saintleva.sourcechew.domain.models.OrganizationDetails
 import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
-import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
+import com.github.saintleva.sourcechew.domain.models.UserDetails
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -17,7 +19,13 @@ interface GithubDetailsDtoBase {
 data class GithubLicenseDto(
     val key: String? = null,
     val name: String? = null,
-    @SerialName("spdx_id") val spdxId: String? = null
+    @SerialName("spdx_id") val spdxId: String? = null,
+)
+
+fun GithubLicenseDto.toDomain() = License(
+    key = key,
+    name = name,
+    spdxId = spdxId,
 )
 
 @Serializable
@@ -32,7 +40,7 @@ data class GithubRepoDetailsDto(
     val language: String? = null,
     @SerialName("stargazers_count") val stars: Int = 0,
     @SerialName("forks_count") val forks: Int = 0,
-    @SerialName("watchers_count") val watchers: Int = 0,
+    @SerialName("subscribers_count") val subscribersCount: Int = 0,
     @SerialName("open_issues_count") val openIssues: Int = 0,
     @SerialName("default_branch") val defaultBranch: String? = null,
     val license: GithubLicenseDto? = null,
@@ -42,7 +50,7 @@ data class GithubRepoDetailsDto(
     @SerialName("pushed_at") val pushedAt: String? = null,
     val homepage: String? = null,
     val archived: Boolean = false,
-    val fork: Boolean = false
+    val fork: Boolean = false,
 ) : GithubDetailsDtoBase
 
 @Serializable
@@ -52,19 +60,22 @@ data class GithubOwnerDetailsDto(
     @SerialName("avatar_url") val avatarUrl: String,
     override val url: String,
     @SerialName("html_url") override val htmlUrl: String,
-    val type: String,
+    val type: String = "User",
     val name: String? = null,
     val company: String? = null,
     val blog: String? = null,
     val location: String? = null,
     val email: String? = null,
     val bio: String? = null,
+    val description: String? = null,
+    @SerialName("site_admin") val siteAdmin: Boolean = false,
+    val hireable: Boolean? = null,
+    @SerialName("is_verified") val isVerified: Boolean = false,
     @SerialName("public_repos") val publicRepos: Int = 0,
     @SerialName("public_gists") val publicGists: Int = 0,
-    val followers: Int? = null,
-    val following: Int? = null,
+    val followers: Int = 0,
     @SerialName("created_at") val createdAt: String? = null,
-    @SerialName("updated_at") val updatedAt: String? = null
+    @SerialName("updated_at") val updatedAt: String? = null,
 ) : GithubDetailsDtoBase
 
 private fun parseInstant(isoString: String?): Instant? =
@@ -78,49 +89,69 @@ private fun parseInstant(isoString: String?): Instant? =
 
 fun GithubRepoDetailsDto.toDomain() = RepoDetails(
     id = id,
-    name = name,
-    fullName = fullname,
     url = url,
     htmlUrl = htmlUrl,
+    createdAt = parseInstant(createdAt),
+    updatedAt = parseInstant(updatedAt),
+    name = name,
+    fullname = fullname,
     owner = owner.toDomain(),
     description = description,
     language = language,
     stars = stars,
     forks = forks,
-    watchers = watchers,
+    subscribersCount = subscribersCount,
     openIssues = openIssues,
     defaultBranch = defaultBranch,
-    licenseName = license?.name ?: license?.spdxId,
+    license = license?.toDomain(),
     topics = topics,
-    createdAt = parseInstant(createdAt),
-    updatedAt = parseInstant(updatedAt),
     pushedAt = parseInstant(pushedAt),
     homepageUrl = homepage?.takeIf { it.isNotBlank() },
     isArchived = archived,
-    isFork = fork
+    isFork = fork,
 )
 
-fun GithubOwnerDetailsDto.toDomain() = OwnerDetailsBase(
-    id = id,
-    login = login,
-    avatarUrl = avatarUrl,
-    url = url,
-    htmlUrl = htmlUrl,
-    type = when (type.lowercase()) {
-        "user" -> OwnerType.USER
-        "organization" -> OwnerType.ORGANIZATION
-        else -> OwnerType.USER
-    },
-    name = name,
-    company = company,
-    blog = blog?.takeIf { it.isNotBlank() },
-    location = location,
-    email = email,
-    bio = bio,
-    publicRepos = publicRepos,
-    publicGists = publicGists,
-    followers = followers,
-    following = following,
-    createdAt = parseInstant(createdAt),
-    updatedAt = parseInstant(updatedAt)
-)
+fun GithubOwnerDetailsDto.toDomain(): OwnerDetailsBase {
+    return if (type.equals("organization", ignoreCase = true)) {
+        OrganizationDetails(
+            id = id,
+            url = url,
+            htmlUrl = htmlUrl,
+            createdAt = parseInstant(createdAt),
+            updatedAt = parseInstant(updatedAt),
+            login = login,
+            avatarUrl = avatarUrl,
+            name = name,
+            company = company,
+            blog = blog?.takeIf { it.isNotBlank() },
+            location = location,
+            email = email,
+            publicRepos = publicRepos,
+            publicGists = publicGists,
+            followers = followers,
+            description = description ?: bio,
+            isVerified = isVerified,
+        )
+    } else {
+        UserDetails(
+            id = id,
+            url = url,
+            htmlUrl = htmlUrl,
+            createdAt = parseInstant(createdAt),
+            updatedAt = parseInstant(updatedAt),
+            login = login,
+            avatarUrl = avatarUrl,
+            name = name,
+            company = company,
+            blog = blog?.takeIf { it.isNotBlank() },
+            location = location,
+            email = email,
+            publicRepos = publicRepos,
+            publicGists = publicGists,
+            followers = followers,
+            bio = bio ?: description,
+            hireable = hireable,
+            siteAdmin = siteAdmin,
+        )
+    }
+}

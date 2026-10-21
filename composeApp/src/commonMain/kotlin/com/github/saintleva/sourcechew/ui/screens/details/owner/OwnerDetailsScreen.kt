@@ -1,6 +1,5 @@
 package com.github.saintleva.sourcechew.ui.screens.details.owner
 
-import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +26,6 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Source
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -48,7 +46,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.models.OwnerType
+import com.github.saintleva.sourcechew.domain.models.OrganizationDetails
+import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
+import com.github.saintleva.sourcechew.domain.models.UserDetails
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import org.jetbrains.compose.resources.stringResource
@@ -57,7 +57,6 @@ import sourcechew.composeapp.generated.resources.bio
 import sourcechew.composeapp.generated.resources.company
 import sourcechew.composeapp.generated.resources.created
 import sourcechew.composeapp.generated.resources.followers
-import sourcechew.composeapp.generated.resources.following
 import sourcechew.composeapp.generated.resources.loading_error
 import sourcechew.composeapp.generated.resources.location
 import sourcechew.composeapp.generated.resources.open_in_browser
@@ -104,6 +103,7 @@ fun OwnerDetailsScreen(
 @Composable
 private fun OwnerDetailsContent(details: OwnerDetailsBase) {
     val uriHandler = LocalUriHandler.current
+    val isOrg = details is OrganizationDetails
 
     Column(
         modifier = Modifier
@@ -125,7 +125,7 @@ private fun OwnerDetailsContent(details: OwnerDetailsBase) {
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = if (details.type == OwnerType.ORGANIZATION) {
+                    imageVector = if (isOrg) {
                         Icons.Default.CorporateFare
                     } else {
                         Icons.Default.Person
@@ -139,7 +139,7 @@ private fun OwnerDetailsContent(details: OwnerDetailsBase) {
             Column {
                 if (!details.name.isNullOrBlank()) {
                     Text(
-                        text = details.name,
+                        text = details.name!!,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                     )
@@ -155,7 +155,7 @@ private fun OwnerDetailsContent(details: OwnerDetailsBase) {
                     label = {
                         Text(
                             stringResource(
-                                if (details.type == OwnerType.ORGANIZATION) Res.string.organization else Res.string.user
+                                if (isOrg) Res.string.organization else Res.string.user
                             )
                         )
                     },
@@ -164,16 +164,21 @@ private fun OwnerDetailsContent(details: OwnerDetailsBase) {
         }
 
         // Bio (for user) or Description (for org)
-        if (!details.bio.isNullOrBlank()) {
+        val bioOrDescription = when (details) {
+            is UserDetails -> details.bio
+            is OrganizationDetails -> details.description
+            else -> null
+        }
+        if (!bioOrDescription.isNullOrBlank()) {
             OutlinedCard(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(
-                        text = stringResource(Res.string.bio),
+                        text = stringResource(if (isOrg) Res.string.organization else Res.string.bio),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = details.bio, style = MaterialTheme.typography.bodyLarge)
+                    Text(text = bioOrDescription, style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
@@ -195,24 +200,12 @@ private fun OwnerDetailsContent(details: OwnerDetailsBase) {
                 label = stringResource(Res.string.public_gists),
                 value = details.publicGists.toString(),
             )
-            if (details.type == OwnerType.USER) {
-                details.followers?.let {
-                    StatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.Group,
-                        label = stringResource(Res.string.followers),
-                        value = it.toString(),
-                    )
-                }
-                details.following?.let {
-                    StatCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.PersonAdd,
-                        label = stringResource(Res.string.following),
-                        value = it.toString(),
-                    )
-                }
-            }
+            StatCard(
+                modifier = Modifier.weight(1f),
+                icon = Icons.Default.Group,
+                label = stringResource(Res.string.followers),
+                value = details.followers.toString(),
+            )
         }
 
         // DetailsBase card

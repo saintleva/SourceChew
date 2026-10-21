@@ -177,7 +177,7 @@ private fun RepoDetailsContent(
                 modifier = Modifier.weight(1f),
                 icon = Icons.Default.Visibility,
                 label = stringResource(Res.string.watchers),
-                value = details.watchers.toString()
+                value = details.subscribersCount.toString()
             )
             StatCard(
                 modifier = Modifier.weight(1f),
@@ -213,8 +213,11 @@ private fun RepoDetailsContent(
                 details.language?.let {
                     InfoRow(label = "Language", value = it)
                 }
-                details.licenseName?.let {
-                    InfoRow(label = stringResource(Res.string.license), value = it)
+                details.license?.let { license ->
+                    val licenseName = license.name ?: license.spdxId ?: license.key
+                    if (!licenseName.isNullOrBlank()) {
+                        InfoRow(label = stringResource(Res.string.license), value = licenseName)
+                    }
                 }
                 details.defaultBranch?.let {
                     InfoRow(label = stringResource(Res.string.default_branch), value = it)
