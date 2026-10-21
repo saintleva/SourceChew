@@ -54,7 +54,6 @@ fun renderCommonApiError(commonApiError: CommonApiError): String = when (commonA
     is CommonApiError.RateLimitExceeded -> stringResource(Res.string.error_rate_limit_exceeded)
     is CommonApiError.ServerError -> stringResource(Res.string.error_server)
     is CommonApiError.UnknownApiError -> stringResource(Res.string.error_unknown_api, commonApiError.statusCode)
-    is CommonApiError.NotFound -> stringResource(Res.string.error_not_found)
 }
 
 @Composable
@@ -65,5 +64,6 @@ fun renderSearchError(searchError: SearchError): String = when (searchError) {
 
 @Composable
 fun renderDetailsError(detailsError: DetailsError): String = when (detailsError) {
+    is DetailsError.ResourceNotFound -> stringResource(Res.string.error_not_found)
     is CommonApiError -> renderCommonApiError(detailsError)
 }

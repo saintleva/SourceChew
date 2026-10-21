@@ -9,13 +9,14 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
 
 data class RepoDetailsRequest(val owner: String, val name: String)
 
 class KtorRepoDetailsApiService(
     private val httpClient: HttpClient
 ) : RepoDetailsApiService,
-    BaseKtorRestApiService<RepoDetailsRequest, RepoDetails, DetailsError> {
+    BaseKtorApiService<RepoDetailsRequest, RepoDetails, DetailsError> {
 
     override suspend fun getHttpResponse(request: RepoDetailsRequest): HttpResponse {
         return httpClient.get("/repos/${request.owner}/${request.name}") {
@@ -29,7 +30,11 @@ class KtorRepoDetailsApiService(
     }
 
     override suspend fun mapErrorResponse(response: HttpResponse): DetailsError {
-        return defaultMapCommonApiError(response)
+        return if (response.status == HttpStatusCode.NotFound) {
+            DetailsError.ResourceNotFound
+        } else {
+            mapCommonApiError(response)
+        }
     }
 
     override suspend fun getRepoDetails(owner: String, name: String): Result<RepoDetails, DetailsError> {

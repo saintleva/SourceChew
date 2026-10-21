@@ -18,8 +18,8 @@ import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 
 
-class KtorSearchInReposRestApiService(httpClient: HttpClient):
-    BaseKtorSearchRestApiService<RepoSearchConditions, FoundRepo>(httpClient) {
+class KtorSearchInReposApiService(private val httpClient: HttpClient):
+    BaseKtorSearchApiService<RepoSearchConditions, FoundRepo> {
 
     companion object {
         const val SEARCH_REPOSITORIES_ENDPOINT = "/search/repositories"
@@ -97,7 +97,7 @@ class KtorSearchInReposRestApiService(httpClient: HttpClient):
                             append(" license:\"${it.trim()}\"")
                         }
                     }.also { finalQuery ->
-                        Napier.d(tag = "KtorRepoRestApiService") { "Query: \"$finalQuery\"" }
+                        Napier.d(tag = "KtorRepoApiService") { "Query: \"$finalQuery\"" }
                     }
                 }
             )

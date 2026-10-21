@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.ui.screens.details.owner
 
+import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +48,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.models.OwnerDetails
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
@@ -102,7 +102,7 @@ fun OwnerDetailsScreen(
 }
 
 @Composable
-private fun OwnerDetailsContent(details: OwnerDetails) {
+private fun OwnerDetailsContent(details: OwnerDetailsBase) {
     val uriHandler = LocalUriHandler.current
 
     Column(
@@ -215,7 +215,7 @@ private fun OwnerDetailsContent(details: OwnerDetails) {
             }
         }
 
-        // Details card
+        // DetailsBase card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(

@@ -18,42 +18,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlin.coroutines.cancellation.CancellationException
 
-/**
- * Maps standard HTTP status codes (401, 403, 404, 429, 5xx) to [CommonApiError].
- */
-suspend fun defaultMapCommonApiError(response: HttpResponse): CommonApiError {
-    return when {
-        response.status == HttpStatusCode.Unauthorized -> {
-            CommonApiError.Unauthorized
-        }
-        response.status == HttpStatusCode.Forbidden -> {
-            val body = response.bodyAsText()
-            if (body.contains("rate limit", ignoreCase = true)) {
-                CommonApiError.RateLimitExceeded
-            } else {
-                CommonApiError.CommonAccessError
-            }
-        }
-        response.status == HttpStatusCode.TooManyRequests -> {
-            CommonApiError.RateLimitExceeded
-        }
-        response.status == HttpStatusCode.NotFound -> {
-            CommonApiError.NotFound
-        }
-        response.status.value in 500..599 -> {
-            CommonApiError.ServerError
-        }
-        else -> {
-            val unknownBody = response.bodyAsText()
-            Napier.e(tag = "BaseKtorRestApiService") {
-                "Unknown error: ${response.status.value}, body: $unknownBody"
-            }
-            CommonApiError.UnknownApiError(response.status.value)
-        }
-    }
-}
-
-interface BaseKtorRestApiService<Request, out Answer, out Error : AppError> {
+interface BaseKtorApiService<Request, out Answer, out Error : AppError> {
 
     // Performs the actual HTTP request
     suspend fun getHttpResponse(request: Request): HttpResponse
@@ -64,8 +29,40 @@ interface BaseKtorRestApiService<Request, out Answer, out Error : AppError> {
     // Delegated mapping of non-successful response to the specific error type
     suspend fun mapErrorResponse(response: HttpResponse): Error
 
+    /**
+     * Maps standard HTTP status codes (401, 403, 429, 5xx) to [CommonApiError].
+     */
+    suspend fun mapCommonApiError(response: HttpResponse): CommonApiError {
+        return when {
+            response.status == HttpStatusCode.Unauthorized -> {
+                CommonApiError.Unauthorized
+            }
+            response.status == HttpStatusCode.Forbidden -> {
+                val body = response.bodyAsText()
+                if (body.contains("rate limit", ignoreCase = true)) {
+                    CommonApiError.RateLimitExceeded
+                } else {
+                    CommonApiError.CommonAccessError
+                }
+            }
+            response.status == HttpStatusCode.TooManyRequests -> {
+                CommonApiError.RateLimitExceeded
+            }
+            response.status.value in 500..599 -> {
+                CommonApiError.ServerError
+            }
+            else -> {
+                val unknownBody = response.bodyAsText()
+                Napier.e(tag = "BaseKtorApiService") {
+                    "Unknown error: ${response.status.value}, body: $unknownBody"
+                }
+                CommonApiError.UnknownApiError(response.status.value)
+            }
+        }
+    }
+
     suspend fun getAnswer(request: Request): Result<Answer, Error> {
-        val logTag = this::class.simpleName ?: "BaseKtorRestApiService"
+        val logTag = this::class.simpleName ?: "BaseKtorApiService"
         try {
             val response = getHttpResponse(request)
 

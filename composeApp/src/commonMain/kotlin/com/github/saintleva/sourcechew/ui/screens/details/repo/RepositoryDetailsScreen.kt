@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.ui.screens.details.repo
 
+import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,7 +40,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import org.jetbrains.compose.resources.stringResource

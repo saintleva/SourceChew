@@ -1,6 +1,6 @@
 package com.github.saintleva.sourcechew.data.network
 
-import com.github.saintleva.sourcechew.domain.models.OwnerDetails
+import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import kotlinx.serialization.SerialName
@@ -24,7 +24,7 @@ data class GithubLicenseDto(
 data class GithubRepoDetailsDto(
     override val id: Long,
     val name: String,
-    @SerialName("full_name") val fullName: String,
+    @SerialName("full_name") val fullname: String,
     override val url: String,
     @SerialName("html_url") override val htmlUrl: String,
     val owner: GithubOwnerDto,
@@ -79,7 +79,7 @@ private fun parseInstant(isoString: String?): Instant? =
 fun GithubRepoDetailsDto.toDomain() = RepoDetails(
     id = id,
     name = name,
-    fullName = fullName,
+    fullName = fullname,
     url = url,
     htmlUrl = htmlUrl,
     owner = owner.toDomain(),
@@ -100,7 +100,7 @@ fun GithubRepoDetailsDto.toDomain() = RepoDetails(
     isFork = fork
 )
 
-fun GithubOwnerDetailsDto.toDomain() = OwnerDetails(
+fun GithubOwnerDetailsDto.toDomain() = OwnerDetailsBase(
     id = id,
     login = login,
     avatarUrl = avatarUrl,

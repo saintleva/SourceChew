@@ -1,8 +1,8 @@
 package com.github.saintleva.sourcechew.ui.screens.details.repo
 
+import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.usecase.GetRepoDetailsUseCase

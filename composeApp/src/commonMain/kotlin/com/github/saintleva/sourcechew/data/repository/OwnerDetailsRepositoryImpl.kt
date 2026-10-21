@@ -1,6 +1,6 @@
 package com.github.saintleva.sourcechew.data.repository
 
-import com.github.saintleva.sourcechew.domain.models.OwnerDetails
+import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
 import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsApiService
 import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsRepository
 import com.github.saintleva.sourcechew.domain.result.DetailsError
@@ -12,13 +12,13 @@ class OwnerDetailsRepositoryImpl(
     private val apiService: OwnerDetailsApiService
 ) : OwnerDetailsRepository {
 
-    private val cache = mutableMapOf<String, OwnerDetails>()
+    private val cache = mutableMapOf<String, OwnerDetailsBase>()
     private val mutex = Mutex()
 
     override suspend fun getOwnerDetails(
         login: String,
         forceRefresh: Boolean
-    ): Result<OwnerDetails, DetailsError> {
+    ): Result<OwnerDetailsBase, DetailsError> {
         val cacheKey = login.lowercase()
         if (!forceRefresh) {
             mutex.withLock {

@@ -5,7 +5,6 @@ import com.github.saintleva.sourcechew.domain.repository.FoundItemsBlock
 import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.SearchResult
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -18,13 +17,11 @@ class PaginatedRequest<ItemSearchConditions>(
     val pageSize: Int
 )
 
-abstract class BaseKtorSearchRestApiService<ItemSearchConditions, out FoundItem: FoundBase>(
-    protected val httpClient: HttpClient
-):
+interface BaseKtorSearchApiService<ItemSearchConditions, out FoundItem: FoundBase> :
     SearchApiService<ItemSearchConditions, FoundItem>,
-    BaseKtorRestApiService<PaginatedRequest<ItemSearchConditions>, FoundItemsBlock<FoundItem>, SearchError> {
+    BaseKtorApiService<PaginatedRequest<ItemSearchConditions>, FoundItemsBlock<FoundItem>, SearchError> {
 
-    abstract suspend fun getHttpResponse(
+    suspend fun getHttpResponse(
         conditions: ItemSearchConditions,
         page: Int,
         pageSize: Int
@@ -53,7 +50,7 @@ abstract class BaseKtorSearchRestApiService<ItemSearchConditions, out FoundItem:
             }
             SearchError.Validation(errorMessage)
         } else {
-            defaultMapCommonApiError(response)
+            mapCommonApiError(response)
         }
     }
 

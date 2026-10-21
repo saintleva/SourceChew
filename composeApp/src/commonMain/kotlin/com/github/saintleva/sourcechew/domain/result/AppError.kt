@@ -7,6 +7,38 @@ package com.github.saintleva.sourcechew.domain.result
 sealed interface AppError
 
 /**
+ * Common REST API errors that can occur across any GitHub API endpoint.
+ * These implement both [SearchError] and [DetailsError].
+ */
+sealed interface CommonApiError : SearchError, DetailsError {
+    /**
+     * Represents an unauthorized access error (HTTP 401).
+     */
+    data object Unauthorized : CommonApiError, SearchError, DetailsError
+
+    /**
+     * Represents rate limit exceeded (HTTP 403 with rate limit or HTTP 429).
+     */
+    data object RateLimitExceeded : CommonApiError, SearchError, DetailsError
+
+    /**
+     * Represents a common access/forbidden error (HTTP 403).
+     */
+    data object CommonAccessError : CommonApiError, SearchError, DetailsError
+
+    /**
+     * Represents a server-side issue on the API end (HTTP 5xx).
+     */
+    data object ServerError : CommonApiError, SearchError, DetailsError
+
+    /**
+     * Represents an unknown or unhandled API error.
+     * @param statusCode The HTTP status code of the response.
+     */
+    data class UnknownApiError(val statusCode: Int) : CommonApiError, SearchError, DetailsError
+}
+
+/**
  * Domain errors specific to search operations.
  */
 sealed interface SearchError : AppError {
@@ -20,41 +52,9 @@ sealed interface SearchError : AppError {
 /**
  * Domain errors specific to details operations (repository or owner details).
  */
-sealed interface DetailsError : AppError
-
-/**
- * Common REST API errors that can occur across any GitHub API endpoint.
- * These implement both [SearchError] and [DetailsError].
- */
-sealed interface CommonApiError : SearchError, DetailsError {
+sealed interface DetailsError : AppError {
     /**
-     * Represents a "resource not found" error (HTTP 404).
+     * Represents a requested resource (repository or owner/user) not found error (HTTP 404).
      */
-    data object NotFound : CommonApiError
-
-    /**
-     * Represents an unauthorized access error (HTTP 401).
-     */
-    data object Unauthorized : CommonApiError
-
-    /**
-     * Represents rate limit exceeded (HTTP 403 with rate limit or HTTP 429).
-     */
-    data object RateLimitExceeded : CommonApiError
-
-    /**
-     * Represents a common access/forbidden error (HTTP 403).
-     */
-    data object CommonAccessError : CommonApiError
-
-    /**
-     * Represents a server-side issue on the API end (HTTP 5xx).
-     */
-    data object ServerError : CommonApiError
-
-    /**
-     * Represents an unknown or unhandled API error.
-     * @param statusCode The HTTP status code of the response.
-     */
-    data class UnknownApiError(val statusCode: Int) : CommonApiError
+    data object ResourceNotFound : DetailsError
 }

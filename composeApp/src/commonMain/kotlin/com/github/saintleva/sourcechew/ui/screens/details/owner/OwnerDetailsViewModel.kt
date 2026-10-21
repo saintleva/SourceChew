@@ -1,8 +1,8 @@
 package com.github.saintleva.sourcechew.ui.screens.details.owner
 
+import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.saintleva.sourcechew.domain.models.OwnerDetails
 import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.usecase.GetOwnerDetailsUseCase
@@ -18,8 +18,8 @@ class OwnerDetailsViewModel(
     private val getOwnerDetailsUseCase: GetOwnerDetailsUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<DetailsUiState<OwnerDetails>>(DetailsUiState.Loading)
-    val uiState: StateFlow<DetailsUiState<OwnerDetails>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<DetailsUiState<OwnerDetailsBase>>(DetailsUiState.Loading)
+    val uiState: StateFlow<DetailsUiState<OwnerDetailsBase>> = _uiState.asStateFlow()
 
     init {
         loadDetails()
