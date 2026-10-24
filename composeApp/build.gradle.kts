@@ -118,6 +118,9 @@ kotlin {
                 implementation(libs.multiplatform.settings)
 
                 implementation(libs.cmp.clipboard)
+
+                implementation(libs.coil.compose)
+                implementation(libs.coil.network.ktor3)
             }
         }
 

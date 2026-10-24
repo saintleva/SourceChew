@@ -119,6 +119,7 @@
     <string name="open_issues">Открытые задачи</string>
     <string name="default_branch">Ветка по умолчанию</string>
     <string name="license">Лицензия</string>
+    <string name="dates">Даты</string>
     <string name="created">Создан</string>
     <string name="updated">Обновлен</string>
     <string name="pushed">Последний коммит</string>
@@ -129,4 +130,13 @@
     <string name="company">Компания</string>
     <string name="website">Веб-сайт</string>
     <string name="owner">Владелец</string>
+    <string name="archived">Заархивирован</string>
+    <string name="fork">Форк</string>
+    <string name="description_section">Описание</string>
+    <string name="max_repo_description_length">Макс. длина описания в деталях</string>
+    <string name="max_repo_description_length_hint">Максимальное количество символов для описания репозитория на экране деталей</string>
+    <string name="max_found_repo_description_length">Макс. длина описания в карточках</string>
+    <string name="max_found_repo_description_length_hint">Максимальное количество символов для описания репозитория в карточках списка поиска</string>
+    <string name="read_more">Читать далее</string>
+    <string name="read_less">Свернуть</string>
 </resources>

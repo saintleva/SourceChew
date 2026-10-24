@@ -23,4 +23,18 @@ class SettingsViewModel(private val appSettingsStore: ConfigStore<AppSettings>) 
             appSettingsStore.update { it.copy(paginationPageSize = validatedValue) }
         }
     }
+
+    fun onMaxRepoDescriptionLengthChange(newValue: Int) {
+        val validatedValue = newValue.coerceIn(AppSettings.maxRepoDescriptionLengthRange)
+        viewModelScope.launch {
+            appSettingsStore.update { it.copy(maxRepoDescriptionLength = validatedValue) }
+        }
+    }
+
+    fun onMaxFoundRepoDescriptionLengthChange(newValue: Int) {
+        val validatedValue = newValue.coerceIn(AppSettings.maxFoundRepoDescriptionLengthRange)
+        viewModelScope.launch {
+            appSettingsStore.update { it.copy(maxFoundRepoDescriptionLength = validatedValue) }
+        }
+    }
 }

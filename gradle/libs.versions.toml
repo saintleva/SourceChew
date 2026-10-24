@@ -51,6 +51,7 @@ java-keyring = "1.0.4"
 ksafe = "3.3.0"
 kmp-toolkit = "3.5.31"
 monitor = "1.8.0"
+coil = "3.6.3"
 
 [libraries]
 
@@ -145,3 +146,6 @@ security-crypto-datastore-preferences = { group = "io.github.osipxd", name = "se
 androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 
 cmp-clipboard = { group = "io.github.mobilebytelabs", name = "cmp-clipboard", version.ref = "kmp-toolkit" }
+
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-ktor3 = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }

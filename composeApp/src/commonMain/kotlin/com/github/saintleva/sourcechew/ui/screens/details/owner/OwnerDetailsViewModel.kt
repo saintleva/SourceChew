@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.Result
-import com.github.saintleva.sourcechew.domain.usecase.GetOwnerDetailsUseCase
+import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsRepository
 import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class OwnerDetailsViewModel(
     val login: String,
-    private val getOwnerDetailsUseCase: GetOwnerDetailsUseCase
+    private val repository: OwnerDetailsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DetailsUiState<OwnerDetailsBase>>(DetailsUiState.Loading)
@@ -31,7 +31,7 @@ class OwnerDetailsViewModel(
                 _uiState.value = DetailsUiState.Loading
             }
             try {
-                when (val result = getOwnerDetailsUseCase(login, forceRefresh)) {
+                when (val result = repository.getOwnerDetails(login, forceRefresh)) {
                     is Result.Success -> {
                         _uiState.value = DetailsUiState.Success(result.value)
                     }

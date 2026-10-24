@@ -19,8 +19,8 @@ import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
-import com.github.saintleva.sourcechew.ui.screens.details.repo.RepositoryDetailsScreen
-import com.github.saintleva.sourcechew.ui.screens.details.repo.RepositoryDetailsViewModel
+import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsScreen
+import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.ItemOwnerContent
@@ -154,7 +154,7 @@ fun WorkNavigation(
                 }
             }
             entry<Route.Work.RepositoryDetails> { key ->
-                val detailsViewModel = koinViewModel<RepositoryDetailsViewModel>(
+                val detailsViewModel = koinViewModel<RepoDetailsViewModel>(
                     parameters = { parametersOf(key.owner, key.name) }
                 )
                 WorkEntryContainer(
@@ -169,7 +169,7 @@ fun WorkNavigation(
                         }
                     }
                 ) { modifier ->
-                    RepositoryDetailsScreen(
+                    RepoDetailsScreen(
                         modifier = modifier,
                         viewModel = detailsViewModel,
                         onOwnerClick = { ownerLogin ->

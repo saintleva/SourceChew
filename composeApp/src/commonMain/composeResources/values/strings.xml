@@ -120,6 +120,7 @@ Try changing your search terms.</string>
     <string name="open_issues">Open Issues</string>
     <string name="default_branch">Default branch</string>
     <string name="license">License</string>
+    <string name="dates">Dates</string>
     <string name="created">Created</string>
     <string name="updated">Updated</string>
     <string name="pushed">Last push</string>
@@ -130,4 +131,13 @@ Try changing your search terms.</string>
     <string name="company">Company</string>
     <string name="website">Website</string>
     <string name="owner">Owner</string>
+    <string name="archived">Archived</string>
+    <string name="fork">Fork</string>
+    <string name="description_section">Description</string>
+    <string name="max_repo_description_length">Repository details description max length</string>
+    <string name="max_repo_description_length_hint">Maximum number of characters for repository description in details screen</string>
+    <string name="max_found_repo_description_length">Repository card description max length</string>
+    <string name="max_found_repo_description_length_hint">Maximum number of characters for repository description in search list cards</string>
+    <string name="read_more">Read more</string>
+    <string name="read_less">Read less</string>
 </resources>

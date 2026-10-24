@@ -21,6 +21,11 @@ import sourcechew.composeapp.generated.resources.pagination_page_size
 import sourcechew.composeapp.generated.resources.pagination_page_size_hint
 import sourcechew.composeapp.generated.resources.pagination_page_size_range
 import sourcechew.composeapp.generated.resources.pagination_section
+import sourcechew.composeapp.generated.resources.description_section
+import sourcechew.composeapp.generated.resources.max_repo_description_length
+import sourcechew.composeapp.generated.resources.max_repo_description_length_hint
+import sourcechew.composeapp.generated.resources.max_found_repo_description_length
+import sourcechew.composeapp.generated.resources.max_found_repo_description_length_hint
 
 
 @Composable
@@ -73,6 +78,56 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp, start = 4.dp)
                 )
+            }
+        }
+
+        SettingsSection(title = stringResource(Res.string.description_section)) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                val repoDetailsRange = AppSettings.maxRepoDescriptionLengthRange
+                Column {
+                    NumberSpinEdit(
+                        label = stringResource(Res.string.max_repo_description_length),
+                        rangeLabel = stringResource(
+                            Res.string.pagination_page_size_range,
+                            repoDetailsRange.first,
+                            repoDetailsRange.last
+                        ),
+                        value = settings.maxRepoDescriptionLength,
+                        onValueChange = viewModel::onMaxRepoDescriptionLengthChange,
+                        range = repoDetailsRange,
+                        decreaseContentDescription = stringResource(Res.string.decrease),
+                        increaseContentDescription = stringResource(Res.string.increase)
+                    )
+                    Text(
+                        text = stringResource(Res.string.max_repo_description_length_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp, start = 4.dp)
+                    )
+                }
+
+                val foundRepoRange = AppSettings.maxFoundRepoDescriptionLengthRange
+                Column {
+                    NumberSpinEdit(
+                        label = stringResource(Res.string.max_found_repo_description_length),
+                        rangeLabel = stringResource(
+                            Res.string.pagination_page_size_range,
+                            foundRepoRange.first,
+                            foundRepoRange.last
+                        ),
+                        value = settings.maxFoundRepoDescriptionLength,
+                        onValueChange = viewModel::onMaxFoundRepoDescriptionLengthChange,
+                        range = foundRepoRange,
+                        decreaseContentDescription = stringResource(Res.string.decrease),
+                        increaseContentDescription = stringResource(Res.string.increase)
+                    )
+                    Text(
+                        text = stringResource(Res.string.max_found_repo_description_length_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp, start = 4.dp)
+                    )
+                }
             }
         }
     }

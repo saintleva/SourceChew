@@ -35,10 +35,6 @@ import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCaseImpl
-import com.github.saintleva.sourcechew.domain.usecase.GetOwnerDetailsUseCase
-import com.github.saintleva.sourcechew.domain.usecase.GetOwnerDetailsUseCaseImpl
-import com.github.saintleva.sourcechew.domain.usecase.GetRepoDetailsUseCase
-import com.github.saintleva.sourcechew.domain.usecase.GetRepoDetailsUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractorImpl
 import kotlinx.serialization.StringFormat
@@ -94,13 +90,5 @@ val domainModule = module {
 
     single<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         SearchInteractorImpl(fetchItemsUseCase = get(qualifier<FoundOwner>()))
-    }
-
-    factory<GetRepoDetailsUseCase> {
-        GetRepoDetailsUseCaseImpl(repository = get())
-    }
-
-    factory<GetOwnerDetailsUseCase> {
-        GetOwnerDetailsUseCaseImpl(repository = get())
     }
 }

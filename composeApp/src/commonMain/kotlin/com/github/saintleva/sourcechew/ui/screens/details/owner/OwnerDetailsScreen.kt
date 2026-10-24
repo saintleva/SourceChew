@@ -38,6 +38,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import com.github.saintleva.sourcechew.ui.common.formatDateTime
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +46,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.OrganizationDetails
 import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
@@ -133,6 +135,11 @@ private fun OwnerDetailsContent(details: OwnerDetailsBase) {
                     contentDescription = null,
                     modifier = Modifier.size(36.dp),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                AsyncImage(
+                    model = details.avatarUrl,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
 
@@ -255,7 +262,7 @@ private fun OwnerDetailsContent(details: OwnerDetailsBase) {
                     DetailRow(
                         icon = Icons.Default.Person,
                         label = stringResource(Res.string.created),
-                        value = it.toString(),
+                        value = it.formatDateTime(),
                     )
                 }
             }
