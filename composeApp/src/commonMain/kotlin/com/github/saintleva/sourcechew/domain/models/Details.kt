@@ -17,6 +17,12 @@ data class License(
     val spdxId: String? = null
 )
 
+data class RepoLanguage(
+    val name: String,
+    val bytes: Long,
+    val percentage: Float
+)
+
 data class RepoDetails(
     override val id: Long,
     override val url: String,
@@ -28,6 +34,7 @@ data class RepoDetails(
     val owner: FoundOwner,
     val description: String?,
     val language: String?,
+    val languages: List<RepoLanguage> = emptyList(),
     val stars: Int,
     val forks: Int,
     val subscribersCount: Int,

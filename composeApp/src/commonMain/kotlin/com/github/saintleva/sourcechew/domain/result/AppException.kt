@@ -31,3 +31,9 @@ class InvalidTokenException : AppException(null)
  * Thrown by Paginator's load lambda when a search query returns an expected business error.
  */
 class PagingSearchException(val error: SearchError) : AppException(null)
+
+/**
+ * Thrown by Paginator's load lambda when a branches query returns an expected business error.
+ */
+class PagingBranchesException(val error: DetailsError) : AppException(null)
+

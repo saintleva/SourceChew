@@ -68,6 +68,7 @@ kotlin {
     sourceSets {
         getByName("commonMain") {
             dependencies {
+                implementation(project.dependencies.platform(libs.paginator.bom))
                 api(libs.kotlinx.datetime)
 
                 //TODO: Use this implementations
@@ -126,12 +127,16 @@ kotlin {
 
         getByName("commonTest") {
             dependencies {
+                implementation(project.dependencies.platform(libs.paginator.bom))
                 implementation(kotlin("test"))
                 implementation(libs.kotest.framework.engine)
                 implementation(libs.kotest.assertions.core)
                 implementation(libs.koin.test)
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.kotest.extensions.koin)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.paginator.offset)
             }
         }
 
@@ -217,9 +222,7 @@ kotlin {
     }
 }
 
-dependencies {
-    commonMainImplementation(platform(libs.paginator.bom))
-}
+
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()

@@ -33,6 +33,8 @@ import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
+import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
+import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
@@ -81,6 +83,13 @@ val domainModule = module {
         FetchItemsUseCaseImpl(
             appSettingsStore = get(qualifier<AppSettings>()),
             searchApiService = get(qualifier<FoundOwner>())
+        )
+    }
+
+    factory<FetchBranchesUseCase> {
+        FetchBranchesUseCaseImpl(
+            appSettingsStore = get(qualifier<AppSettings>()),
+            branchesApiService = get()
         )
     }
 

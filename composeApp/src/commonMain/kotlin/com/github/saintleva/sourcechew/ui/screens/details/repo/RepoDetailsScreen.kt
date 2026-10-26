@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
@@ -59,9 +61,12 @@ import coil3.compose.AsyncImage
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
+import com.github.saintleva.sourcechew.domain.models.RepoLanguage
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.formatDateTime
+import com.github.saintleva.sourcechew.ui.common.formatPercentage
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
+import com.github.saintleva.sourcechew.ui.common.getLanguageColor
 import com.github.saintleva.sourcechew.ui.common.titleWithCount
 import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import org.jetbrains.compose.resources.stringResource
@@ -72,6 +77,7 @@ import sourcechew.composeapp.generated.resources.dates
 import sourcechew.composeapp.generated.resources.default_branch
 import sourcechew.composeapp.generated.resources.fork
 import sourcechew.composeapp.generated.resources.forks
+import sourcechew.composeapp.generated.resources.languages
 import sourcechew.composeapp.generated.resources.license
 import sourcechew.composeapp.generated.resources.loading_error
 import sourcechew.composeapp.generated.resources.open_in_browser
@@ -296,8 +302,14 @@ private fun RepoDetailsContent(
             }
         }
 
+        // Languages Section
+        if (details.languages.isNotEmpty()) {
+            LanguagesSection(languages = details.languages)
+        }
+
         // Info items
-        val hasGeneralInfo = details.language != null ||
+        val showSingleLanguage = details.languages.isEmpty() && details.language != null
+        val hasGeneralInfo = showSingleLanguage ||
                 details.license != null ||
                 details.defaultBranch != null ||
                 details.homepageUrl != null
@@ -310,8 +322,8 @@ private fun RepoDetailsContent(
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    details.language?.let {
-                        InfoRow(label = "Language", value = it)
+                    details.language?.takeIf { details.languages.isEmpty() }?.let { lang ->
+                        InfoRow(label = stringResource(Res.string.languages), value = lang)
                     }
                     details.license?.let { license ->
                         val licenseName = license.name ?: license.spdxId ?: license.key
@@ -379,6 +391,70 @@ private fun RepoDetailsContent(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun LanguagesSection(languages: List<RepoLanguage>) {
+    ExpandableSection(
+        title = titleWithCount(Res.string.languages, languages.size),
+        initiallyExpanded = true
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Segmented Progress Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                languages.forEach { lang ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(lang.percentage.coerceAtLeast(0.1f))
+                            .background(getLanguageColor(lang.name))
+                    )
+                }
+            }
+
+            // Legend FlowRow
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                languages.forEach { lang ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(getLanguageColor(lang.name))
+                        )
+                        Text(
+                            text = lang.name,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = formatPercentage(lang.percentage),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
+import com.jamal_aliev.paginator.compose.core.PaginatedSlots
 import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
 import com.jamal_aliev.paginator.core.page.PageState
 import io.github.aakira.napier.Napier
@@ -81,26 +82,28 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
         modifier = modifier.fillMaxSize(),
         state = listState,
         key = { it.id },
-        prependErrorIndicator = { state ->
-            AppendIndicator(
-                errorState = state,
-                onRetry = viewModel::loadPrevious
-            )
-        },
-        appendErrorIndicator = { state ->
-            AppendIndicator(
-                errorState = state,
-                onRetry = viewModel::loadNext
-            )
-        },
-        loadingContent = { FullscreenLoading() },
-        emptyContent = { EmptyContent() },
-        errorContent = { state ->
-            ErrorContent(
-                cause = state.exception,
-                onRetry = viewModel::restart
-            )
-        }
+        slots = PaginatedSlots(
+            prependErrorIndicator = { state ->
+                AppendIndicator(
+                    errorState = state,
+                    onRetry = viewModel::loadPrevious
+                )
+            },
+            appendErrorIndicator = { state ->
+                AppendIndicator(
+                    errorState = state,
+                    onRetry = viewModel::loadNext
+                )
+            },
+            loadingContent = { FullscreenLoading() },
+            emptyContent = { EmptyContent() },
+            errorContent = { state ->
+                ErrorContent(
+                    cause = state.exception,
+                    onRetry = viewModel::restart
+                )
+            }
+        )
     ) { item, globalIndex, _, _, page ->
         if (globalIndex == 0) {
             val meta = page.metadata as? SearchMetadata

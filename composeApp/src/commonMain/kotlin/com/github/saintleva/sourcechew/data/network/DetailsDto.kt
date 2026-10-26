@@ -4,6 +4,7 @@ import com.github.saintleva.sourcechew.domain.models.License
 import com.github.saintleva.sourcechew.domain.models.OrganizationDetails
 import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
+import com.github.saintleva.sourcechew.domain.models.RepoLanguage
 import com.github.saintleva.sourcechew.domain.models.UserDetails
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -87,7 +88,20 @@ private fun parseInstant(isoString: String?): Instant? =
         }
     }
 
-fun GithubRepoDetailsDto.toDomain() = RepoDetails(
+fun Map<String, Long>.toRepoLanguages(): List<RepoLanguage> {
+    val totalBytes = values.sum()
+    if (totalBytes <= 0L) return emptyList()
+    return map { (name, bytes) ->
+        val percentage = (bytes.toDouble() / totalBytes * 100.0).toFloat()
+        RepoLanguage(
+            name = name,
+            bytes = bytes,
+            percentage = percentage
+        )
+    }.sortedByDescending { it.bytes }
+}
+
+fun GithubRepoDetailsDto.toDomain(languages: List<RepoLanguage> = emptyList()) = RepoDetails(
     id = id,
     url = url,
     htmlUrl = htmlUrl,
@@ -98,6 +112,7 @@ fun GithubRepoDetailsDto.toDomain() = RepoDetails(
     owner = owner.toDomain(),
     description = description,
     language = language,
+    languages = languages,
     stars = stars,
     forks = forks,
     subscribersCount = subscribersCount,
