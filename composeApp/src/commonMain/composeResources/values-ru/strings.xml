@@ -139,4 +139,8 @@
     <string name="max_found_repo_description_length_hint">Максимальное количество символов для описания репозитория в карточках списка поиска</string>
     <string name="read_more">Читать далее</string>
     <string name="read_less">Свернуть</string>
+    <string name="branches">Ветки</string>
+    <string name="default_branch_badge">По умолчанию</string>
+    <string name="commit_sha">Коммит: %1$s</string>
+    <string name="go_to_default_branch">Главная: %1$s</string>
 </resources>

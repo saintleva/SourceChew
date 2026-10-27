@@ -17,6 +17,8 @@ import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.ui.screens.branches.BranchesScreen
+import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsScreen
@@ -119,7 +121,7 @@ fun WorkNavigation(
                         viewModel = foundViewModel,
                         itemContent = { repo ->
                             ItemRepoContent(repo) {
-                                backStack.add(Route.Work.RepositoryDetails(repo.owner.login, repo.name))
+                                backStack.add(Route.Work.RepoDetails(repo.owner.login, repo.name))
                             }
                         }
                     )
@@ -153,7 +155,7 @@ fun WorkNavigation(
                     )
                 }
             }
-            entry<Route.Work.RepositoryDetails> { key ->
+            entry<Route.Work.RepoDetails> { key ->
                 val detailsViewModel = koinViewModel<RepoDetailsViewModel>(
                     parameters = { parametersOf(key.owner, key.name) }
                 )
@@ -174,6 +176,9 @@ fun WorkNavigation(
                         viewModel = detailsViewModel,
                         onOwnerClick = { ownerLogin ->
                             backStack.add(Route.Work.OwnerDetails(ownerLogin))
+                        },
+                        onBranchesClick = { owner, repo, defaultBranch ->
+                            backStack.add(Route.Work.Branches(owner, repo, defaultBranch))
                         }
                     )
                 }
@@ -197,6 +202,28 @@ fun WorkNavigation(
                     OwnerDetailsScreen(
                         modifier = modifier,
                         viewModel = detailsViewModel
+                    )
+                }
+            }
+            entry<Route.Work.Branches> { key ->
+                val branchesViewModel = koinViewModel<BranchesViewModel>(
+                    parameters = { parametersOf(key.owner, key.repo, key.defaultBranch) }
+                )
+                WorkEntryContainer(
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = ::navigateToSearch,
+                    actions = {
+                        IconButton(onClick = branchesViewModel::restart) {
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(Res.string.refresh_button))
+                        }
+                        BackIcon {
+                            backStack.pop()
+                        }
+                    }
+                ) { modifier ->
+                    BranchesScreen(
+                        modifier = modifier,
+                        viewModel = branchesViewModel
                     )
                 }
             }

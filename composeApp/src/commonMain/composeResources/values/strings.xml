@@ -140,4 +140,8 @@ Try changing your search terms.</string>
     <string name="max_found_repo_description_length_hint">Maximum number of characters for repository description in search list cards</string>
     <string name="read_more">Read more</string>
     <string name="read_less">Read less</string>
+    <string name="branches">Branches</string>
+    <string name="default_branch_badge">Default</string>
+    <string name="commit_sha">Commit: %1$s</string>
+    <string name="go_to_default_branch">Main: %1$s</string>
 </resources>

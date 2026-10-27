@@ -36,6 +36,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.SuggestionChip
@@ -72,6 +73,7 @@ import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.archived
+import sourcechew.composeapp.generated.resources.branches
 import sourcechew.composeapp.generated.resources.created
 import sourcechew.composeapp.generated.resources.dates
 import sourcechew.composeapp.generated.resources.default_branch
@@ -97,7 +99,8 @@ import sourcechew.composeapp.generated.resources.website
 fun RepoDetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: RepoDetailsViewModel,
-    onOwnerClick: (String) -> Unit
+    onOwnerClick: (String) -> Unit,
+    onBranchesClick: (owner: String, repo: String, defaultBranch: String?) -> Unit = { _, _, _ -> }
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val settings by viewModel.settings.collectAsStateWithLifecycle()
@@ -125,7 +128,8 @@ fun RepoDetailsScreen(
                 RepoDetailsContent(
                     details = currentState.details,
                     maxDescriptionLength = settings.maxRepoDescriptionLength,
-                    onOwnerClick = onOwnerClick
+                    onOwnerClick = onOwnerClick,
+                    onBranchesClick = onBranchesClick
                 )
             }
         }
@@ -136,7 +140,8 @@ fun RepoDetailsScreen(
 private fun RepoDetailsContent(
     details: RepoDetails,
     maxDescriptionLength: Int,
-    onOwnerClick: (String) -> Unit
+    onOwnerClick: (String) -> Unit,
+    onBranchesClick: (owner: String, repo: String, defaultBranch: String?) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
     var isDescriptionExpanded by remember { mutableStateOf(false) }
@@ -281,6 +286,21 @@ private fun RepoDetailsContent(
             )
         }
 
+        // Primary Action: Navigate to Branches
+        Button(
+            onClick = {
+                onBranchesClick(details.owner.login, details.name, details.defaultBranch)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(Icons.Default.ForkRight, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            val branchesLabel = details.defaultBranch?.let { defaultBranch ->
+                "${stringResource(Res.string.branches)} ($defaultBranch)"
+            } ?: stringResource(Res.string.branches)
+            Text(branchesLabel)
+        }
+
         // Topics (Expandable)
         if (details.topics.isNotEmpty()) {
             ExpandableSection(
@@ -331,8 +351,14 @@ private fun RepoDetailsContent(
                             InfoRow(label = stringResource(Res.string.license), value = licenseName)
                         }
                     }
-                    details.defaultBranch?.let {
-                        InfoRow(label = stringResource(Res.string.default_branch), value = it)
+                    details.defaultBranch?.let { defaultBranch ->
+                        InfoRow(
+                            label = stringResource(Res.string.default_branch),
+                            value = defaultBranch,
+                            onClick = {
+                                onBranchesClick(details.owner.login, details.name, defaultBranch)
+                            }
+                        )
                     }
                     details.homepageUrl?.let { homepage ->
                         InfoRow(
@@ -380,8 +406,8 @@ private fun RepoDetailsContent(
             }
         }
 
-        // Action: Open in Browser
-        Button(
+        // Action: Open in Browser (Secondary)
+        OutlinedButton(
             onClick = { uriHandler.openUri(details.htmlUrl) },
             modifier = Modifier.fillMaxWidth()
         ) {
