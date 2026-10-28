@@ -38,7 +38,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import com.github.saintleva.sourcechew.ui.common.formatDateTime
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,11 +45,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.github.saintleva.sourcechew.domain.models.OrganizationDetails
 import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
 import com.github.saintleva.sourcechew.domain.models.UserDetails
+import com.github.saintleva.sourcechew.ui.common.ErrorContent
+import com.github.saintleva.sourcechew.ui.common.formatDateTime
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import org.jetbrains.compose.resources.stringResource
@@ -59,13 +60,11 @@ import sourcechew.composeapp.generated.resources.bio
 import sourcechew.composeapp.generated.resources.company
 import sourcechew.composeapp.generated.resources.created
 import sourcechew.composeapp.generated.resources.followers
-import sourcechew.composeapp.generated.resources.loading_error
 import sourcechew.composeapp.generated.resources.location
 import sourcechew.composeapp.generated.resources.open_in_browser
 import sourcechew.composeapp.generated.resources.organization
 import sourcechew.composeapp.generated.resources.public_gists
 import sourcechew.composeapp.generated.resources.public_repos
-import sourcechew.composeapp.generated.resources.retry_button
 import sourcechew.composeapp.generated.resources.user
 import sourcechew.composeapp.generated.resources.website
 
@@ -333,32 +332,5 @@ private fun DetailRow(
             fontWeight = FontWeight.Medium,
             color = if (onClick != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
         )
-    }
-}
-
-@Composable
-private fun ErrorContent(
-    modifier: Modifier = Modifier,
-    message: String,
-    onRetry: () -> Unit,
-) {
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = stringResource(Res.string.loading_error),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.error,
-        )
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        Button(onClick = onRetry, modifier = Modifier.padding(top = 16.dp)) {
-            Text(stringResource(Res.string.retry_button))
-        }
     }
 }

@@ -53,16 +53,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.models.RepoLanguage
+import com.github.saintleva.sourcechew.ui.common.ErrorContent
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.formatDateTime
 import com.github.saintleva.sourcechew.ui.common.formatPercentage
@@ -81,14 +81,12 @@ import sourcechew.composeapp.generated.resources.fork
 import sourcechew.composeapp.generated.resources.forks
 import sourcechew.composeapp.generated.resources.languages
 import sourcechew.composeapp.generated.resources.license
-import sourcechew.composeapp.generated.resources.loading_error
 import sourcechew.composeapp.generated.resources.open_in_browser
 import sourcechew.composeapp.generated.resources.open_issues
 import sourcechew.composeapp.generated.resources.owner
 import sourcechew.composeapp.generated.resources.pushed
 import sourcechew.composeapp.generated.resources.read_less
 import sourcechew.composeapp.generated.resources.read_more
-import sourcechew.composeapp.generated.resources.retry_button
 import sourcechew.composeapp.generated.resources.stars
 import sourcechew.composeapp.generated.resources.topics
 import sourcechew.composeapp.generated.resources.updated
@@ -551,32 +549,5 @@ private fun InfoRow(
             fontWeight = FontWeight.Medium,
             color = if (onClick != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
         )
-    }
-}
-
-@Composable
-private fun ErrorContent(
-    modifier: Modifier = Modifier,
-    message: String,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = modifier.padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = stringResource(Res.string.loading_error),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.error
-        )
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-        Button(onClick = onRetry, modifier = Modifier.padding(top = 16.dp)) {
-            Text(stringResource(Res.string.retry_button))
-        }
     }
 }

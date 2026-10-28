@@ -17,40 +17,29 @@
 
 package com.github.saintleva.sourcechew.ui.screens.found
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
-import com.github.saintleva.sourcechew.ui.common.getErrorMessage
+import com.github.saintleva.sourcechew.ui.common.AppendIndicator
+import com.github.saintleva.sourcechew.ui.common.EmptyContent
+import com.github.saintleva.sourcechew.ui.common.ErrorContent
+import com.github.saintleva.sourcechew.ui.common.FullscreenLoading
 import com.jamal_aliev.paginator.compose.core.PaginatedSlots
 import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
-import com.jamal_aliev.paginator.core.page.PageState
-import io.github.aakira.napier.Napier
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.found_items
-import sourcechew.composeapp.generated.resources.loading_error
-import sourcechew.composeapp.generated.resources.loading_more_error
-import sourcechew.composeapp.generated.resources.no_items_found_description
-import sourcechew.composeapp.generated.resources.no_items_found_title
-import sourcechew.composeapp.generated.resources.retry_button
-
 
 @Composable
 fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
@@ -113,7 +102,6 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
     }
 }
 
-
 @Composable
 private fun MetadataHeader(metadata: SearchMetadata) {
     Text(
@@ -124,79 +112,4 @@ private fun MetadataHeader(metadata: SearchMetadata) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
     )
-}
-
-@Composable
-private fun AppendIndicator(
-    errorState: PageState.ErrorState<FoundBase>,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(
-            text = stringResource(Res.string.loading_more_error),
-            color = MaterialTheme.colorScheme.error,
-        )
-        Text(
-            text = getErrorMessage(errorState.exception),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        Button(onClick = onRetry) {
-            Text(stringResource(Res.string.retry_button))
-        }
-    }
-}
-
-@Composable
-private fun FullscreenLoading() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun EmptyContent() {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = stringResource(Res.string.no_items_found_title),
-            style = MaterialTheme.typography.titleLarge,
-        )
-        Text(
-            text = stringResource(Res.string.no_items_found_description),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-    }
-}
-
-@Composable
-private fun ErrorContent(cause: Throwable, onRetry: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = stringResource(Res.string.loading_error),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.error,
-        )
-        Napier.d(tag = "FoundScreen : ErrorContent") { "Error: $cause" }
-        Text(
-            text = getErrorMessage(cause),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        Button(onClick = onRetry, modifier = Modifier.padding(top = 16.dp)) {
-            Text(stringResource(Res.string.retry_button))
-        }
-    }
 }
