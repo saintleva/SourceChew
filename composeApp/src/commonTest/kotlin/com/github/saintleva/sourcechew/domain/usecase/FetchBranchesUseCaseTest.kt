@@ -1,9 +1,9 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
-import com.github.saintleva.sourcechew.domain.models.RepoBranch
+import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.repository.RepoBranchesApiService
+import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
 import com.github.saintleva.sourcechew.domain.result.Result
@@ -24,29 +24,29 @@ private class FakeConfigStore<T>(initial: T) : ConfigStore<T> {
     }
 }
 
-private class FakeRepoBranchesApiService(
-    var resultProvider: suspend (owner: String, repo: String, page: Int, pageSize: Int) -> Result<List<RepoBranch>, DetailsError>
-) : RepoBranchesApiService {
+private class FakeBranchesApiService(
+    var resultProvider: suspend (owner: String, repo: String, page: Int, pageSize: Int) -> Result<List<Branch>, DetailsError>
+) : BranchesApiService {
     override suspend fun getBranches(
         owner: String,
         repo: String,
         page: Int,
         pageSize: Int,
-    ): Result<List<RepoBranch>, DetailsError> = resultProvider(owner, repo, page, pageSize)
+    ): Result<List<Branch>, DetailsError> = resultProvider(owner, repo, page, pageSize)
 }
 
 class FetchBranchesUseCaseTest : FunSpec({
 
     test("creates paginator and loads branches successfully without metadata") {
         val expectedBranches = listOf(
-            RepoBranch(name = "main", commitSha = "sha-main-123"),
-            RepoBranch(name = "develop", commitSha = "sha-dev-456"),
+            Branch(name = "main", commitSha = "sha-main-123"),
+            Branch(name = "develop", commitSha = "sha-dev-456"),
         )
         val configStore = FakeConfigStore(AppSettings.default.copy(paginationPageSize = 25))
         var requestedPage: Int? = null
         var requestedPageSize: Int? = null
 
-        val apiService = FakeRepoBranchesApiService { _, _, page, pageSize ->
+        val apiService = FakeBranchesApiService { _, _, page, pageSize ->
             requestedPage = page
             requestedPageSize = pageSize
             Result.Success(expectedBranches)
@@ -69,7 +69,7 @@ class FetchBranchesUseCaseTest : FunSpec({
 
     test("records PagingBranchesException in page error state when API call fails") {
         val configStore = FakeConfigStore(AppSettings.default)
-        val apiService = FakeRepoBranchesApiService { _, _, _, _ ->
+        val apiService = FakeBranchesApiService { _, _, _, _ ->
             Result.Failure(DetailsError.ResourceNotFound)
         }
 
@@ -82,7 +82,7 @@ class FetchBranchesUseCaseTest : FunSpec({
         paginator.jump(BookmarkInt(1))
 
         val pageState = paginator.cache.getStateOf(1)
-        val errorState = pageState.shouldBeInstanceOf<OffsetPageState.Error<RepoBranch>>()
+        val errorState = pageState.shouldBeInstanceOf<OffsetPageState.Error<Branch>>()
         val error = errorState.exception
         error.shouldBeInstanceOf<PagingBranchesException>()
         error.error shouldBe DetailsError.ResourceNotFound

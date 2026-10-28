@@ -1,9 +1,9 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
-import com.github.saintleva.sourcechew.domain.models.RepoBranch
+import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.repository.RepoBranchesApiService
+import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
 import com.github.saintleva.sourcechew.domain.result.Result
 import com.jamal_aliev.paginator.offset.Paginator
@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.first
 
 class FetchBranchesUseCaseImpl(
     private val appSettingsStore: ConfigStore<AppSettings>,
-    private val branchesApiService: RepoBranchesApiService
+    private val branchesApiService: BranchesApiService
 ) : FetchBranchesUseCase {
 
-    override suspend fun invoke(owner: String, repo: String): Paginator<RepoBranch> {
+    override suspend fun invoke(owner: String, repo: String): Paginator<Branch> {
         val pageSize = appSettingsStore.config.first().paginationPageSize
         return paginator(capacity = pageSize) {
             load { page ->

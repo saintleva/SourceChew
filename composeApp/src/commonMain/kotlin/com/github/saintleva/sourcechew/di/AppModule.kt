@@ -103,7 +103,8 @@ val appModule = module {
             owner = owner,
             repo = repo,
             defaultBranch = defaultBranch,
-            fetchBranchesUseCase = get()
+            fetchBranchesUseCase = get(),
+            branchesApiService = get()
         )
     }
 }

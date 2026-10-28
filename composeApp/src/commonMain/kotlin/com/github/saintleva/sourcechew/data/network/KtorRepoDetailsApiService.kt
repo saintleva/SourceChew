@@ -10,7 +10,6 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -20,7 +19,7 @@ data class RepoDetailsRequest(val owner: String, val name: String)
 class KtorRepoDetailsApiService(
     private val httpClient: HttpClient
 ) : RepoDetailsApiService,
-    BaseKtorApiService<RepoDetailsRequest, RepoDetails, DetailsError> {
+    BaseKtorResourceApiService<RepoDetailsRequest, RepoDetails> {
 
     override suspend fun getHttpResponse(request: RepoDetailsRequest): HttpResponse {
         return httpClient.get("/repos/${request.owner}/${request.name}") {
@@ -31,14 +30,6 @@ class KtorRepoDetailsApiService(
     override suspend fun deserializeSuccess(response: HttpResponse): RepoDetails {
         val dto = response.body<GithubRepoDetailsDto>()
         return dto.toDomain()
-    }
-
-    override suspend fun mapErrorResponse(response: HttpResponse): DetailsError {
-        return if (response.status == HttpStatusCode.NotFound) {
-            DetailsError.ResourceNotFound
-        } else {
-            mapCommonApiError(response)
-        }
     }
 
     override suspend fun getRepoDetails(owner: String, name: String): Result<RepoDetails, DetailsError> {

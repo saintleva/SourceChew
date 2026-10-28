@@ -1,6 +1,6 @@
 package com.github.saintleva.sourcechew.data.network
 
-import com.github.saintleva.sourcechew.domain.models.RepoBranch
+import com.github.saintleva.sourcechew.domain.models.Branch
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,7 +16,7 @@ data class GithubBranchCommitDto(
     val url: String? = null,
 )
 
-fun GithubBranchDto.toDomain() = RepoBranch(
+fun GithubBranchDto.toDomain() = Branch(
     name = name,
     commitSha = commit.sha,
 )

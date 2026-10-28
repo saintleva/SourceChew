@@ -1,6 +1,6 @@
 package com.github.saintleva.sourcechew.domain.models
 
-data class RepoBranch(
+data class Branch(
     val name: String,
     val commitSha: String
 )

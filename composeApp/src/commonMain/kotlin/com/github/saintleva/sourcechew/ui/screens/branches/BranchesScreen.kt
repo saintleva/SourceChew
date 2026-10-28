@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.ForkRight
@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.models.RepoBranch
+import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.ui.common.AppendIndicator
 import com.github.saintleva.sourcechew.ui.common.EmptyContent
 import com.github.saintleva.sourcechew.ui.common.ErrorContent
@@ -74,20 +74,7 @@ fun BranchesScreen(
     }
 
     val defaultBranchName = viewModel.defaultBranch
-    val defaultBranchRepo = remember(paginatorState) {
-        if (defaultBranchName.isNullOrBlank()) null
-        else {
-            val cache = paginator.cache
-            var found: RepoBranch? = null
-            for (page in cache.pages) {
-                val pageState = cache.getStateOf(page)
-                val data = pageState?.data ?: continue
-                found = data.firstOrNull { it.name == defaultBranchName }
-                if (found != null) break
-            }
-            found
-        }
-    }
+    val defaultBranchCommitSha by viewModel.defaultBranchCommitSha.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
         Text(
@@ -100,12 +87,12 @@ fun BranchesScreen(
         if (!defaultBranchName.isNullOrBlank()) {
             BranchCard(
                 branchName = defaultBranchName,
-                commitSha = defaultBranchRepo?.commitSha,
+                commitSha = defaultBranchCommitSha,
                 isDefault = true
             )
         }
 
-        PaginatedLazyColumn<RepoBranch>(
+        PaginatedLazyColumn<Branch>(
             paginator = paginator,
             modifier = Modifier.fillMaxSize(),
             state = listState,
