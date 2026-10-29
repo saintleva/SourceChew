@@ -2,6 +2,7 @@ package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.models.RepoLanguage
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.repository.RepoDetailsApiService
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
@@ -14,14 +15,12 @@ import io.ktor.http.isSuccess
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
-data class RepoDetailsRequest(val owner: String, val name: String)
-
 class KtorRepoDetailsApiService(
     private val httpClient: HttpClient
 ) : RepoDetailsApiService,
-    BaseKtorResourceApiService<RepoDetailsRequest, RepoDetails> {
+    BaseKtorResourceApiService<RepoRef, RepoDetails> {
 
-    override suspend fun getHttpResponse(request: RepoDetailsRequest): HttpResponse {
+    override suspend fun getHttpResponse(request: RepoRef): HttpResponse {
         return httpClient.get("/repos/${request.owner}/${request.name}") {
             expectSuccess = false
         }
@@ -32,12 +31,12 @@ class KtorRepoDetailsApiService(
         return dto.toDomain()
     }
 
-    override suspend fun getRepoDetails(owner: String, name: String): Result<RepoDetails, DetailsError> {
+    override suspend fun getRepoDetails(repoRef: RepoRef): Result<RepoDetails, DetailsError> {
         return coroutineScope {
             val languagesDeferred = async {
-                fetchLanguages(owner, name)
+                fetchLanguages(repoRef)
             }
-            val detailsResult = getAnswer(RepoDetailsRequest(owner, name))
+            val detailsResult = getAnswer(repoRef)
             if (detailsResult is Result.Success) {
                 val languages = languagesDeferred.await()
                 Result.Success(detailsResult.value.copy(languages = languages))
@@ -48,9 +47,9 @@ class KtorRepoDetailsApiService(
         }
     }
 
-    private suspend fun fetchLanguages(owner: String, name: String): List<RepoLanguage> {
+    private suspend fun fetchLanguages(repoRef: RepoRef): List<RepoLanguage> {
         return try {
-            val response = httpClient.get("/repos/$owner/$name/languages") {
+            val response = httpClient.get("/repos/${repoRef.owner}/${repoRef.name}/languages") {
                 expectSuccess = false
             }
             if (response.status.isSuccess()) {

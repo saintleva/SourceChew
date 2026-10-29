@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 
 
 class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
-    private val fetchItemsUseCase: FetchItemsUseCase<ItemSearchConditions, FoundItem>,
+    private val fetchFoundItemsUseCase: FetchFoundItemsUseCase<ItemSearchConditions, FoundItem>,
     coroutineDispatcher: CoroutineDispatcher = ioDispatcher
 ) : SearchInteractor<ItemSearchConditions, FoundItem> {
 
@@ -70,7 +70,7 @@ class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
             previous.release(silently = true)
         }
 
-        val paginator = fetchItemsUseCase(conditions)
+        val paginator = fetchFoundItemsUseCase(conditions)
         previousConditions = conditions
         lastFound = paginator
         lastScrollPosition = null

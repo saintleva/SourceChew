@@ -17,15 +17,11 @@
 
 package com.github.saintleva.sourcechew.di
 
-import androidx.datastore.core.okio.OkioSerializer
 import com.github.saintleva.sourcechew.data.auth.AuthRepositoryImpl
 import com.github.saintleva.sourcechew.data.secure.DefaultTokenStorage
 import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
 import com.github.saintleva.sourcechew.data.storage.AppPreferences
-import com.github.saintleva.sourcechew.data.storage.BytesCodec
-import com.github.saintleva.sourcechew.data.storage.CodecOkioSerializer
 import com.github.saintleva.sourcechew.data.storage.DataStoreConfigStore
-import com.github.saintleva.sourcechew.data.storage.StringFormatCodec
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
@@ -35,12 +31,10 @@ import com.github.saintleva.sourcechew.domain.repository.AuthRepository
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCaseImpl
-import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCase
-import com.github.saintleva.sourcechew.domain.usecase.FetchItemsUseCaseImpl
+import com.github.saintleva.sourcechew.domain.usecase.FetchFoundItemsUseCase
+import com.github.saintleva.sourcechew.domain.usecase.FetchFoundItemsUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractorImpl
-import kotlinx.serialization.StringFormat
-import kotlinx.serialization.json.Json
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 
@@ -72,15 +66,15 @@ val domainModule = module {
 
     single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
 
-    factory<FetchItemsUseCase<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
-        FetchItemsUseCaseImpl(
+    factory<FetchFoundItemsUseCase<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
+        FetchFoundItemsUseCaseImpl(
             appSettingsStore = get(qualifier<AppSettings>()),
             searchApiService = get(qualifier<FoundRepo>())
         )
     }
 
-    factory<FetchItemsUseCase<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
-        FetchItemsUseCaseImpl(
+    factory<FetchFoundItemsUseCase<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
+        FetchFoundItemsUseCaseImpl(
             appSettingsStore = get(qualifier<AppSettings>()),
             searchApiService = get(qualifier<FoundOwner>())
         )
@@ -94,10 +88,10 @@ val domainModule = module {
     }
 
     single<SearchInteractor<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
-        SearchInteractorImpl(fetchItemsUseCase = get(qualifier<FoundRepo>()))
+        SearchInteractorImpl(fetchFoundItemsUseCase = get(qualifier<FoundRepo>()))
     }
 
     single<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
-        SearchInteractorImpl(fetchItemsUseCase = get(qualifier<FoundOwner>()))
+        SearchInteractorImpl(fetchFoundItemsUseCase = get(qualifier<FoundOwner>()))
     }
 }

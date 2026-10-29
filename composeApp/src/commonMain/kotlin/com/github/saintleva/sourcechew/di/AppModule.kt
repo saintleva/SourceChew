@@ -21,6 +21,7 @@ import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.ui.screens.auth.AuthViewModel
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
@@ -82,10 +83,9 @@ val appModule = module {
         )
     }
 
-    viewModel<RepoDetailsViewModel> { (owner: String, name: String) ->
+    viewModel<RepoDetailsViewModel> { (repoRef: RepoRef) ->
         RepoDetailsViewModel(
-            owner = owner,
-            name = name,
+            repoRef = repoRef,
             repository = get(),
             appSettingsStore = get(qualifier<AppSettings>())
         )
@@ -98,10 +98,9 @@ val appModule = module {
         )
     }
 
-    viewModel<BranchesViewModel> { (owner: String, repo: String, defaultBranch: String?) ->
+    viewModel<BranchesViewModel> { (repoRef: RepoRef, defaultBranch: String?) ->
         BranchesViewModel(
-            owner = owner,
-            repo = repo,
+            repoRef = repoRef,
             defaultBranch = defaultBranch,
             fetchBranchesUseCase = get(),
             branchesApiService = get()

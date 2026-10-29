@@ -157,7 +157,7 @@ fun WorkNavigation(
             }
             entry<Route.Work.RepoDetails> { key ->
                 val detailsViewModel = koinViewModel<RepoDetailsViewModel>(
-                    parameters = { parametersOf(key.owner, key.name) }
+                    parameters = { parametersOf(key.repoRef) }
                 )
                 WorkEntryContainer(
                     onMenuItemClick = onMenuItemClick,
@@ -207,7 +207,7 @@ fun WorkNavigation(
             }
             entry<Route.Work.Branches> { key ->
                 val branchesViewModel = koinViewModel<BranchesViewModel>(
-                    parameters = { parametersOf(key.owner, key.repo, key.defaultBranch) }
+                    parameters = { parametersOf(key.repoRef, key.defaultBranch) }
                 )
                 WorkEntryContainer(
                     onMenuItemClick = onMenuItemClick,

@@ -29,3 +29,13 @@ fun Range<LocalDate>.toGitHubValue(): String =
 @JvmName("intRangeToGitHubValue")
 fun Range<Int>.toGitHubValue(): String =
     toGitHubValue { it.toString() }
+
+fun parseInstant(isoString: String?): kotlin.time.Instant? =
+    isoString?.let {
+        try {
+            kotlin.time.Instant.parse(it)
+        } catch (_: Exception) {
+            null
+        }
+    }
+

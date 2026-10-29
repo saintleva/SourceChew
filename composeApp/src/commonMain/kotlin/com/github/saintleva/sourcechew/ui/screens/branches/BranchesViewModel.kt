@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.ui.screens.branches
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.Branch
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
 import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
@@ -15,12 +16,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class BranchesViewModel(
-    val owner: String,
-    val repo: String,
+    val repoRef: RepoRef,
     val defaultBranch: String?,
     private val fetchBranchesUseCase: FetchBranchesUseCase,
     private val branchesApiService: BranchesApiService
 ) : ViewModel() {
+
+    val owner: String get() = repoRef.owner
+    val repo: String get() = repoRef.name
 
     private val _paginator = MutableStateFlow<Paginator<Branch>?>(null)
     val paginator: StateFlow<Paginator<Branch>?> = _paginator.asStateFlow()
@@ -37,7 +40,7 @@ class BranchesViewModel(
 
     private fun loadBranches() {
         viewModelScope.launch {
-            val p = fetchBranchesUseCase(owner, repo)
+            val p = fetchBranchesUseCase(repoRef)
             _paginator.value = p
             p.jump(BookmarkInt(1))
         }
@@ -46,7 +49,7 @@ class BranchesViewModel(
     private fun fetchDefaultBranchCommitSha() {
         if (!defaultBranch.isNullOrBlank()) {
             viewModelScope.launch {
-                when (val result = branchesApiService.getSingleBranch(owner, repo, defaultBranch)) {
+                when (val result = branchesApiService.getSingleBranch(repoRef, defaultBranch)) {
                     is Result.Success -> _defaultBranchCommitSha.value = result.value.commitSha
                     is Result.Failure -> { /* no-op */ }
                 }

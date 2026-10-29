@@ -143,4 +143,18 @@
     <string name="default_branch_badge">По умолчанию</string>
     <string name="commit_sha">Коммит: %1$s</string>
     <string name="go_to_default_branch">Главная: %1$s</string>
+    <string name="time_just_now">только что</string>
+    <string name="time_minute_ago">1 минуту назад</string>
+    <string name="time_minutes_ago">%1$d мин. назад</string>
+    <string name="time_hour_ago">1 час назад</string>
+    <string name="time_hours_ago">%1$d ч. назад</string>
+    <string name="time_day_ago">1 день назад</string>
+    <string name="time_days_ago">%1$d дн. назад</string>
+    <string name="time_month_ago">1 месяц назад</string>
+    <string name="time_months_ago">%1$d мес. назад</string>
+    <string name="time_year_ago">1 год назад</string>
+    <string name="time_years_ago">%1$d лет назад</string>
+    <string name="updated_ago">Обновлено %1$s</string>
+    <string name="star_button">Star</string>
+    <string name="sponsor_button">Sponsor</string>
 </resources>

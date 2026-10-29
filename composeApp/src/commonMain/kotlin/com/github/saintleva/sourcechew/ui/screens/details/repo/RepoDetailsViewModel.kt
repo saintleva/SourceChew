@@ -8,6 +8,7 @@ import com.github.saintleva.sourcechew.domain.result.Result
 import com.github.saintleva.sourcechew.domain.repository.RepoDetailsRepository
 import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import com.github.saintleva.sourcechew.domain.models.AppSettings
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import kotlinx.coroutines.CancellationException
@@ -18,11 +19,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class RepoDetailsViewModel(
-    val owner: String,
-    val name: String,
+    val repoRef: RepoRef,
     private val repository: RepoDetailsRepository,
     appSettingsStore: ConfigStore<AppSettings>
 ) : ViewModel() {
+
+    val owner: String get() = repoRef.owner
+    val name: String get() = repoRef.name
 
     private val _uiState = MutableStateFlow<DetailsUiState<RepoDetails>>(DetailsUiState.Loading)
     val uiState: StateFlow<DetailsUiState<RepoDetails>> = _uiState.asStateFlow()
@@ -43,7 +46,7 @@ class RepoDetailsViewModel(
                 _uiState.value = DetailsUiState.Loading
             }
             try {
-                when (val result = repository.getRepoDetails(owner, name, forceRefresh)) {
+                when (val result = repository.getRepoDetails(repoRef, forceRefresh)) {
                     is Result.Success -> {
                         _uiState.value = DetailsUiState.Success(result.value)
                     }

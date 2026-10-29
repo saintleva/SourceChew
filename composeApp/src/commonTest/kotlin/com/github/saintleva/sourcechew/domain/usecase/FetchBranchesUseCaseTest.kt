@@ -2,6 +2,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.Branch
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
 import com.github.saintleva.sourcechew.domain.result.DetailsError
@@ -25,14 +26,18 @@ private class FakeConfigStore<T>(initial: T) : ConfigStore<T> {
 }
 
 private class FakeBranchesApiService(
-    var resultProvider: suspend (owner: String, repo: String, page: Int, pageSize: Int) -> Result<List<Branch>, DetailsError>
+    var resultProvider: suspend (repoRef: RepoRef, page: Int, pageSize: Int) -> Result<List<Branch>, DetailsError>
 ) : BranchesApiService {
     override suspend fun getBranches(
-        owner: String,
-        repo: String,
+        repoRef: RepoRef,
         page: Int,
         pageSize: Int,
-    ): Result<List<Branch>, DetailsError> = resultProvider(owner, repo, page, pageSize)
+    ): Result<List<Branch>, DetailsError> = resultProvider(repoRef, page, pageSize)
+
+    override suspend fun getSingleBranch(
+        repoRef: RepoRef,
+        branch: String,
+    ): Result<Branch, DetailsError> = Result.Failure(DetailsError.ResourceNotFound)
 }
 
 class FetchBranchesUseCaseTest : FunSpec({
@@ -46,7 +51,7 @@ class FetchBranchesUseCaseTest : FunSpec({
         var requestedPage: Int? = null
         var requestedPageSize: Int? = null
 
-        val apiService = FakeBranchesApiService { _, _, page, pageSize ->
+        val apiService = FakeBranchesApiService { _, page, pageSize ->
             requestedPage = page
             requestedPageSize = pageSize
             Result.Success(expectedBranches)
@@ -57,7 +62,7 @@ class FetchBranchesUseCaseTest : FunSpec({
             branchesApiService = apiService,
         )
 
-        val paginator = useCase(owner = "octocat", repo = "Hello-World")
+        val paginator = useCase(RepoRef("octocat", "Hello-World"))
         paginator.jump(BookmarkInt(1))
 
         requestedPage shouldBe 1
@@ -69,7 +74,7 @@ class FetchBranchesUseCaseTest : FunSpec({
 
     test("records PagingBranchesException in page error state when API call fails") {
         val configStore = FakeConfigStore(AppSettings.default)
-        val apiService = FakeBranchesApiService { _, _, _, _ ->
+        val apiService = FakeBranchesApiService { _, _, _ ->
             Result.Failure(DetailsError.ResourceNotFound)
         }
 
@@ -78,7 +83,7 @@ class FetchBranchesUseCaseTest : FunSpec({
             branchesApiService = apiService,
         )
 
-        val paginator = useCase(owner = "octocat", repo = "NonExistent")
+        val paginator = useCase(RepoRef("octocat", "NonExistent"))
         paginator.jump(BookmarkInt(1))
 
         val pageState = paginator.cache.getStateOf(1)

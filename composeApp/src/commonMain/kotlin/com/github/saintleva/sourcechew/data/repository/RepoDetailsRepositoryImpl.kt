@@ -1,6 +1,7 @@
 package com.github.saintleva.sourcechew.data.repository
 
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.repository.RepoDetailsApiService
 import com.github.saintleva.sourcechew.domain.repository.RepoDetailsRepository
 import com.github.saintleva.sourcechew.domain.result.DetailsError
@@ -16,11 +17,10 @@ class RepoDetailsRepositoryImpl(
     private val mutex = Mutex()
 
     override suspend fun getRepoDetails(
-        owner: String,
-        name: String,
+        repoRef: RepoRef,
         forceRefresh: Boolean
     ): Result<RepoDetails, DetailsError> {
-        val cacheKey = "${owner.lowercase()}/${name.lowercase()}"
+        val cacheKey = repoRef.cacheKey
         if (!forceRefresh) {
             mutex.withLock {
                 val cached = cache[cacheKey]
@@ -28,7 +28,7 @@ class RepoDetailsRepositoryImpl(
             }
         }
 
-        val result = apiService.getRepoDetails(owner, name)
+        val result = apiService.getRepoDetails(repoRef)
         if (result is Result.Success) {
             mutex.withLock {
                 cache[cacheKey] = result.value

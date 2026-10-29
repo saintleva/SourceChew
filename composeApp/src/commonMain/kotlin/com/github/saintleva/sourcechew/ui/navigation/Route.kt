@@ -1,6 +1,7 @@
 package com.github.saintleva.sourcechew.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.ui.screens.search.SearchTab
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
@@ -44,7 +45,9 @@ sealed interface Route : NavKey {
         }
 
         @Serializable
-        data class RepoDetails(val owner: String, val name: String) : Work
+        data class RepoDetails(val owner: String, val name: String) : Work {
+            val repoRef: RepoRef get() = RepoRef(owner, name)
+        }
 
         @Serializable
         data class OwnerDetails(val login: String) : Work
@@ -54,7 +57,9 @@ sealed interface Route : NavKey {
             val owner: String,
             val repo: String,
             val defaultBranch: String? = null
-        ) : Work
+        ) : Work {
+            val repoRef: RepoRef get() = RepoRef(owner, repo)
+        }
     }
 }
 

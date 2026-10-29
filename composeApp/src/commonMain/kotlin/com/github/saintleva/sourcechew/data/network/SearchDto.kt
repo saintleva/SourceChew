@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.data.network
 
+import com.github.saintleva.sourcechew.data.network.utils.parseInstant
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
@@ -26,12 +27,14 @@ fun <T, R : FoundBase> GithubSearchResponseDto<T>.toDomain(itemMapper: (T) -> R)
 data class GithubRepoDto(
     val id: Long,
     val name: String,
-    @SerialName("full_name") val fullName: String,
-    val url: String,
+    @SerialName("full_name") val fullName: String? = null,
+    val url: String? = null,
     val owner: GithubOwnerDto,
-    val description: String?,
-    val language: String?,
-    @SerialName("stargazers_count") val stars: Int
+    val description: String? = null,
+    val language: String? = null,
+    @SerialName("stargazers_count") val stars: Int = 0,
+    @SerialName("updated_at") val updatedAt: String? = null,
+    @SerialName("pushed_at") val pushedAt: String? = null,
 )
 
 // DTO for the owner of the repository
@@ -40,19 +43,18 @@ data class GithubOwnerDto(
     val id: Long,
     val type: String,
     val login: String,
-    val url: String,
+    val url: String? = null,
     @SerialName("avatar_url") val avatarUrl: String
 )
 
 fun GithubRepoDto.toDomain() = FoundRepo(
     id = id,
     name = name,
-    fullName = fullName,
-    url = url,
     owner = owner.toDomain(),
     description = description,
     language = language,
-    stars = stars
+    stars = stars,
+    updatedAt = parseInstant(pushedAt ?: updatedAt)
 )
 
 fun GithubOwnerDto.toDomain() = FoundOwner(
@@ -63,7 +65,6 @@ fun GithubOwnerDto.toDomain() = FoundOwner(
         else -> throw IllegalArgumentException("Unknown owner type: $type")
     },
     login = login,
-    url = url,
     avatarUrl = avatarUrl
 )
 
