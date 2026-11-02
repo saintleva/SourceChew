@@ -73,13 +73,15 @@ val appModule = module {
 
     viewModel<FoundViewModel<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
         FoundViewModel(
-            searchInteractor = get(qualifier<FoundRepo>())
+            searchInteractor = get(qualifier<FoundRepo>()),
+            appSettingsStore = get(qualifier<AppSettings>())
         )
     }
 
     viewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         FoundViewModel(
-            searchInteractor = get(qualifier<FoundOwner>())
+            searchInteractor = get(qualifier<FoundOwner>()),
+            appSettingsStore = get(qualifier<AppSettings>())
         )
     }
 

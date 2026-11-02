@@ -1,6 +1,5 @@
 package com.github.saintleva.sourcechew.ui.screens.found
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,57 +15,38 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CorporateFare
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.github.saintleva.sourcechew.ui.common.truncate
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerType
-import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.ui.common.formatCompactNumber
 import com.github.saintleva.sourcechew.ui.common.formatRelativeTime
 import com.github.saintleva.sourcechew.ui.common.getLanguageColor
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
-import org.koin.core.qualifier.qualifier
 import sourcechew.composeapp.generated.resources.Res
-import sourcechew.composeapp.generated.resources.sponsor_button
-import sourcechew.composeapp.generated.resources.star_button
 import sourcechew.composeapp.generated.resources.updated_ago
 
 
 @Composable
-fun ItemRepoContent(
+fun ItemFoundRepoContent(
     repo: FoundRepo,
-    onClick: () -> Unit = {}
+    maxDescriptionLength: Int,
+    onRepoClick: (FoundRepo) -> Unit,
+    onOwnerClick: (ownerLogin: String) -> Unit
 ) {
-    val appSettingsStore = koinInject<ConfigStore<AppSettings>>(qualifier<AppSettings>())
-    val settings by appSettingsStore.config.collectAsStateWithLifecycle(initialValue = AppSettings.default)
-    val maxLength = settings.maxFoundRepoDescriptionLength
-
     val description = repo.description ?: ""
-    val truncatedDescription = if (description.length > maxLength) {
-        description.take(maxLength) + "..."
-    } else {
-        description
-    }
+    val truncatedDescription = description.truncate(maxDescriptionLength)
 
     val isOrg = repo.owner.type == OwnerType.ORGANIZATION
 
@@ -74,23 +54,25 @@ fun ItemRepoContent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = { onRepoClick(repo) }),
         shape = RoundedCornerShape(10.dp)
     ) {
         Column(
             modifier = Modifier.padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Top row: Avatar + Owner/Name + Action buttons
+            // Top row: Owner (clickable) + Repo name
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Row(
-                    modifier = Modifier.weight(1f, fill = false),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { onOwnerClick(repo.owner.login) },
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Box(
                         modifier = Modifier
@@ -112,85 +94,31 @@ fun ItemRepoContent(
                         )
                     }
 
-                    val titleText = buildAnnotatedString {
-                        withStyle(
-                            SpanStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Normal
-                            )
-                        ) {
-                            append("${repo.owner.login}/")
-                        }
-                        withStyle(
-                            SpanStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        ) {
-                            append(repo.name)
-                        }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Text(
+                            text = repo.owner.login,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Normal
+                        )
+                        Text(
+                            text = "/",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Normal
+                        )
                     }
-
-                    Text(
-                        text = titleText,
-                        style = MaterialTheme.typography.titleMedium
-                    )
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.StarBorder,
-                                contentDescription = null,
-                                modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = stringResource(Res.string.star_button),
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.FavoriteBorder,
-                                contentDescription = null,
-                                modifier = Modifier.size(14.dp),
-                                tint = Color(0xFFE91E63)
-                            )
-                            Text(
-                                text = stringResource(Res.string.sponsor_button),
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = repo.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             // Description body

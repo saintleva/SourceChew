@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CorporateFare
+import com.github.saintleva.sourcechew.ui.common.truncate
 import androidx.compose.material.icons.filled.ForkRight
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Person
@@ -182,8 +183,8 @@ private fun RepoDetailsContent(
         if (!details.description.isNullOrBlank()) {
             val description = details.description!!
             val isLong = description.length > maxDescriptionLength
-            val displayText = if (isLong && !isDescriptionExpanded) {
-                description.take(maxDescriptionLength) + "..."
+            val displayText = if (!isDescriptionExpanded) {
+                description.truncate(maxDescriptionLength)
             } else {
                 description
             }

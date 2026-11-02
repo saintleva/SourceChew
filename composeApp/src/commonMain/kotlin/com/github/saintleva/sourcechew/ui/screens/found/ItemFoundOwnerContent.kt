@@ -36,9 +36,9 @@ import sourcechew.composeapp.generated.resources.user
 
 
 @Composable
-fun ItemOwnerContent(
+fun ItemFoundOwnerContent(
     owner: FoundOwner,
-    onClick: () -> Unit = {},
+    onClick: () -> Unit
 ) {
     val isOrg = owner.type == OwnerType.ORGANIZATION
     val typeIcon = if (isOrg) Icons.Default.CorporateFare else Icons.Default.Person

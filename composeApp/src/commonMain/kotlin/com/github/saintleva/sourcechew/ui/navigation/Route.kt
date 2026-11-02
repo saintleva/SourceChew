@@ -44,22 +44,20 @@ sealed interface Route : NavKey {
             data object Owner : Found
         }
 
-        @Serializable
-        data class RepoDetails(val owner: String, val name: String) : Work {
-            val repoRef: RepoRef get() = RepoRef(owner, name)
-        }
+        sealed interface Details : Work {
 
-        @Serializable
-        data class OwnerDetails(val login: String) : Work
+            @Serializable
+            data class Repo(val repoRef: RepoRef) : Details
+
+            @Serializable
+            data class Owner(val login: String) : Details
+        }
 
         @Serializable
         data class Branches(
-            val owner: String,
-            val repo: String,
+            val repoRef: RepoRef,
             val defaultBranch: String? = null
-        ) : Work {
-            val repoRef: RepoRef get() = RepoRef(owner, repo)
-        }
+        ) : Work
     }
 }
 
@@ -79,8 +77,8 @@ val workSerializersModule = SerializersModule {
         subclass(Route.Work.Search::class, Route.Work.Search.serializer())
         subclass(Route.Work.Found.Repo::class, Route.Work.Found.Repo.serializer())
         subclass(Route.Work.Found.Owner::class, Route.Work.Found.Owner.serializer())
-        subclass(Route.Work.RepoDetails::class, Route.Work.RepoDetails.serializer())
-        subclass(Route.Work.OwnerDetails::class, Route.Work.OwnerDetails.serializer())
+        subclass(Route.Work.Details.Repo::class, Route.Work.Details.Repo.serializer())
+        subclass(Route.Work.Details.Owner::class, Route.Work.Details.Owner.serializer())
         subclass(Route.Work.Branches::class, Route.Work.Branches.serializer())
     }
 }

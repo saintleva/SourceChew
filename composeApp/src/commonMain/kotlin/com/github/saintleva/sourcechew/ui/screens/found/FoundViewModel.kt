@@ -19,18 +19,34 @@ package com.github.saintleva.sourcechew.ui.screens.found
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundBase
+import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
+import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import com.jamal_aliev.paginator.offset.Paginator
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
 class FoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
-    private val searchInteractor: SearchInteractor<ItemSearchConditions, FoundItem>
+    private val searchInteractor: SearchInteractor<ItemSearchConditions, FoundItem>,
+    appSettingsStore: ConfigStore<AppSettings>
 ) : ViewModel() {
+
+    val maxDescriptionLength: StateFlow<Int> = appSettingsStore.config
+        .map { it.maxFoundRepoDescriptionLength }
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileUiSubscribed,
+            initialValue = AppSettings.default.maxFoundRepoDescriptionLength
+        )
 
     init {
         Napier.d(tag = "init") {

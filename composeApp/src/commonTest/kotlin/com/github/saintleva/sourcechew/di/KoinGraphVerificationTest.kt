@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.di
 
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import io.kotest.core.spec.style.FunSpec
 import io.ktor.client.engine.HttpClientEngine
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -13,7 +14,10 @@ class KoinGraphVerificationTest : FunSpec({
         module {
             includes(appModule, domainModule, dataModule, platformModule)
         }.verify(
-            extraTypes = platformExtraTypes + listOf(HttpClientEngine::class)
+            extraTypes = platformExtraTypes + listOf(
+                HttpClientEngine::class,
+                RepoRef::class,
+            )
         )
     }
 })

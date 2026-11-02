@@ -14,6 +14,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
+import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
@@ -23,10 +24,9 @@ import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsScre
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewModel
-import com.github.saintleva.sourcechew.ui.screens.found.FoundScreen
+import com.github.saintleva.sourcechew.ui.screens.found.FoundOwnerScreen
+import com.github.saintleva.sourcechew.ui.screens.found.FoundRepoScreen
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
-import com.github.saintleva.sourcechew.ui.screens.found.ItemOwnerContent
-import com.github.saintleva.sourcechew.ui.screens.found.ItemRepoContent
 import com.github.saintleva.sourcechew.ui.screens.search.SearchTabScreen
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -116,13 +116,14 @@ fun WorkNavigation(
                         }
                     }
                 ) { modifier ->
-                    FoundScreen(
+                    FoundRepoScreen(
                         modifier = modifier,
                         viewModel = foundViewModel,
-                        itemContent = { repo ->
-                            ItemRepoContent(repo) {
-                                backStack.add(Route.Work.RepoDetails(repo.owner.login, repo.name))
-                            }
+                        onRepoClick = { repoRef ->
+                            backStack.add(Route.Work.Details.Repo(repoRef))
+                        },
+                        onOwnerClick = { ownerLogin ->
+                            backStack.add(Route.Work.Details.Owner(ownerLogin))
                         }
                     )
                 }
@@ -144,18 +145,16 @@ fun WorkNavigation(
                         }
                     }
                 ) { modifier ->
-                    FoundScreen(
+                    FoundOwnerScreen(
                         modifier = modifier,
                         viewModel = foundViewModel,
-                        itemContent = { owner ->
-                            ItemOwnerContent(owner) {
-                                backStack.add(Route.Work.OwnerDetails(owner.login))
-                            }
+                        onOwnerClick = { owner ->
+                            backStack.add(Route.Work.Details.Owner(owner.login))
                         }
                     )
                 }
             }
-            entry<Route.Work.RepoDetails> { key ->
+            entry<Route.Work.Details.Repo> { key ->
                 val detailsViewModel = koinViewModel<RepoDetailsViewModel>(
                     parameters = { parametersOf(key.repoRef) }
                 )
@@ -175,15 +174,15 @@ fun WorkNavigation(
                         modifier = modifier,
                         viewModel = detailsViewModel,
                         onOwnerClick = { ownerLogin ->
-                            backStack.add(Route.Work.OwnerDetails(ownerLogin))
+                            backStack.add(Route.Work.Details.Owner(ownerLogin))
                         },
                         onBranchesClick = { owner, repo, defaultBranch ->
-                            backStack.add(Route.Work.Branches(owner, repo, defaultBranch))
+                            backStack.add(Route.Work.Branches(RepoRef(owner, repo), defaultBranch))
                         }
                     )
                 }
             }
-            entry<Route.Work.OwnerDetails> { key ->
+            entry<Route.Work.Details.Owner> { key ->
                 val detailsViewModel = koinViewModel<OwnerDetailsViewModel>(
                     parameters = { parametersOf(key.login) }
                 )
