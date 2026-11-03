@@ -1,47 +1,21 @@
 package com.github.saintleva.sourcechew.ui.screens.search
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
-import com.github.saintleva.sourcechew.domain.models.BaseSearchConditions
-import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchScope
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchSort
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.Range
-import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
-import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
-import com.github.saintleva.sourcechew.domain.usecase.SearchState
+import com.github.saintleva.sourcechew.test.FakeConfigStore
+import com.github.saintleva.sourcechew.test.FakeSearchInteractor
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-
-private class FakeOwnerConfigStore<T>(initial: T) : ConfigStore<T> {
-    private val _config = MutableStateFlow(initial)
-    override val config: Flow<T> = _config
-    override suspend fun update(updater: (T) -> T) {
-        _config.update(updater)
-    }
-}
-
-private class FakeOwnerSearchInteractor<C : BaseSearchConditions<C>, I : FoundBase> : SearchInteractor<C, I> {
-    override val searchState: StateFlow<SearchState<I>> = MutableStateFlow(SearchState.Selecting)
-    override val everSearched: Boolean = false
-    override var lastScrollPosition: ScrollPosition? = null
-    override suspend fun search(conditions: C, usePreviousSearch: Boolean) {}
-    override fun canUsePreviousConditions(newConditions: C): Boolean = false
-    override fun switchToSelecting() {}
-    override fun clear() {}
-}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OwnerSearchViewModelTest : FunSpec(
@@ -58,9 +32,9 @@ class OwnerSearchViewModelTest : FunSpec(
 
         test("onReposFilterChange updates repos condition") {
             val viewModel = OwnerSearchViewModel(
-                conditionsStore = FakeOwnerConfigStore(OwnerSearchConditions.default),
-                appSettingsStore = FakeOwnerConfigStore(AppSettings.default),
-                searchInteractor = FakeOwnerSearchInteractor(),
+                conditionsStore = FakeConfigStore(OwnerSearchConditions.default),
+                appSettingsStore = FakeConfigStore(AppSettings.default),
+                searchInteractor = FakeSearchInteractor(),
             )
             val repos = Range.atLeast(10)
             viewModel.onReposFilterChange(repos)
@@ -72,9 +46,9 @@ class OwnerSearchViewModelTest : FunSpec(
 
         test("onFollowersFilterChange updates followers condition") {
             val viewModel = OwnerSearchViewModel(
-                conditionsStore = FakeOwnerConfigStore(OwnerSearchConditions.default),
-                appSettingsStore = FakeOwnerConfigStore(AppSettings.default),
-                searchInteractor = FakeOwnerSearchInteractor(),
+                conditionsStore = FakeConfigStore(OwnerSearchConditions.default),
+                appSettingsStore = FakeConfigStore(AppSettings.default),
+                searchInteractor = FakeSearchInteractor(),
             )
             val followers = Range.between(100, 500)
             viewModel.onFollowersFilterChange(followers)
@@ -83,9 +57,9 @@ class OwnerSearchViewModelTest : FunSpec(
 
         test("onCreatedFilterChange updates created condition") {
             val viewModel = OwnerSearchViewModel(
-                conditionsStore = FakeOwnerConfigStore(OwnerSearchConditions.default),
-                appSettingsStore = FakeOwnerConfigStore(AppSettings.default),
-                searchInteractor = FakeOwnerSearchInteractor(),
+                conditionsStore = FakeConfigStore(OwnerSearchConditions.default),
+                appSettingsStore = FakeConfigStore(AppSettings.default),
+                searchInteractor = FakeSearchInteractor(),
             )
             val created = Range.exact(LocalDate(2023, 5, 1))
             viewModel.onCreatedFilterChange(created)
@@ -94,9 +68,9 @@ class OwnerSearchViewModelTest : FunSpec(
 
         test("onLocationsChange updates locations condition") {
             val viewModel = OwnerSearchViewModel(
-                conditionsStore = FakeOwnerConfigStore(OwnerSearchConditions.default),
-                appSettingsStore = FakeOwnerConfigStore(AppSettings.default),
-                searchInteractor = FakeOwnerSearchInteractor(),
+                conditionsStore = FakeConfigStore(OwnerSearchConditions.default),
+                appSettingsStore = FakeConfigStore(AppSettings.default),
+                searchInteractor = FakeSearchInteractor(),
             )
             val locations = setOf("San Francisco", "London")
             viewModel.onLocationsChange(locations)
@@ -105,9 +79,9 @@ class OwnerSearchViewModelTest : FunSpec(
 
         test("Scope, type and sort toggles work properly") {
             val viewModel = OwnerSearchViewModel(
-                conditionsStore = FakeOwnerConfigStore(OwnerSearchConditions.default),
-                appSettingsStore = FakeOwnerConfigStore(AppSettings.default),
-                searchInteractor = FakeOwnerSearchInteractor(),
+                conditionsStore = FakeConfigStore(OwnerSearchConditions.default),
+                appSettingsStore = FakeConfigStore(AppSettings.default),
+                searchInteractor = FakeSearchInteractor(),
             )
 
             viewModel.toggleScope(OwnerSearchScope.FULLNAME)

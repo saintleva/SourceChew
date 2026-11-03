@@ -3,42 +3,17 @@ package com.github.saintleva.sourcechew.domain.usecase
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.models.RepoRef
-import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
 import com.github.saintleva.sourcechew.domain.result.Result
+import com.github.saintleva.sourcechew.test.FakeBranchesApiService
+import com.github.saintleva.sourcechew.test.FakeConfigStore
+import com.jamal_aliev.paginator.offset.*
 import com.jamal_aliev.paginator.offset.bookmark.BookmarkInt
 import com.jamal_aliev.paginator.offset.page.OffsetPageState
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
-
-private class FakeConfigStore<T>(initial: T) : ConfigStore<T> {
-    private val _config = MutableStateFlow(initial)
-    override val config: Flow<T> = _config
-    override suspend fun update(updater: (T) -> T) {
-        _config.update(updater)
-    }
-}
-
-private class FakeBranchesApiService(
-    var resultProvider: suspend (repoRef: RepoRef, page: Int, pageSize: Int) -> Result<List<Branch>, DetailsError>
-) : BranchesApiService {
-    override suspend fun getBranches(
-        repoRef: RepoRef,
-        page: Int,
-        pageSize: Int,
-    ): Result<List<Branch>, DetailsError> = resultProvider(repoRef, page, pageSize)
-
-    override suspend fun getSingleBranch(
-        repoRef: RepoRef,
-        branch: String,
-    ): Result<Branch, DetailsError> = Result.Failure(DetailsError.ResourceNotFound)
-}
 
 class FetchBranchesUseCaseTest : FunSpec({
 
