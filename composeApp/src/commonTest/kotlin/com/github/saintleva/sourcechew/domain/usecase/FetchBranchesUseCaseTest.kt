@@ -2,6 +2,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.Branch
+import com.github.saintleva.sourcechew.domain.models.Commit
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
@@ -19,8 +20,8 @@ class FetchBranchesUseCaseTest : FunSpec({
 
     test("creates paginator and loads branches successfully without metadata") {
         val expectedBranches = listOf(
-            Branch(name = "main", commitSha = "sha-main-123"),
-            Branch(name = "develop", commitSha = "sha-dev-456"),
+            Branch(name = "main", commit = Commit("sha-main-123")),
+            Branch(name = "develop", commit = Commit("sha-dev-456")),
         )
         val configStore = FakeConfigStore(AppSettings.default.copy(paginationPageSize = 25))
         var requestedPage: Int? = null

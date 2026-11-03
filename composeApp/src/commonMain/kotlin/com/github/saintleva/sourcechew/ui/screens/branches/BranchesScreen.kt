@@ -31,10 +31,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.Branch
+import com.github.saintleva.sourcechew.domain.models.Commit
 import com.github.saintleva.sourcechew.ui.common.AppendIndicator
 import com.github.saintleva.sourcechew.ui.common.EmptyContent
 import com.github.saintleva.sourcechew.ui.common.ErrorContent
 import com.github.saintleva.sourcechew.ui.common.FullscreenLoading
+import com.github.saintleva.sourcechew.ui.common.formatRelativeTime
 import com.jamal_aliev.paginator.compose.core.PaginatedSlots
 import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
 import org.jetbrains.compose.resources.stringResource
@@ -74,7 +76,7 @@ fun BranchesScreen(
     }
 
     val defaultBranchName = viewModel.defaultBranch
-    val defaultBranchCommitSha by viewModel.defaultBranchCommitSha.collectAsStateWithLifecycle()
+    val defaultBranchCommit by viewModel.defaultBranchCommit.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
         Text(
@@ -87,7 +89,7 @@ fun BranchesScreen(
         if (!defaultBranchName.isNullOrBlank()) {
             BranchCard(
                 branchName = defaultBranchName,
-                commitSha = defaultBranchCommitSha,
+                commit = defaultBranchCommit,
                 isDefault = true
             )
         }
@@ -123,7 +125,7 @@ fun BranchesScreen(
             if (item.name == viewModel.defaultBranch) return@PaginatedLazyColumn
             BranchCard(
                 branchName = item.name,
-                commitSha = item.commitSha,
+                commit = item.commit,
                 isDefault = false
             )
         }
@@ -133,7 +135,7 @@ fun BranchesScreen(
 @Composable
 private fun BranchCard(
     branchName: String,
-    commitSha: String?,
+    commit: Commit?,
     isDefault: Boolean = false
 ) {
     val cardColors = if (isDefault) {
@@ -213,13 +215,29 @@ private fun BranchCard(
                         }
                     }
                 }
-                if (!commitSha.isNullOrBlank()) {
+                if (commit != null) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(Res.string.commit_sha, commitSha.take(7)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (commit.sha.isNotBlank()) {
+                            Text(
+                                text = stringResource(Res.string.commit_sha, commit.sha.take(7)),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        val madeAt = commit.madeAt
+                        if (madeAt != null) {
+                            Text(
+                                text = madeAt.formatRelativeTime(),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -12,14 +12,22 @@ import com.jamal_aliev.paginator.offset.dsl.paginator
 import com.jamal_aliev.paginator.offset.load.LoadResult
 import kotlinx.coroutines.flow.first
 
+
 class FetchBranchesUseCaseImpl(
     private val appSettingsStore: ConfigStore<AppSettings>,
     private val branchesApiService: BranchesApiService
 ) : FetchBranchesUseCase {
 
-    override suspend fun invoke(repoRef: RepoRef): Paginator<Branch> {
+    override suspend fun invoke(repoRef: RepoRef, defaultBranch: String?): BranchPaginating {
+
+        val default = if (defaultBranch == null) {
+            null
+        } else {
+            (branchesApiService.getSingleBranch(repoRef, defaultBranch) as? Result.Success)?.value
+        }
+
         val pageSize = appSettingsStore.config.first().paginationPageSize
-        return paginator(capacity = pageSize) {
+        val paginator = paginator(capacity = pageSize) {
             load { page ->
                 when (val result = branchesApiService.getBranches(repoRef, page, pageSize)) {
                     is Result.Success -> LoadResult(data = result.value)
@@ -27,5 +35,7 @@ class FetchBranchesUseCaseImpl(
                 }
             }
         }
+
+        return BranchPaginating(default, paginator)
     }
 }
