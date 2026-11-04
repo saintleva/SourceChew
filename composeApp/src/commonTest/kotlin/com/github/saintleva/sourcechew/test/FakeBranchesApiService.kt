@@ -10,7 +10,8 @@ import com.github.saintleva.sourcechew.domain.result.Result
  * Fake implementation of [BranchesApiService] for testing.
  */
 class FakeBranchesApiService(
-    var resultProvider: suspend (repoRef: RepoRef, page: Int, pageSize: Int) -> Result<List<Branch>, DetailsError>
+    var resultProvider: suspend (repoRef: RepoRef, page: Int, pageSize: Int) -> Result<List<Branch>, DetailsError> = { _, _, _ -> Result.Success(emptyList()) },
+    var singleBranchResultProvider: suspend (repoRef: RepoRef, branch: String) -> Result<Branch, DetailsError> = { _, _ -> Result.Failure(DetailsError.ResourceNotFound) }
 ) : BranchesApiService {
     override suspend fun getBranches(
         repoRef: RepoRef,
@@ -21,5 +22,5 @@ class FakeBranchesApiService(
     override suspend fun getSingleBranch(
         repoRef: RepoRef,
         branch: String,
-    ): Result<Branch, DetailsError> = Result.Failure(DetailsError.ResourceNotFound)
+    ): Result<Branch, DetailsError> = singleBranchResultProvider(repoRef, branch)
 }

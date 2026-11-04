@@ -55,8 +55,7 @@ sealed interface Route : NavKey {
 
         @Serializable
         data class Branches(
-            val repoRef: RepoRef,
-            val defaultBranch: String? = null
+            val repoRef: RepoRef
         ) : Work
     }
 }

@@ -2,13 +2,10 @@ package com.github.saintleva.sourcechew.ui.screens.branches
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.Branch
-import com.github.saintleva.sourcechew.domain.models.Commit
 import com.github.saintleva.sourcechew.domain.models.RepoRef
-import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
-import com.github.saintleva.sourcechew.domain.result.Result
-import com.github.saintleva.sourcechew.domain.usecase.BranchPaginating
+import com.github.saintleva.sourcechew.domain.usecase.BranchData
+import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
 import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
@@ -20,17 +17,36 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 
 class BranchesViewModel(
     val repoRef: RepoRef,
-    val defaultBranch: String?,
-    private val fetchBranchesUseCase: FetchBranchesUseCase,
-    private val branchesApiService: BranchesApiService
+    private val fetchBranchesUseCase: FetchBranchesUseCase
 ) : ViewModel() {
 
-
-    private val _branches = MutableStateFlow<BranchPaginating?>(null)
+    private val _branches = MutableStateFlow<BranchData?>(null)
     val branches = _branches.asStateFlow()
+
+    val paginator: StateFlow<Paginator<Branch>?> = branches
+        .map { it?.paginator }
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileUiSubscribed,
+            initialValue = null
+        )
+
+    val defaultBranchResult: StateFlow<BranchDetailsResult?> = branches
+        .map { it?.default }
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileUiSubscribed,
+            initialValue = null
+        )
+
+    val defaultBranch: Branch?
+        get() = (branches.value?.default as? BranchDetailsResult.Success)?.value
+
+    private var loadJob: Job? = null
 
     private var scrollPosition: ScrollPosition? = null
 
@@ -39,24 +55,12 @@ class BranchesViewModel(
     }
 
     private fun loadBranches() {
-        viewModelScope.launch {
-            _branches.value = fetchBranchesUseCase(repoRef, defaultBranch)
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
+            _branches.value = fetchBranchesUseCase(repoRef)
             _branches.value?.paginator?.jump(BookmarkInt(1))
         }
     }
-
-    //TODO: Remove this
-//
-//    private fun fetchDefaultBranchCommit() {
-//        if (!defaultBranch.isNullOrBlank()) {
-//            viewModelScope.launch {
-//                when (val result = branchesApiService.getSingleBranch(repoRef, defaultBranch)) {
-//                    is Result.Success -> _defaultBranchCommit.value = result.value.commit
-//                    is Result.Failure -> { /* no-op */ }
-//                }
-//            }
-//        }
-//    }
 
     fun consumeInitialScroll(): ScrollPosition? {
         val current = scrollPosition
@@ -68,23 +72,25 @@ class BranchesViewModel(
         scrollPosition = ScrollPosition(index, offset)
     }
 
+    fun refresh() {
+        loadBranches()
+    }
+
     fun restart() {
         viewModelScope.launch {
-            _defaultBranchCommit.value = null
-            _paginator.value?.restart()
-            fetchDefaultBranchCommit()
+            paginator.value?.restart()
         }
     }
 
     fun loadPrevious() {
         viewModelScope.launch {
-            _paginator.value?.goPreviousPage()
+            paginator.value?.goPreviousPage()
         }
     }
 
     fun loadNext() {
         viewModelScope.launch {
-            _paginator.value?.goNextPage()
+            paginator.value?.goNextPage()
         }
     }
 }

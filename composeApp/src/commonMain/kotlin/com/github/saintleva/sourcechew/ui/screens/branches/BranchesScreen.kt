@@ -32,11 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.models.Commit
+import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.ui.common.AppendIndicator
 import com.github.saintleva.sourcechew.ui.common.EmptyContent
 import com.github.saintleva.sourcechew.ui.common.ErrorContent
 import com.github.saintleva.sourcechew.ui.common.FullscreenLoading
 import com.github.saintleva.sourcechew.ui.common.formatRelativeTime
+import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import com.jamal_aliev.paginator.compose.core.PaginatedSlots
 import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
 import org.jetbrains.compose.resources.stringResource
@@ -44,6 +46,7 @@ import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.branches
 import sourcechew.composeapp.generated.resources.commit_sha
 import sourcechew.composeapp.generated.resources.default_branch_badge
+import sourcechew.composeapp.generated.resources.loading_error
 
 @Composable
 fun BranchesScreen(
@@ -75,8 +78,8 @@ fun BranchesScreen(
         }
     }
 
-    val defaultBranchName = viewModel.defaultBranch
-    val defaultBranchCommit by viewModel.defaultBranchCommit.collectAsStateWithLifecycle()
+    val defaultBranchResult by viewModel.defaultBranchResult.collectAsStateWithLifecycle()
+    val defaultBranch = viewModel.defaultBranch
 
     Column(modifier = modifier.fillMaxSize()) {
         Text(
@@ -86,12 +89,86 @@ fun BranchesScreen(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
 
-        if (!defaultBranchName.isNullOrBlank()) {
-            BranchCard(
-                branchName = defaultBranchName,
-                commit = defaultBranchCommit,
-                isDefault = true
-            )
+        when (val result = defaultBranchResult) {
+            is BranchDetailsResult.Success -> {
+                val branch = result.value
+                if (branch != null) {
+                    BranchCard(
+                        branchName = branch.name,
+                        commit = branch.commit,
+                        isDefault = true
+                    )
+                }
+            }
+            is BranchDetailsResult.Error -> {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
+                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(Res.string.loading_error),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = getErrorMessage(result.error),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                }
+            }
+            is BranchDetailsResult.InfrastructureError -> {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
+                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(Res.string.loading_error),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = getErrorMessage(result.cause),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                }
+            }
+            null -> {
+                // Loading state for default branch
+            }
         }
 
         PaginatedLazyColumn<Branch>(
@@ -122,7 +199,7 @@ fun BranchesScreen(
                 }
             )
         ) { item, _, _, _, _ ->
-            if (item.name == viewModel.defaultBranch) return@PaginatedLazyColumn
+            if (item.name == defaultBranch?.name) return@PaginatedLazyColumn
             BranchCard(
                 branchName = item.name,
                 commit = item.commit,

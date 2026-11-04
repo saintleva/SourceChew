@@ -100,12 +100,10 @@ val appModule = module {
         )
     }
 
-    viewModel<BranchesViewModel> { (repoRef: RepoRef, defaultBranch: String?) ->
+    viewModel<BranchesViewModel> { (repoRef: RepoRef) ->
         BranchesViewModel(
             repoRef = repoRef,
-            defaultBranch = defaultBranch,
-            fetchBranchesUseCase = get(),
-            branchesApiService = get()
+            fetchBranchesUseCase = get()
         )
     }
 }

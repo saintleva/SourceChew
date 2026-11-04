@@ -176,8 +176,8 @@ fun WorkNavigation(
                         onOwnerClick = { ownerLogin ->
                             backStack.add(Route.Work.Details.Owner(ownerLogin))
                         },
-                        onBranchesClick = { owner, repo, defaultBranch ->
-                            backStack.add(Route.Work.Branches(RepoRef(owner, repo), defaultBranch))
+                        onBranchesClick = { owner, repo ->
+                            backStack.add(Route.Work.Branches(RepoRef(owner, repo)))
                         }
                     )
                 }
@@ -206,7 +206,7 @@ fun WorkNavigation(
             }
             entry<Route.Work.Branches> { key ->
                 val branchesViewModel = koinViewModel<BranchesViewModel>(
-                    parameters = { parametersOf(key.repoRef, key.defaultBranch) }
+                    parameters = { parametersOf(key.repoRef) }
                 )
                 WorkEntryContainer(
                     onMenuItemClick = onMenuItemClick,

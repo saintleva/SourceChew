@@ -99,7 +99,7 @@ fun RepoDetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: RepoDetailsViewModel,
     onOwnerClick: (String) -> Unit,
-    onBranchesClick: (owner: String, repo: String, defaultBranch: String?) -> Unit = { _, _, _ -> }
+    onBranchesClick: (owner: String, repo: String) -> Unit = { _, _ -> }
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val settings by viewModel.settings.collectAsStateWithLifecycle()
@@ -140,7 +140,7 @@ private fun RepoDetailsContent(
     details: RepoDetails,
     maxDescriptionLength: Int,
     onOwnerClick: (String) -> Unit,
-    onBranchesClick: (owner: String, repo: String, defaultBranch: String?) -> Unit
+    onBranchesClick: (owner: String, repo: String) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
     var isDescriptionExpanded by remember { mutableStateOf(false) }
@@ -288,7 +288,7 @@ private fun RepoDetailsContent(
         // Primary Action: Navigate to Branches
         Button(
             onClick = {
-                onBranchesClick(details.owner.login, details.name, details.defaultBranch)
+                onBranchesClick(details.owner.login, details.name)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -355,7 +355,7 @@ private fun RepoDetailsContent(
                             label = stringResource(Res.string.default_branch),
                             value = defaultBranch,
                             onClick = {
-                                onBranchesClick(details.owner.login, details.name, defaultBranch)
+                                onBranchesClick(details.owner.login, details.name)
                             }
                         )
                     }

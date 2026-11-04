@@ -83,7 +83,8 @@ val domainModule = module {
     factory<FetchBranchesUseCase> {
         FetchBranchesUseCaseImpl(
             appSettingsStore = get(qualifier<AppSettings>()),
-            branchesApiService = get()
+            branchesApiService = get(),
+            repoDetailsApiService = get()
         )
     }
 
