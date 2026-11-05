@@ -25,6 +25,7 @@ import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
+import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import com.jamal_aliev.paginator.offset.Paginator
 import io.github.aakira.napier.Napier
@@ -38,7 +39,7 @@ import kotlinx.coroutines.launch
 class FoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
     private val searchInteractor: SearchInteractor<ItemSearchConditions, FoundItem>,
     appSettingsStore: ConfigStore<AppSettings>
-) : ViewModel() {
+) : PaginatedViewModel<FoundItem>() {
 
     val maxDescriptionLength: StateFlow<Int> = appSettingsStore.config
         .map { it.maxFoundRepoDescriptionLength }
@@ -54,25 +55,13 @@ class FoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
         }
     }
 
-    val paginator: Paginator<FoundItem>?
+    override val paginator: Paginator<FoundItem>?
         get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator
 
-    fun consumeInitialScroll(): ScrollPosition? = searchInteractor.lastScrollPosition
+    override fun consumeInitialScroll(): ScrollPosition? = searchInteractor.lastScrollPosition
 
-    fun saveScroll(index: Int, offset: Int) {
+    override fun saveScroll(index: Int, offset: Int) {
         searchInteractor.lastScrollPosition = ScrollPosition(index, offset)
-    }
-
-    fun restart() {
-        viewModelScope.launch { paginator?.restart() }
-    }
-
-    fun loadPrevious() {
-        viewModelScope.launch { paginator?.goPreviousPage() }
-    }
-
-    fun loadNext() {
-        viewModelScope.launch { paginator?.goNextPage() }
     }
 
     fun onNavigationBack() {

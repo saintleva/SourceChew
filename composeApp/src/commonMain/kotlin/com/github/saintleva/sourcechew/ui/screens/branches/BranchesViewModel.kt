@@ -8,6 +8,7 @@ import com.github.saintleva.sourcechew.domain.usecase.BranchData
 import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
 import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
+import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import com.jamal_aliev.paginator.offset.Paginator
 import com.jamal_aliev.paginator.offset.bookmark.BookmarkInt
@@ -22,18 +23,21 @@ import kotlinx.coroutines.Job
 class BranchesViewModel(
     val repoRef: RepoRef,
     private val fetchBranchesUseCase: FetchBranchesUseCase
-) : ViewModel() {
+) : PaginatedViewModel<Branch>() {
 
     private val _branches = MutableStateFlow<BranchData?>(null)
     val branches = _branches.asStateFlow()
 
-    val paginator: StateFlow<Paginator<Branch>?> = branches
+    private val paginatorStateFlow = branches
         .map { it?.paginator }
         .stateIn(
             scope = viewModelScope,
             started = WhileUiSubscribed,
             initialValue = null
         )
+
+    override val paginator: Paginator<Branch>?
+        get() = paginatorStateFlow.value
 
     val defaultBranchResult: StateFlow<BranchDetailsResult?> = branches
         .map { it?.default }
@@ -58,39 +62,21 @@ class BranchesViewModel(
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             _branches.value = fetchBranchesUseCase(repoRef)
-            _branches.value?.paginator?.jump(BookmarkInt(1))
+            paginator?.jump(BookmarkInt(1))
         }
     }
 
-    fun consumeInitialScroll(): ScrollPosition? {
+    override fun consumeInitialScroll(): ScrollPosition? {
         val current = scrollPosition
         scrollPosition = null
         return current
     }
 
-    fun saveScroll(index: Int, offset: Int) {
+    override fun saveScroll(index: Int, offset: Int) {
         scrollPosition = ScrollPosition(index, offset)
     }
 
     fun refresh() {
         loadBranches()
-    }
-
-    fun restart() {
-        viewModelScope.launch {
-            paginator.value?.restart()
-        }
-    }
-
-    fun loadPrevious() {
-        viewModelScope.launch {
-            paginator.value?.goPreviousPage()
-        }
-    }
-
-    fun loadNext() {
-        viewModelScope.launch {
-            paginator.value?.goNextPage()
-        }
     }
 }
