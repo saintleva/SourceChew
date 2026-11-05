@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
+import org.jetbrains.compose.resources.stringResource
+import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.found_owners
 
 @Composable
 fun FoundOwnerScreen(
@@ -14,6 +17,7 @@ fun FoundOwnerScreen(
     FoundScreen(
         modifier = modifier,
         viewModel = viewModel,
+        itemsTitle = stringResource(Res.string.found_owners),
         itemContent = { owner ->
             ItemFoundOwnerContent(
                 owner = owner,

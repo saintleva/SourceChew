@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) Anton Liaukevich 2021-2022 <leva.dev@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.github.saintleva.sourcechew.ui.screens.branches
 
 import androidx.compose.foundation.BorderStroke
@@ -11,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.ForkRight
@@ -22,25 +38,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.models.Commit
 import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
-import com.github.saintleva.sourcechew.ui.common.AppendIndicator
-import com.github.saintleva.sourcechew.ui.common.EmptyContent
-import com.github.saintleva.sourcechew.ui.common.ErrorContent
-import com.github.saintleva.sourcechew.ui.common.FullscreenLoading
+import com.github.saintleva.sourcechew.ui.common.PaginatedList
 import com.github.saintleva.sourcechew.ui.common.formatRelativeTime
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
-import com.jamal_aliev.paginator.compose.core.PaginatedSlots
-import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.branches
@@ -53,31 +61,7 @@ fun BranchesScreen(
     modifier: Modifier = Modifier,
     viewModel: BranchesViewModel
 ) {
-    val paginatorState by viewModel.paginator.collectAsStateWithLifecycle()
-    val paginator = paginatorState
-
-    if (paginator == null) {
-        FullscreenLoading(modifier = modifier)
-        return
-    }
-
-    val listState = remember(paginator) {
-        val initial = viewModel.consumeInitialScroll()
-        LazyListState(
-            firstVisibleItemIndex = initial?.index ?: 0,
-            firstVisibleItemScrollOffset = initial?.offset ?: 0,
-        )
-    }
-
-    DisposableEffect(paginator) {
-        onDispose {
-            viewModel.saveScroll(
-                listState.firstVisibleItemIndex,
-                listState.firstVisibleItemScrollOffset,
-            )
-        }
-    }
-
+    val branchesState by viewModel.branches.collectAsStateWithLifecycle()
     val defaultBranchResult by viewModel.defaultBranchResult.collectAsStateWithLifecycle()
     val defaultBranch = viewModel.defaultBranch
 
@@ -100,111 +84,61 @@ fun BranchesScreen(
                     )
                 }
             }
-            is BranchDetailsResult.Error -> {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
-                    ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(Res.string.loading_error),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = getErrorMessage(result.error),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onErrorContainer
-                            )
-                        }
-                    }
-                }
-            }
-            is BranchDetailsResult.InfrastructureError -> {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
-                    ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(Res.string.loading_error),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = getErrorMessage(result.cause),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onErrorContainer
-                            )
-                        }
-                    }
-                }
-            }
+            is BranchDetailsResult.Error -> BranchErrorCard(message = getErrorMessage(result.error))
+            is BranchDetailsResult.InfrastructureError -> BranchErrorCard(message = getErrorMessage(result.cause))
             null -> {
                 // Loading state for default branch
             }
         }
 
-        PaginatedLazyColumn<Branch>(
-            paginator = paginator,
+        PaginatedList(
+            viewModel = viewModel,
+            paginator = branchesState?.paginator,
             modifier = Modifier.fillMaxSize(),
-            state = listState,
-            key = { it.name },
-            slots = PaginatedSlots(
-                prependErrorIndicator = { state ->
-                    AppendIndicator(
-                        errorState = state,
-                        onRetry = viewModel::loadPrevious
-                    )
-                },
-                appendErrorIndicator = { state ->
-                    AppendIndicator(
-                        errorState = state,
-                        onRetry = viewModel::loadNext
-                    )
-                },
-                loadingContent = { FullscreenLoading() },
-                emptyContent = { EmptyContent() },
-                errorContent = { state ->
-                    ErrorContent(
-                        cause = state.exception,
-                        onRetry = viewModel::restart
-                    )
-                }
-            )
+            key = { it.name }
         ) { item, _, _, _, _ ->
-            if (item.name == defaultBranch?.name) return@PaginatedLazyColumn
-            BranchCard(
-                branchName = item.name,
-                commit = item.commit,
-                isDefault = false
-            )
+            if (item.name != defaultBranch?.name) {
+                BranchCard(
+                    branchName = item.name,
+                    commit = item.commit,
+                    isDefault = false
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BranchErrorCard(message: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f)
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(Res.string.loading_error),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
         }
     }
 }

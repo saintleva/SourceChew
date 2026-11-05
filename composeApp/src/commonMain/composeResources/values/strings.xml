@@ -35,6 +35,8 @@
     <string name="stop_search">Stop search</string>
     <string name="go_back">Go back</string>
     <string name="found_items">Items found</string>
+    <string name="found_repositories">Repositories found</string>
+    <string name="found_owners">Owners found</string>
     <string name="loading_error">Loading Error</string>
     <string name="unknown_error">Unknown error</string>
     <string name="retry_button">Retry</string>

@@ -8,6 +8,9 @@ import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import org.jetbrains.compose.resources.stringResource
+import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.found_repositories
 
 @Composable
 fun FoundRepoScreen(
@@ -23,6 +26,7 @@ fun FoundRepoScreen(
     FoundScreen(
         modifier = modifier,
         viewModel = viewModel,
+        itemsTitle = stringResource(Res.string.found_repositories),
         itemContent = { repo ->
             ItemFoundRepoContent(
                 repo = repo,

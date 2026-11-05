@@ -17,26 +17,17 @@
 
 package com.github.saintleva.sourcechew.ui.screens.found
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
-import com.github.saintleva.sourcechew.ui.common.AppendIndicator
-import com.github.saintleva.sourcechew.ui.common.EmptyContent
-import com.github.saintleva.sourcechew.ui.common.ErrorContent
-import com.github.saintleva.sourcechew.ui.common.FullscreenLoading
-import com.jamal_aliev.paginator.compose.core.PaginatedSlots
-import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
+import com.github.saintleva.sourcechew.ui.common.PaginatedList
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.found_items
@@ -45,67 +36,29 @@ import sourcechew.composeapp.generated.resources.found_items
 fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
     modifier: Modifier,
     viewModel: FoundViewModel<ItemSearchConditions, FoundItem>,
+    itemsTitle: String,
     itemContent: @Composable (FoundItem) -> Unit
 ) {
-    val paginator = viewModel.paginator ?: return
-
-    val listState = remember(paginator) {
-        val initial = viewModel.consumeInitialScroll()
-        LazyListState(
-            firstVisibleItemIndex = initial?.index ?: 0,
-            firstVisibleItemScrollOffset = initial?.offset ?: 0,
-        )
-    }
-
-    DisposableEffect(paginator) {
-        onDispose {
-            viewModel.saveScroll(
-                listState.firstVisibleItemIndex,
-                listState.firstVisibleItemScrollOffset,
-            )
-        }
-    }
-
-    PaginatedLazyColumn<FoundItem>(
-        paginator = paginator,
-        modifier = modifier.fillMaxSize(),
-        state = listState,
-        key = { it.id },
-        slots = PaginatedSlots(
-            prependErrorIndicator = { state ->
-                AppendIndicator(
-                    errorState = state,
-                    onRetry = viewModel::loadPrevious
-                )
-            },
-            appendErrorIndicator = { state ->
-                AppendIndicator(
-                    errorState = state,
-                    onRetry = viewModel::loadNext
-                )
-            },
-            loadingContent = { FullscreenLoading() },
-            emptyContent = { EmptyContent() },
-            errorContent = { state ->
-                ErrorContent(
-                    cause = state.exception,
-                    onRetry = viewModel::restart
-                )
-            }
-        )
+    PaginatedList(
+        viewModel = viewModel,
+        modifier = modifier,
+        key = { it.id }
     ) { item, globalIndex, _, _, page ->
         if (globalIndex == 0) {
             val meta = page.metadata as? SearchMetadata
-            meta?.let { MetadataHeader(meta) }
+            meta?.let { MetadataHeader(it, itemsTitle = itemsTitle) }
         }
         itemContent(item)
     }
 }
 
 @Composable
-private fun MetadataHeader(metadata: SearchMetadata) {
+private fun MetadataHeader(
+    metadata: SearchMetadata,
+    itemsTitle: String
+) {
     Text(
-        text = "${stringResource(Res.string.found_items)}: ${metadata.totalCount}",
+        text = "$itemsTitle: ${metadata.totalCount}",
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
