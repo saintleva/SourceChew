@@ -8,7 +8,6 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchScope
 import com.github.saintleva.sourcechew.domain.models.RepoSearchSort
 import com.github.saintleva.sourcechew.domain.repository.FoundItemsBlock
-import com.github.saintleva.sourcechew.domain.repository.SearchApiService
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -19,7 +18,7 @@ import io.ktor.client.statement.HttpResponse
 
 
 class KtorSearchInReposApiService(private val httpClient: HttpClient):
-    BaseKtorSearchApiService<RepoSearchConditions, FoundRepo> {
+    BaseKtorSearchRepository<RepoSearchConditions, FoundRepo> {
 
     companion object {
         const val SEARCH_REPOSITORIES_ENDPOINT = "/search/repositories"

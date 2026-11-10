@@ -18,7 +18,7 @@ import io.ktor.client.statement.HttpResponse
 
 
 class KtorSearchInOwnersApiService(private val httpClient: HttpClient):
-    BaseKtorSearchApiService<OwnerSearchConditions, FoundOwner> {
+    BaseKtorSearchRepository<OwnerSearchConditions, FoundOwner> {
 
     companion object {
         const val SEARCH_OWNERS_ENDPOINT = "/search/users"

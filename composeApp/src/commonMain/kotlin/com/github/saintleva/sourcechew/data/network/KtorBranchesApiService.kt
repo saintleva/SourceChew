@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.models.RepoRef
-import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
+import com.github.saintleva.sourcechew.domain.repository.BranchesRepository
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
 import io.ktor.client.HttpClient
@@ -25,7 +25,7 @@ data class SingleBranchRequest(
 
 class KtorBranchesApiService(
     private val httpClient: HttpClient,
-) : BranchesApiService {
+) : BranchesRepository {
 
     private val branchesService = object : BaseKtorResourceApiService<BranchesRequest, List<Branch>> {
 

@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.data.repository
 
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.models.RepoRef
-import com.github.saintleva.sourcechew.domain.repository.RepoDetailsApiService
+import com.github.saintleva.sourcechew.data.network.RepoDetailsApiService
 import com.github.saintleva.sourcechew.domain.repository.RepoDetailsRepository
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result

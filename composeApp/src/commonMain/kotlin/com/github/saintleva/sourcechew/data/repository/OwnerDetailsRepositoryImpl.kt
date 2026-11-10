@@ -1,7 +1,7 @@
 package com.github.saintleva.sourcechew.data.repository
 
 import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
-import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsApiService
+import com.github.saintleva.sourcechew.data.network.OwnerDetailsApiService
 import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsRepository
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result

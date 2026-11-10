@@ -2,9 +2,9 @@ package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.repository.BranchesRepository
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
-import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
-import com.github.saintleva.sourcechew.domain.repository.RepoDetailsApiService
+import com.github.saintleva.sourcechew.domain.repository.RepoDetailsRepository
 import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
 import com.github.saintleva.sourcechew.domain.result.Result
@@ -19,21 +19,21 @@ import kotlinx.coroutines.flow.first
 
 class FetchBranchesUseCaseImpl(
     private val appSettingsStore: ConfigStore<AppSettings>,
-    private val branchesApiService: BranchesApiService,
-    private val repoDetailsApiService: RepoDetailsApiService
+    private val branchesRepository: BranchesRepository,
+    private val repoDetailsRepository: RepoDetailsRepository
 ) : FetchBranchesUseCase {
 
     override suspend fun invoke(repoRef: RepoRef): BranchData = coroutineScope {
         val defaultResultDeferred = async {
             // Safely fetch default branch details, catching both Result failures and thrown exceptions
             try {
-                when (val repoDetailsResult = repoDetailsApiService.getRepoDetails(repoRef)) {
+                when (val repoDetailsResult = repoDetailsRepository.getRepoDetails(repoRef, forceRefresh = true)) {
                     is Result.Success -> {
                         val defaultBranchName = repoDetailsResult.value.defaultBranch
                         if (defaultBranchName == null) {
                             BranchDetailsResult.Success(null)
                         } else {
-                            when (val branchResult = branchesApiService.getSingleBranch(repoRef, defaultBranchName)) {
+                            when (val branchResult = branchesRepository.getSingleBranch(repoRef, defaultBranchName)) {
                                 is Result.Success -> BranchDetailsResult.Success(branchResult.value)
                                 is Result.Failure -> BranchDetailsResult.Error(branchResult.error)
                             }
@@ -59,7 +59,7 @@ class FetchBranchesUseCaseImpl(
 
         val paginator = paginator(capacity = pageSize) {
             load { page ->
-                when (val result = branchesApiService.getBranches(repoRef, page, pageSize)) {
+                when (val result = branchesRepository.getBranches(repoRef, page, pageSize)) {
                     is Result.Success -> LoadResult(data = result.value)
                     is Result.Failure -> throw PagingBranchesException(result.error)
                 }

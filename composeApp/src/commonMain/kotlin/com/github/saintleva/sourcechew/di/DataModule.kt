@@ -6,9 +6,9 @@ import com.github.saintleva.sourcechew.data.network.KtorBranchesApiService
 import com.github.saintleva.sourcechew.data.network.KtorRepoDetailsApiService
 import com.github.saintleva.sourcechew.data.network.KtorSearchInOwnersApiService
 import com.github.saintleva.sourcechew.data.network.KtorSearchInReposApiService
-import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsApiService
-import com.github.saintleva.sourcechew.domain.repository.BranchesApiService
-import com.github.saintleva.sourcechew.domain.repository.RepoDetailsApiService
+import com.github.saintleva.sourcechew.data.network.OwnerDetailsApiService
+import com.github.saintleva.sourcechew.domain.repository.BranchesRepository
+import com.github.saintleva.sourcechew.data.network.RepoDetailsApiService
 import com.github.saintleva.sourcechew.data.network.createHttpClient
 import com.github.saintleva.sourcechew.data.repository.OwnerDetailsRepositoryImpl
 import com.github.saintleva.sourcechew.data.repository.RepoDetailsRepositoryImpl
@@ -22,7 +22,7 @@ import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsRepository
 import com.github.saintleva.sourcechew.domain.repository.RepoDetailsRepository
-import com.github.saintleva.sourcechew.domain.repository.SearchApiService
+import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import io.ktor.client.HttpClient
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
@@ -60,11 +60,11 @@ val dataModule = module {
         )
     }
 
-    single<SearchApiService<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
+    single<SearchRepository<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
         KtorSearchInReposApiService(httpClient = get())
     }
 
-    single<SearchApiService<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
+    single<SearchRepository<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         KtorSearchInOwnersApiService(httpClient = get())
     }
 
@@ -72,7 +72,7 @@ val dataModule = module {
         KtorRepoDetailsApiService(httpClient = get())
     }
 
-    single<BranchesApiService> {
+    single<BranchesRepository> {
         KtorBranchesApiService(httpClient = get())
     }
 

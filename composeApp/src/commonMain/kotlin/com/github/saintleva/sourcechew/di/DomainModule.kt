@@ -69,22 +69,22 @@ val domainModule = module {
     factory<FetchFoundItemsUseCase<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
         FetchFoundItemsUseCaseImpl(
             appSettingsStore = get(qualifier<AppSettings>()),
-            searchApiService = get(qualifier<FoundRepo>())
+            searchRepository = get(qualifier<FoundRepo>())
         )
     }
 
     factory<FetchFoundItemsUseCase<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         FetchFoundItemsUseCaseImpl(
             appSettingsStore = get(qualifier<AppSettings>()),
-            searchApiService = get(qualifier<FoundOwner>())
+            searchRepository = get(qualifier<FoundOwner>())
         )
     }
 
     factory<FetchBranchesUseCase> {
         FetchBranchesUseCaseImpl(
             appSettingsStore = get(qualifier<AppSettings>()),
-            branchesApiService = get(),
-            repoDetailsApiService = get()
+            branchesRepository = get(),
+            repoDetailsRepository = get()
         )
     }
 

@@ -3,7 +3,6 @@ package com.github.saintleva.sourcechew.data.network
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.models.RepoLanguage
 import com.github.saintleva.sourcechew.domain.models.RepoRef
-import com.github.saintleva.sourcechew.domain.repository.RepoDetailsApiService
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
 import io.ktor.client.HttpClient

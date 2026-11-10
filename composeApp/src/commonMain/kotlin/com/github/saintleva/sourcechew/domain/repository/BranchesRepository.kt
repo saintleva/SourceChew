@@ -5,7 +5,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
 
-interface BranchesApiService {
+interface BranchesRepository {
     suspend fun getBranches(
         repoRef: RepoRef,
         page: Int,

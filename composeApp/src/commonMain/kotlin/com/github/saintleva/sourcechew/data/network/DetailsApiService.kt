@@ -1,4 +1,4 @@
-package com.github.saintleva.sourcechew.domain.repository
+package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
 import com.github.saintleva.sourcechew.domain.models.RepoDetails

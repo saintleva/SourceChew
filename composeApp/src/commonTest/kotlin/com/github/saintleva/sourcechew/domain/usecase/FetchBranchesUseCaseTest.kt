@@ -11,9 +11,9 @@ import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.NetworkException
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
 import com.github.saintleva.sourcechew.domain.result.Result
-import com.github.saintleva.sourcechew.test.FakeBranchesApiService
+import com.github.saintleva.sourcechew.test.FakeBranchesRepository
 import com.github.saintleva.sourcechew.test.FakeConfigStore
-import com.github.saintleva.sourcechew.test.FakeRepoDetailsApiService
+import com.github.saintleva.sourcechew.test.FakeRepoDetailsRepository
 import com.jamal_aliev.paginator.offset.*
 import com.jamal_aliev.paginator.offset.bookmark.BookmarkInt
 import com.jamal_aliev.paginator.offset.page.OffsetPageState
@@ -65,7 +65,7 @@ class FetchBranchesUseCaseTest : FunSpec({
         var requestedPage: Int? = null
         var requestedPageSize: Int? = null
 
-        val branchesApiService = FakeBranchesApiService(
+        val branchesRepository = FakeBranchesRepository(
             resultProvider = { _, page, pageSize ->
                 requestedPage = page
                 requestedPageSize = pageSize
@@ -77,14 +77,14 @@ class FetchBranchesUseCaseTest : FunSpec({
             }
         )
 
-        val repoDetailsApiService = FakeRepoDetailsApiService {
+        val repoDetailsRepository = FakeRepoDetailsRepository {
             Result.Success(dummyRepoDetails)
         }
 
         val useCase = FetchBranchesUseCaseImpl(
             appSettingsStore = configStore,
-            branchesApiService = branchesApiService,
-            repoDetailsApiService = repoDetailsApiService,
+            branchesRepository = branchesRepository,
+            repoDetailsRepository = repoDetailsRepository,
         )
 
         val branchData = useCase(RepoRef("octocat", "Hello-World"))
@@ -102,19 +102,19 @@ class FetchBranchesUseCaseTest : FunSpec({
 
     test("records PagingBranchesException in page error state when API call fails") {
         val configStore = FakeConfigStore(AppSettings.default)
-        val branchesApiService = FakeBranchesApiService(
+        val branchesRepository = FakeBranchesRepository(
             resultProvider = { _, _, _ ->
                 Result.Failure(DetailsError.ResourceNotFound)
             }
         )
-        val repoDetailsApiService = FakeRepoDetailsApiService {
+        val repoDetailsRepository = FakeRepoDetailsRepository {
             Result.Failure(DetailsError.ResourceNotFound)
         }
 
         val useCase = FetchBranchesUseCaseImpl(
             appSettingsStore = configStore,
-            branchesApiService = branchesApiService,
-            repoDetailsApiService = repoDetailsApiService,
+            branchesRepository = branchesRepository,
+            repoDetailsRepository = repoDetailsRepository,
         )
 
         val branchData = useCase(RepoRef("octocat", "NonExistent"))
@@ -132,15 +132,15 @@ class FetchBranchesUseCaseTest : FunSpec({
 
     test("handles thrown exception gracefully when fetching default branch") {
         val configStore = FakeConfigStore(AppSettings.default)
-        val branchesApiService = FakeBranchesApiService()
-        val repoDetailsApiService = FakeRepoDetailsApiService {
+        val branchesRepository = FakeBranchesRepository()
+        val repoDetailsRepository = FakeRepoDetailsRepository {
             throw NetworkException(RuntimeException("Network down"))
         }
 
         val useCase = FetchBranchesUseCaseImpl(
             appSettingsStore = configStore,
-            branchesApiService = branchesApiService,
-            repoDetailsApiService = repoDetailsApiService,
+            branchesRepository = branchesRepository,
+            repoDetailsRepository = repoDetailsRepository,
         )
 
         val branchData = useCase(RepoRef("octocat", "Hello-World"))

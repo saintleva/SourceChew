@@ -1,7 +1,6 @@
 package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
-import com.github.saintleva.sourcechew.domain.repository.OwnerDetailsApiService
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
 import io.ktor.client.HttpClient

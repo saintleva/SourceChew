@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.data.network
 
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.repository.FoundItemsBlock
-import com.github.saintleva.sourcechew.domain.repository.SearchApiService
+import com.github.saintleva.sourcechew.domain.repository.SearchRepository
 import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.SearchResult
 import io.ktor.client.call.body
@@ -17,8 +17,8 @@ class PaginatedRequest<ItemSearchConditions>(
     val pageSize: Int
 )
 
-interface BaseKtorSearchApiService<ItemSearchConditions, out FoundItem: FoundBase> :
-    SearchApiService<ItemSearchConditions, FoundItem>,
+interface BaseKtorSearchRepository<ItemSearchConditions, out FoundItem: FoundBase> :
+    SearchRepository<ItemSearchConditions, FoundItem>,
     BaseKtorApiService<PaginatedRequest<ItemSearchConditions>, FoundItemsBlock<FoundItem>, SearchError> {
 
     suspend fun getHttpResponse(
