@@ -6,6 +6,8 @@ import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.InvalidTokenException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
+import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
+import com.github.saintleva.sourcechew.domain.result.PagingMembersException
 import com.github.saintleva.sourcechew.domain.result.PagingSearchException
 import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
@@ -29,6 +31,8 @@ import sourcechew.composeapp.generated.resources.unknown_error
 fun getErrorMessage(error: Throwable): String {
     return when (error) {
         is PagingSearchException -> renderSearchError(error.error)
+        is PagingBranchesException -> renderDetailsError(error.error)
+        is PagingMembersException -> renderDetailsError(error.error)
         is NetworkException -> stringResource(Res.string.error_network)
         is DeserializationException -> stringResource(Res.string.error_deserialization)
         is InvalidTokenException -> stringResource(Res.string.error_invalid_token)

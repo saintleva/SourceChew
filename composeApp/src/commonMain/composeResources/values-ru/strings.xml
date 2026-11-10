@@ -159,4 +159,6 @@
     <string name="updated_ago">Обновлено %1$s</string>
     <string name="star_button">Star</string>
     <string name="sponsor_button">Sponsor</string>
+    <string name="organizations">Организации</string>
+    <string name="members">Участники</string>
 </resources>

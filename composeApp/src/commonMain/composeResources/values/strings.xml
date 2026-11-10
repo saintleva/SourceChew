@@ -160,4 +160,6 @@ Try changing your search terms.</string>
     <string name="updated_ago">Updated %1$s</string>
     <string name="star_button">Star</string>
     <string name="sponsor_button">Sponsor</string>
+    <string name="organizations">Organizations</string>
+    <string name="members">Members</string>
 </resources>

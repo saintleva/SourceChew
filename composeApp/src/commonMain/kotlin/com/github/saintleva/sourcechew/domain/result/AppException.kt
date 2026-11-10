@@ -37,3 +37,8 @@ class PagingSearchException(val error: SearchError) : AppException(null)
  */
 class PagingBranchesException(val error: DetailsError) : AppException(null)
 
+/**
+ * Thrown by Paginator's load lambda when a members query returns an expected business error.
+ */
+class PagingMembersException(val error: DetailsError) : AppException(null)
+
