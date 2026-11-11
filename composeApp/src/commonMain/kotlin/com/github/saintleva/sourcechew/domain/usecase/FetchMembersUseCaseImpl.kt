@@ -2,6 +2,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
+import com.github.saintleva.sourcechew.domain.models.Owner
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.repository.MembersRepository
 import com.github.saintleva.sourcechew.domain.result.PagingMembersException
@@ -16,7 +17,7 @@ class FetchMembersUseCaseImpl(
     private val membersRepository: MembersRepository,
 ) : FetchMembersUseCase {
 
-    override suspend fun invoke(org: String): Paginator<FoundOwner> {
+    override suspend fun invoke(org: String): Paginator<Owner> {
         val pageSize = appSettingsStore.config.first().paginationPageSize
         return paginator(capacity = pageSize) {
             load { page ->

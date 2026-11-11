@@ -23,3 +23,9 @@ data class FoundOwner(
     val login: String,
     val avatarUrl: String
 ) : FoundBase
+
+data class Owner(
+    val id: Long,
+    val login: String,
+    val avatarUrl: String
+)

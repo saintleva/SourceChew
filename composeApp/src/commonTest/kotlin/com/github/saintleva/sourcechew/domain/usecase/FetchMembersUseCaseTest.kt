@@ -1,8 +1,7 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.AppSettings
-import com.github.saintleva.sourcechew.domain.models.FoundOwner
-import com.github.saintleva.sourcechew.domain.models.OwnerType
+import com.github.saintleva.sourcechew.domain.models.Owner
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.PagingMembersException
 import com.github.saintleva.sourcechew.domain.result.Result
@@ -17,9 +16,8 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 
 class FetchMembersUseCaseTest : FunSpec({
 
-    val dummyMember = FoundOwner(
+    val dummyMember = Owner(
         id = 1L,
-        type = OwnerType.USER,
         login = "octocat",
         avatarUrl = "https://avatars.githubusercontent.com/u/583231"
     )
@@ -73,7 +71,7 @@ class FetchMembersUseCaseTest : FunSpec({
         paginator.jump(BookmarkInt(1))
 
         val pageState = paginator.cache.getStateOf(1)
-        val errorState = pageState.shouldBeInstanceOf<OffsetPageState.Error<FoundOwner>>()
+        val errorState = pageState.shouldBeInstanceOf<OffsetPageState.Error<Owner>>()
         val error = errorState.exception
         error.shouldBeInstanceOf<PagingMembersException>()
         error.error shouldBe DetailsError.ResourceNotFound

@@ -57,6 +57,11 @@ sealed interface Route : NavKey {
         data class Branches(
             val repoRef: RepoRef
         ) : Work
+
+        @Serializable
+        data class Members(
+            val org: String
+        ) : Work
     }
 }
 
@@ -79,5 +84,6 @@ val workSerializersModule = SerializersModule {
         subclass(Route.Work.Details.Repo::class, Route.Work.Details.Repo.serializer())
         subclass(Route.Work.Details.Owner::class, Route.Work.Details.Owner.serializer())
         subclass(Route.Work.Branches::class, Route.Work.Branches.serializer())
+        subclass(Route.Work.Members::class, Route.Work.Members.serializer())
     }
 }

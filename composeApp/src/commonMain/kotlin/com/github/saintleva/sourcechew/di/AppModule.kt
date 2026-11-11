@@ -28,6 +28,7 @@ import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
+import com.github.saintleva.sourcechew.ui.screens.members.MembersViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.OwnerSearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.RepoSearchViewModel
 import com.github.saintleva.sourcechew.ui.screens.settings.SettingsViewModel
@@ -104,6 +105,13 @@ val appModule = module {
         BranchesViewModel(
             repoRef = repoRef,
             fetchBranchesUseCase = get()
+        )
+    }
+
+    viewModel<MembersViewModel> { (org: String) ->
+        MembersViewModel(
+            org = org,
+            fetchMembersUseCase = get()
         )
     }
 }

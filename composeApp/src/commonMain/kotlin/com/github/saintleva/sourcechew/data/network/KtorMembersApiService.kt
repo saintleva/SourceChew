@@ -1,6 +1,6 @@
 package com.github.saintleva.sourcechew.data.network
 
-import com.github.saintleva.sourcechew.domain.models.FoundOwner
+import com.github.saintleva.sourcechew.domain.models.Owner
 import com.github.saintleva.sourcechew.domain.repository.MembersRepository
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
@@ -20,7 +20,7 @@ data class MembersRequest(
 class KtorMembersApiService(
     private val httpClient: HttpClient,
 ) : MembersRepository,
-    BaseKtorResourceApiService<MembersRequest, List<FoundOwner>> {
+    BaseKtorResourceApiService<MembersRequest, List<Owner>> {
 
     override suspend fun getHttpResponse(request: MembersRequest): HttpResponse {
         return httpClient.get("/orgs/${request.org}/members") {
@@ -30,7 +30,7 @@ class KtorMembersApiService(
         }
     }
 
-    override suspend fun deserializeSuccess(response: HttpResponse): List<FoundOwner> {
+    override suspend fun deserializeSuccess(response: HttpResponse): List<Owner> {
         val dtos = response.body<List<GithubMemberDto>>()
         return dtos.map { it.toDomain() }
     }
@@ -39,7 +39,7 @@ class KtorMembersApiService(
         org: String,
         page: Int,
         pageSize: Int,
-    ): Result<List<FoundOwner>, DetailsError> {
+    ): Result<List<Owner>, DetailsError> {
         return getAnswer(
             MembersRequest(
                 org = org,

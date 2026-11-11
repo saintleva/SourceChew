@@ -27,6 +27,8 @@ import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewMo
 import com.github.saintleva.sourcechew.ui.screens.found.FoundOwnerScreen
 import com.github.saintleva.sourcechew.ui.screens.found.FoundRepoScreen
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
+import com.github.saintleva.sourcechew.ui.screens.members.MembersScreen
+import com.github.saintleva.sourcechew.ui.screens.members.MembersViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.SearchTabScreen
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -200,7 +202,10 @@ fun WorkNavigation(
                 ) { modifier ->
                     OwnerDetailsScreen(
                         modifier = modifier,
-                        viewModel = detailsViewModel
+                        viewModel = detailsViewModel,
+                        onOrgMembersClick = { org ->
+                            backStack.add(Route.Work.Members(org))
+                        }
                     )
                 }
             }
@@ -223,6 +228,31 @@ fun WorkNavigation(
                     BranchesScreen(
                         modifier = modifier,
                         viewModel = branchesViewModel
+                    )
+                }
+            }
+            entry<Route.Work.Members> { key ->
+                val membersViewModel = koinViewModel<MembersViewModel>(
+                    parameters = { parametersOf(key.org) }
+                )
+                WorkEntryContainer(
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = ::navigateToSearch,
+                    actions = {
+                        IconButton(onClick = membersViewModel::restart) {
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(Res.string.refresh_button))
+                        }
+                        BackIcon {
+                            backStack.pop()
+                        }
+                    }
+                ) { modifier ->
+                    MembersScreen(
+                        modifier = modifier,
+                        viewModel = membersViewModel,
+                        onMemberClick = { member ->
+                            backStack.add(Route.Work.Details.Owner(member.login))
+                        }
                     )
                 }
             }
