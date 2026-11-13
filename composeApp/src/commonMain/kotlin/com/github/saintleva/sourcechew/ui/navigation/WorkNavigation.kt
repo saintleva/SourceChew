@@ -29,6 +29,8 @@ import com.github.saintleva.sourcechew.ui.screens.found.FoundRepoScreen
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
 import com.github.saintleva.sourcechew.ui.screens.members.MembersScreen
 import com.github.saintleva.sourcechew.ui.screens.members.MembersViewModel
+import com.github.saintleva.sourcechew.ui.screens.userorgs.UserOrgsScreen
+import com.github.saintleva.sourcechew.ui.screens.userorgs.UserOrgsViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.SearchTabScreen
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -203,6 +205,9 @@ fun WorkNavigation(
                     OwnerDetailsScreen(
                         modifier = modifier,
                         viewModel = detailsViewModel,
+                        onUserOrgsClick = { username ->
+                            backStack.add(Route.Work.UserOrgs(username))
+                        },
                         onOrgMembersClick = { org ->
                             backStack.add(Route.Work.Members(org))
                         }
@@ -217,7 +222,7 @@ fun WorkNavigation(
                     onMenuItemClick = onMenuItemClick,
                     onSearchItemClick = ::navigateToSearch,
                     actions = {
-                        IconButton(onClick = branchesViewModel::restart) {
+                        IconButton(onClick = branchesViewModel::refresh) {
                             Icon(Icons.Default.Refresh, contentDescription = stringResource(Res.string.refresh_button))
                         }
                         BackIcon {
@@ -239,9 +244,6 @@ fun WorkNavigation(
                     onMenuItemClick = onMenuItemClick,
                     onSearchItemClick = ::navigateToSearch,
                     actions = {
-                        IconButton(onClick = membersViewModel::restart) {
-                            Icon(Icons.Default.Refresh, contentDescription = stringResource(Res.string.refresh_button))
-                        }
                         BackIcon {
                             backStack.pop()
                         }
@@ -252,6 +254,28 @@ fun WorkNavigation(
                         viewModel = membersViewModel,
                         onMemberClick = { member ->
                             backStack.add(Route.Work.Details.Owner(member.login))
+                        }
+                    )
+                }
+            }
+            entry<Route.Work.UserOrgs> { key ->
+                val userOrgsViewModel = koinViewModel<UserOrgsViewModel>(
+                    parameters = { parametersOf(key.username) }
+                )
+                WorkEntryContainer(
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = ::navigateToSearch,
+                    actions = {
+                        BackIcon {
+                            backStack.pop()
+                        }
+                    }
+                ) { modifier ->
+                    UserOrgsScreen(
+                        modifier = modifier,
+                        viewModel = userOrgsViewModel,
+                        onOrgClick = { org ->
+                            backStack.add(Route.Work.Details.Owner(org.login))
                         }
                     )
                 }

@@ -80,13 +80,13 @@ class MembersViewModelTest : FunSpec({
         viewModel.consumeInitialScroll() shouldBe null
     }
 
-    test("refresh reloads paginator") {
-        var callCount = 0
+    test("restart reloads paginator content") {
+        var loadCount = 0
         val fakeUseCase = object : FetchMembersUseCase {
             override suspend fun invoke(org: String): Paginator<Owner> {
-                callCount++
                 return paginator(capacity = 20) {
                     load {
+                        loadCount++
                         LoadResult(data = emptyList<Owner>())
                     }
                 }
@@ -99,11 +99,11 @@ class MembersViewModelTest : FunSpec({
         )
 
         testDispatcher.scheduler.advanceUntilIdle()
-        val initialCallCount = callCount
+        val initialLoadCount = loadCount
 
-        viewModel.refresh()
+        viewModel.restart()
         testDispatcher.scheduler.advanceUntilIdle()
 
-        callCount shouldBe (initialCallCount + 1)
+        loadCount shouldBe (initialLoadCount + 1)
     }
 })

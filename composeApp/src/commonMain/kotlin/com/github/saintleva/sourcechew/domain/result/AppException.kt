@@ -42,3 +42,9 @@ class PagingBranchesException(val error: DetailsError) : AppException(null)
  */
 class PagingMembersException(val error: DetailsError) : AppException(null)
 
+/**
+ * Thrown by Paginator's load lambda when a user organizations query returns an expected business error.
+ */
+class PagingUserOrgsException(val error: DetailsError) : AppException(null)
+
+

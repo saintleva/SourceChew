@@ -17,24 +17,17 @@ class MembersViewModel(
     private val fetchMembersUseCase: FetchMembersUseCase
 ) : PaginatedViewModel<Owner>() {
 
-    private val _paginator = MutableStateFlow<Paginator<Owner>?>(null)
-    val paginatorState = _paginator.asStateFlow()
+    private val paginatorState = MutableStateFlow<Paginator<Owner>?>(null)
 
     override val paginator: Paginator<Owner>?
-        get() = _paginator.value
+        get() = paginatorState.value
 
-    private var loadJob: Job? = null
     private var scrollPosition: ScrollPosition? = null
 
     init {
-        loadMembers()
-    }
-
-    private fun loadMembers() {
-        loadJob?.cancel()
-        loadJob = viewModelScope.launch {
+        viewModelScope.launch {
             val p = fetchMembersUseCase(org)
-            _paginator.value = p
+            paginatorState.value = p
             p.jump(BookmarkInt(1))
         }
     }
@@ -47,9 +40,5 @@ class MembersViewModel(
 
     override fun saveScroll(index: Int, offset: Int) {
         scrollPosition = ScrollPosition(index, offset)
-    }
-
-    fun refresh() {
-        loadMembers()
     }
 }

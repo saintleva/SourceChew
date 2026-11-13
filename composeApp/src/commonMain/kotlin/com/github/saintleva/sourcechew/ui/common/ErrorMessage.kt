@@ -9,6 +9,7 @@ import com.github.saintleva.sourcechew.domain.result.NetworkException
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
 import com.github.saintleva.sourcechew.domain.result.PagingMembersException
 import com.github.saintleva.sourcechew.domain.result.PagingSearchException
+import com.github.saintleva.sourcechew.domain.result.PagingUserOrgsException
 import com.github.saintleva.sourcechew.domain.result.SearchError
 import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
 import org.jetbrains.compose.resources.stringResource
@@ -33,6 +34,7 @@ fun getErrorMessage(error: Throwable): String {
         is PagingSearchException -> renderSearchError(error.error)
         is PagingBranchesException -> renderDetailsError(error.error)
         is PagingMembersException -> renderDetailsError(error.error)
+        is PagingUserOrgsException -> renderDetailsError(error.error)
         is NetworkException -> stringResource(Res.string.error_network)
         is DeserializationException -> stringResource(Res.string.error_deserialization)
         is InvalidTokenException -> stringResource(Res.string.error_invalid_token)

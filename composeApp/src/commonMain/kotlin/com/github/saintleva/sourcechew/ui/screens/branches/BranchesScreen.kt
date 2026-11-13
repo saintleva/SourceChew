@@ -31,9 +31,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.ForkRight
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,6 +57,7 @@ import sourcechew.composeapp.generated.resources.branches
 import sourcechew.composeapp.generated.resources.commit_sha
 import sourcechew.composeapp.generated.resources.default_branch_badge
 import sourcechew.composeapp.generated.resources.loading_error
+import sourcechew.composeapp.generated.resources.refresh_button
 
 @Composable
 fun BranchesScreen(
@@ -84,8 +87,14 @@ fun BranchesScreen(
                     )
                 }
             }
-            is BranchDetailsResult.Error -> BranchErrorCard(message = getErrorMessage(result.error))
-            is BranchDetailsResult.InfrastructureError -> BranchErrorCard(message = getErrorMessage(result.cause))
+            is BranchDetailsResult.Error -> BranchErrorCard(
+                message = getErrorMessage(result.error),
+                onRetry = viewModel::refresh
+            )
+            is BranchDetailsResult.InfrastructureError -> BranchErrorCard(
+                message = getErrorMessage(result.cause),
+                onRetry = viewModel::refresh
+            )
             null -> {
                 // Loading state for default branch
             }
@@ -109,7 +118,10 @@ fun BranchesScreen(
 }
 
 @Composable
-private fun BranchErrorCard(message: String) {
+private fun BranchErrorCard(
+    message: String,
+    onRetry: (() -> Unit)? = null
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,6 +150,15 @@ private fun BranchErrorCard(message: String) {
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )
+            }
+            if (onRetry != null) {
+                IconButton(onClick = onRetry) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = stringResource(Res.string.refresh_button),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     }
