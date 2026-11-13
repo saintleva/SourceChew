@@ -16,19 +16,18 @@ class UserOrgsViewModel(
     private val fetchUserOrgsUseCase: FetchUserOrgsUseCase
 ) : PaginatedViewModel<Owner>() {
 
-    private val paginatorState = MutableStateFlow<Paginator<Owner>?>(null)
+    private val _paginatorStateFlow = MutableStateFlow<Paginator<Owner>?>(null)
+    val paginatorStateFlow = _paginatorStateFlow.asStateFlow()
 
     override val paginator: Paginator<Owner>?
-        get() = paginatorState.value
-
-    val currentPaginatorState = paginatorState.asStateFlow()
+        get() = paginatorStateFlow.value
 
     private var scrollPosition: ScrollPosition? = null
 
     init {
         viewModelScope.launch {
             val p = fetchUserOrgsUseCase(username)
-            paginatorState.value = p
+            _paginatorStateFlow.value = p
             p.jump(BookmarkInt(1))
         }
     }
