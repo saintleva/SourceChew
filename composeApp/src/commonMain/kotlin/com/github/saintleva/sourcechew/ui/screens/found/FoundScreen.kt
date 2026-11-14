@@ -32,11 +32,14 @@ import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.found_items
 
+import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
+
 @Composable
-fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
-    modifier: Modifier,
-    viewModel: FoundViewModel<ItemSearchConditions, FoundItem>,
-    itemsTitle: String,
+fun <FoundItem: FoundBase> FoundScreen(
+    modifier: Modifier = Modifier,
+    viewModel: PaginatedViewModel<FoundItem>,
+    itemsTitle: String? = null,
+    showMetadata: Boolean = true,
     itemContent: @Composable (FoundItem) -> Unit
 ) {
     PaginatedList(
@@ -44,7 +47,7 @@ fun <ItemSearchConditions, FoundItem: FoundBase> FoundScreen(
         modifier = modifier,
         key = { it.id }
     ) { item, globalIndex, _, _, page ->
-        if (globalIndex == 0) {
+        if (globalIndex == 0 && showMetadata && itemsTitle != null) {
             val meta = page.metadata as? SearchMetadata
             meta?.let { MetadataHeader(it, itemsTitle = itemsTitle) }
         }

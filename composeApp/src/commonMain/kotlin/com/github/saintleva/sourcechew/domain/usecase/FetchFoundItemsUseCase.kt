@@ -1,9 +1,37 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
+import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundBase
+import com.github.saintleva.sourcechew.domain.repository.ConfigStore
+import com.github.saintleva.sourcechew.domain.repository.SearchRepository
+import com.github.saintleva.sourcechew.domain.result.PagingSearchException
+import com.github.saintleva.sourcechew.domain.result.Result
 import com.jamal_aliev.paginator.offset.Paginator
-
+import com.jamal_aliev.paginator.offset.dsl.paginator
+import com.jamal_aliev.paginator.offset.load.LoadResult
+import kotlinx.coroutines.flow.first
 
 interface FetchFoundItemsUseCase<ItemSearchConditions, out FoundItem: FoundBase> {
     suspend operator fun invoke(conditions: ItemSearchConditions): Paginator<@UnsafeVariance FoundItem>
+}
+
+class FetchFoundItemsUseCaseImpl<ItemSearchConditions, out FoundItem: FoundBase>(
+    private val appSettingsStore: ConfigStore<AppSettings>,
+    private val searchRepository: SearchRepository<ItemSearchConditions, FoundItem>
+) : FetchFoundItemsUseCase<ItemSearchConditions, FoundItem> {
+
+    override suspend fun invoke(conditions: ItemSearchConditions): Paginator<@UnsafeVariance FoundItem> {
+        val pageSize = appSettingsStore.config.first().paginationPageSize
+        return paginator(capacity = pageSize) {
+            load { page ->
+                when (val result = searchRepository.searchItems(conditions, page, pageSize)) {
+                    is Result.Success -> LoadResult(
+                        data = result.value.items,
+                        metadata = result.value.metadata,
+                    )
+                    is Result.Failure -> throw PagingSearchException(result.error)
+                }
+            }
+        }
+    }
 }

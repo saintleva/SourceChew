@@ -8,6 +8,7 @@ import com.github.saintleva.sourcechew.domain.result.InvalidTokenException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
 import com.github.saintleva.sourcechew.domain.result.PagingMembersException
+import com.github.saintleva.sourcechew.domain.result.PagingOwnerReposException
 import com.github.saintleva.sourcechew.domain.result.PagingSearchException
 import com.github.saintleva.sourcechew.domain.result.PagingUserOrgsException
 import com.github.saintleva.sourcechew.domain.result.SearchError
@@ -35,6 +36,7 @@ fun getErrorMessage(error: Throwable): String {
         is PagingBranchesException -> renderDetailsError(error.error)
         is PagingMembersException -> renderDetailsError(error.error)
         is PagingUserOrgsException -> renderDetailsError(error.error)
+        is PagingOwnerReposException -> renderDetailsError(error.error)
         is NetworkException -> stringResource(Res.string.error_network)
         is DeserializationException -> stringResource(Res.string.error_deserialization)
         is InvalidTokenException -> stringResource(Res.string.error_invalid_token)

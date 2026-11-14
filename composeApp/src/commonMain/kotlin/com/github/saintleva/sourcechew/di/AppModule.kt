@@ -26,6 +26,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.ui.screens.auth.AuthViewModel
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
+import com.github.saintleva.sourcechew.ui.screens.ownerrepos.OwnerReposViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
 import com.github.saintleva.sourcechew.ui.screens.members.MembersViewModel
@@ -120,6 +121,14 @@ val appModule = module {
         UserOrgsViewModel(
             username = username,
             fetchUserOrgsUseCase = get()
+        )
+    }
+
+    viewModel<OwnerReposViewModel> { (owner: String) ->
+        OwnerReposViewModel(
+            owner = owner,
+            fetchOwnerReposUseCase = get(),
+            appSettingsStore = get(qualifier<AppSettings>())
         )
     }
 }

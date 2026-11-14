@@ -13,6 +13,9 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
@@ -22,6 +25,7 @@ import com.github.saintleva.sourcechew.ui.screens.branches.BranchesScreen
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
+import com.github.saintleva.sourcechew.ui.screens.ownerrepos.OwnerReposViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundOwnerScreen
@@ -107,6 +111,9 @@ fun WorkNavigation(
                 val foundViewModel = koinViewModel<FoundViewModel<RepoSearchConditions, FoundRepo>>(
                     qualifier<FoundRepo>()
                 )
+                val maxDescriptionLength by foundViewModel.maxDescriptionLength.collectAsStateWithLifecycle(
+                    AppSettings.default.maxFoundRepoDescriptionLength
+                )
                 WorkEntryContainer(
                     onMenuItemClick = onMenuItemClick,
                     onSearchItemClick = {
@@ -123,6 +130,7 @@ fun WorkNavigation(
                     FoundRepoScreen(
                         modifier = modifier,
                         viewModel = foundViewModel,
+                        maxDescriptionLength = maxDescriptionLength,
                         onRepoClick = { repoRef ->
                             backStack.add(Route.Work.Details.Repo(repoRef))
                         },
@@ -205,11 +213,47 @@ fun WorkNavigation(
                     OwnerDetailsScreen(
                         modifier = modifier,
                         viewModel = detailsViewModel,
+                        onUserReposClick = { username ->
+                            backStack.add(Route.Work.OwnerRepos(username))
+                        },
                         onUserOrgsClick = { username ->
                             backStack.add(Route.Work.UserOrgs(username))
                         },
+                        onOrgReposClick = { org ->
+                            backStack.add(Route.Work.OwnerRepos(org))
+                        },
                         onOrgMembersClick = { org ->
                             backStack.add(Route.Work.Members(org))
+                        }
+                    )
+                }
+            }
+            entry<Route.Work.OwnerRepos> { key ->
+                val ownerReposViewModel = koinViewModel<OwnerReposViewModel>(
+                    parameters = { parametersOf(key.owner) }
+                )
+                val maxDescriptionLength by ownerReposViewModel.maxDescriptionLength.collectAsStateWithLifecycle(
+                    AppSettings.default.maxFoundRepoDescriptionLength
+                )
+                WorkEntryContainer(
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = ::navigateToSearch,
+                    actions = {
+                        BackIcon {
+                            backStack.pop()
+                        }
+                    }
+                ) { modifier ->
+                    FoundRepoScreen(
+                        modifier = modifier,
+                        viewModel = ownerReposViewModel,
+                        maxDescriptionLength = maxDescriptionLength,
+                        showMetadata = false,
+                        onRepoClick = { repoRef ->
+                            backStack.add(Route.Work.Details.Repo(repoRef))
+                        },
+                        onOwnerClick = { ownerLogin ->
+                            backStack.add(Route.Work.Details.Owner(ownerLogin))
                         }
                     )
                 }

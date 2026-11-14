@@ -37,6 +37,8 @@ import com.github.saintleva.sourcechew.domain.usecase.FetchMembersUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FetchMembersUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.FetchUserOrgsUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FetchUserOrgsUseCaseImpl
+import com.github.saintleva.sourcechew.domain.usecase.FetchOwnerReposUseCase
+import com.github.saintleva.sourcechew.domain.usecase.FetchOwnerReposUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractorImpl
 import org.koin.core.qualifier.qualifier
@@ -103,6 +105,13 @@ val domainModule = module {
         FetchUserOrgsUseCaseImpl(
             appSettingsStore = get(qualifier<AppSettings>()),
             userOrgsRepository = get()
+        )
+    }
+
+    factory<FetchOwnerReposUseCase> {
+        FetchOwnerReposUseCaseImpl(
+            appSettingsStore = get(qualifier<AppSettings>()),
+            ownerReposRepository = get()
         )
     }
 

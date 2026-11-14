@@ -47,4 +47,10 @@ class PagingMembersException(val error: DetailsError) : AppException(null)
  */
 class PagingUserOrgsException(val error: DetailsError) : AppException(null)
 
+/**
+ * Thrown by Paginator's load lambda when an owner repositories query returns an expected business error.
+ */
+class PagingOwnerReposException(val error: DetailsError) : AppException(null)
+
+
 

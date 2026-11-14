@@ -2,6 +2,7 @@ package com.github.saintleva.sourcechew.di
 
 import androidx.datastore.core.okio.OkioSerializer
 import com.github.saintleva.sourcechew.data.network.KtorOwnerDetailsApiService
+import com.github.saintleva.sourcechew.data.network.KtorOwnerReposApiService
 import com.github.saintleva.sourcechew.data.network.KtorBranchesApiService
 import com.github.saintleva.sourcechew.data.network.KtorMembersApiService
 import com.github.saintleva.sourcechew.data.network.KtorUserOrgsApiService
@@ -10,6 +11,7 @@ import com.github.saintleva.sourcechew.data.network.KtorSearchInOwnersApiService
 import com.github.saintleva.sourcechew.data.network.KtorSearchInReposApiService
 import com.github.saintleva.sourcechew.data.network.OwnerDetailsApiService
 import com.github.saintleva.sourcechew.domain.repository.BranchesRepository
+import com.github.saintleva.sourcechew.domain.repository.OwnerReposRepository
 import com.github.saintleva.sourcechew.data.network.RepoDetailsApiService
 import com.github.saintleva.sourcechew.data.network.createHttpClient
 import com.github.saintleva.sourcechew.data.repository.OwnerDetailsRepositoryImpl
@@ -90,6 +92,10 @@ val dataModule = module {
 
     single<UserOrgsRepository> {
         KtorUserOrgsApiService(httpClient = get())
+    }
+
+    single<OwnerReposRepository> {
+        KtorOwnerReposApiService(httpClient = get())
     }
 
     single<RepoDetailsRepository> {

@@ -3,7 +3,7 @@ package com.github.saintleva.sourcechew.ui.screens.found
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
-import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
+import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.found_owners
@@ -11,7 +11,7 @@ import sourcechew.composeapp.generated.resources.found_owners
 @Composable
 fun FoundOwnerScreen(
     modifier: Modifier = Modifier,
-    viewModel: FoundViewModel<OwnerSearchConditions, FoundOwner>,
+    viewModel: PaginatedViewModel<FoundOwner>,
     onOwnerClick: (FoundOwner) -> Unit
 ) {
     FoundScreen(
