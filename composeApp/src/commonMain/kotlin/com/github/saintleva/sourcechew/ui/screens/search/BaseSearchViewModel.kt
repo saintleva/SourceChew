@@ -93,6 +93,7 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
         searchInteractor.canUsePreviousConditions(conditions.value)
 
     fun search() {
+        _searchJob?.cancel()
         _searchJob = viewModelScope.launch {
             searchInteractor.search(conditions.value, usePreviousSearch.value)
         }
