@@ -1,6 +1,7 @@
 package com.github.saintleva.sourcechew.ui.screens.details.owner
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,15 +15,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Source
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.OrganizationDetails
+import com.github.saintleva.sourcechew.ui.common.ErrorContent
+import com.github.saintleva.sourcechew.ui.common.getErrorMessage
+import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.description_section
@@ -31,6 +39,48 @@ import sourcechew.composeapp.generated.resources.public_repos
 
 @Composable
 fun OrganizationDetailsScreen(
+    modifier: Modifier = Modifier,
+    viewModel: OwnerDetailsViewModel,
+    onReposClick: (org: String) -> Unit = {},
+    onMembersClick: (org: String) -> Unit = {},
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Box(modifier = modifier.fillMaxSize()) {
+        when (val currentState = state) {
+            is DetailsUiState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+            is DetailsUiState.Error -> {
+                ErrorContent(
+                    modifier = Modifier.align(Alignment.Center),
+                    message = getErrorMessage(currentState.error),
+                    onRetry = viewModel::refresh,
+                )
+            }
+            is DetailsUiState.InfrastructureError -> {
+                ErrorContent(
+                    modifier = Modifier.align(Alignment.Center),
+                    message = getErrorMessage(currentState.cause),
+                    onRetry = viewModel::refresh,
+                )
+            }
+            is DetailsUiState.Success -> {
+                val details = currentState.details as? OrganizationDetails
+                if (details != null) {
+                    OrganizationDetailsContent(
+                        details = details,
+                        onReposClick = { onReposClick(details.login) },
+                        onMembersClick = { onMembersClick(details.login) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun OrganizationDetailsContent(
     details: OrganizationDetails,
     modifier: Modifier = Modifier,
     onReposClick: () -> Unit = {},

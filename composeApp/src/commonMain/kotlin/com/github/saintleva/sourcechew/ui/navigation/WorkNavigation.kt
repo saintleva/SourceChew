@@ -21,10 +21,12 @@ import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesScreen
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
-import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsScreen
+import com.github.saintleva.sourcechew.ui.screens.details.owner.OrganizationDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
+import com.github.saintleva.sourcechew.ui.screens.details.owner.UserDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.ownerrepos.OwnerReposViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewModel
@@ -134,8 +136,11 @@ fun WorkNavigation(
                         onRepoClick = { repoRef ->
                             backStack.add(Route.Work.Details.Repo(repoRef))
                         },
-                        onOwnerClick = { ownerLogin ->
-                            backStack.add(Route.Work.Details.Owner(ownerLogin))
+                        onOwnerClick = { owner ->
+                            when (owner.type) {
+                                OwnerType.ORGANIZATION -> backStack.add(Route.Work.Details.Organization(owner.login))
+                                OwnerType.USER -> backStack.add(Route.Work.Details.User(owner.login))
+                            }
                         }
                     )
                 }
@@ -161,7 +166,10 @@ fun WorkNavigation(
                         modifier = modifier,
                         viewModel = foundViewModel,
                         onOwnerClick = { owner ->
-                            backStack.add(Route.Work.Details.Owner(owner.login))
+                            when (owner.type) {
+                                OwnerType.ORGANIZATION -> backStack.add(Route.Work.Details.Organization(owner.login))
+                                OwnerType.USER -> backStack.add(Route.Work.Details.User(owner.login))
+                            }
                         }
                     )
                 }
@@ -185,8 +193,11 @@ fun WorkNavigation(
                     RepoDetailsScreen(
                         modifier = modifier,
                         viewModel = detailsViewModel,
-                        onOwnerClick = { ownerLogin ->
-                            backStack.add(Route.Work.Details.Owner(ownerLogin))
+                        onOwnerClick = { owner ->
+                            when (owner.type) {
+                                OwnerType.ORGANIZATION -> backStack.add(Route.Work.Details.Organization(owner.login))
+                                OwnerType.USER -> backStack.add(Route.Work.Details.User(owner.login))
+                            }
                         },
                         onBranchesClick = { owner, repo ->
                             backStack.add(Route.Work.Branches(RepoRef(owner, repo)))
@@ -194,7 +205,7 @@ fun WorkNavigation(
                     )
                 }
             }
-            entry<Route.Work.Details.Owner> { key ->
+            entry<Route.Work.Details.User> { key ->
                 val detailsViewModel = koinViewModel<OwnerDetailsViewModel>(
                     parameters = { parametersOf(key.login) }
                 )
@@ -210,19 +221,41 @@ fun WorkNavigation(
                         }
                     }
                 ) { modifier ->
-                    OwnerDetailsScreen(
+                    UserDetailsScreen(
                         modifier = modifier,
                         viewModel = detailsViewModel,
-                        onUserReposClick = { username ->
+                        onReposClick = { username ->
                             backStack.add(Route.Work.OwnerRepos(username))
                         },
-                        onUserOrgsClick = { username ->
+                        onOrgsClick = { username ->
                             backStack.add(Route.Work.UserOrgs(username))
-                        },
-                        onOrgReposClick = { org ->
+                        }
+                    )
+                }
+            }
+            entry<Route.Work.Details.Organization> { key ->
+                val detailsViewModel = koinViewModel<OwnerDetailsViewModel>(
+                    parameters = { parametersOf(key.login) }
+                )
+                WorkEntryContainer(
+                    onMenuItemClick = onMenuItemClick,
+                    onSearchItemClick = ::navigateToSearch,
+                    actions = {
+                        IconButton(onClick = detailsViewModel::refresh) {
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(Res.string.refresh_button))
+                        }
+                        BackIcon {
+                            backStack.pop()
+                        }
+                    }
+                ) { modifier ->
+                    OrganizationDetailsScreen(
+                        modifier = modifier,
+                        viewModel = detailsViewModel,
+                        onReposClick = { org ->
                             backStack.add(Route.Work.OwnerRepos(org))
                         },
-                        onOrgMembersClick = { org ->
+                        onMembersClick = { org ->
                             backStack.add(Route.Work.Members(org))
                         }
                     )
@@ -252,8 +285,11 @@ fun WorkNavigation(
                         onRepoClick = { repoRef ->
                             backStack.add(Route.Work.Details.Repo(repoRef))
                         },
-                        onOwnerClick = { ownerLogin ->
-                            backStack.add(Route.Work.Details.Owner(ownerLogin))
+                        onOwnerClick = { owner ->
+                            when (owner.type) {
+                                OwnerType.ORGANIZATION -> backStack.add(Route.Work.Details.Organization(owner.login))
+                                OwnerType.USER -> backStack.add(Route.Work.Details.User(owner.login))
+                            }
                         }
                     )
                 }
@@ -297,7 +333,7 @@ fun WorkNavigation(
                         modifier = modifier,
                         viewModel = membersViewModel,
                         onMemberClick = { member ->
-                            backStack.add(Route.Work.Details.Owner(member.login))
+                            backStack.add(Route.Work.Details.User(member.login))
                         }
                     )
                 }
@@ -319,7 +355,7 @@ fun WorkNavigation(
                         modifier = modifier,
                         viewModel = userOrgsViewModel,
                         onOrgClick = { org ->
-                            backStack.add(Route.Work.Details.Owner(org.login))
+                            backStack.add(Route.Work.Details.Organization(org.login))
                         }
                     )
                 }

@@ -27,8 +27,6 @@ fun <T, R : FoundBase> GithubSearchResponseDto<T>.toDomain(itemMapper: (T) -> R)
 data class GithubRepoDto(
     val id: Long,
     val name: String,
-    @SerialName("full_name") val fullName: String? = null,
-    val url: String? = null,
     val owner: GithubOwnerDto,
     val description: String? = null,
     val language: String? = null,
@@ -43,7 +41,6 @@ data class GithubOwnerDto(
     val id: Long,
     val type: String,
     val login: String,
-    val url: String? = null,
     @SerialName("avatar_url") val avatarUrl: String
 )
 
@@ -72,12 +69,10 @@ fun GithubOwnerDto.toDomain() = FoundOwner(
 data class GithubErrorResponseDto(
     val message: String? = null,
     val errors: List<GithubErrorDetailDto>? = null,
-    @SerialName("documentation_url") val documentationUrl: String? = null
 )
 
 @Serializable
 data class GithubErrorDetailDto(
-    val resource: String? = null,
     val field: String? = null,
     val code: String? = null,
     val message: String? = null

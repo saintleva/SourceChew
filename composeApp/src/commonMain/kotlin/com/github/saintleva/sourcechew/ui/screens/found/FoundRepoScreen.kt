@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.ui.screens.found
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.github.saintleva.sourcechew.domain.models.AppSettings
+import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
@@ -17,7 +18,7 @@ fun FoundRepoScreen(
     maxDescriptionLength: Int = AppSettings.default.maxFoundRepoDescriptionLength,
     showMetadata: Boolean = true,
     onRepoClick: (RepoRef) -> Unit,
-    onOwnerClick: (String) -> Unit
+    onOwnerClick: (FoundOwner) -> Unit
 ) {
     FoundScreen(
         modifier = modifier,
@@ -29,7 +30,7 @@ fun FoundRepoScreen(
                 repo = repo,
                 maxDescriptionLength = maxDescriptionLength,
                 onRepoClick = { onRepoClick(RepoRef(repo.owner.login, repo.name)) },
-                onOwnerClick = { onOwnerClick(repo.owner.login) }
+                onOwnerClick = { onOwnerClick(repo.owner) }
             )
         }
     )

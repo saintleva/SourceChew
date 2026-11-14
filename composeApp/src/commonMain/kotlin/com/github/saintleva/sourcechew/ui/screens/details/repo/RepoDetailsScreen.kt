@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.models.RepoLanguage
@@ -98,7 +99,7 @@ import sourcechew.composeapp.generated.resources.website
 fun RepoDetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: RepoDetailsViewModel,
-    onOwnerClick: (String) -> Unit,
+    onOwnerClick: (FoundOwner) -> Unit,
     onBranchesClick: (owner: String, repo: String) -> Unit = { _, _ -> }
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -139,7 +140,7 @@ fun RepoDetailsScreen(
 private fun RepoDetailsContent(
     details: RepoDetails,
     maxDescriptionLength: Int,
-    onOwnerClick: (String) -> Unit,
+    onOwnerClick: (FoundOwner) -> Unit,
     onBranchesClick: (owner: String, repo: String) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
@@ -213,7 +214,7 @@ private fun RepoDetailsContent(
         OutlinedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onOwnerClick(details.owner.login) }
+                .clickable { onOwnerClick(details.owner) }
         ) {
             Row(
                 modifier = Modifier.padding(12.dp),
