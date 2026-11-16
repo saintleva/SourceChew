@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Code
@@ -28,8 +30,10 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Source
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +44,8 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import com.github.saintleva.sourcechew.ui.common.StatCard
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,9 +53,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.github.saintleva.sourcechew.domain.models.OwnerDetailsBase
+import com.github.saintleva.sourcechew.domain.models.OwnerType
+import com.github.saintleva.sourcechew.ui.common.ErrorContent
+import com.github.saintleva.sourcechew.ui.common.OpenInBrowserButton
 import com.github.saintleva.sourcechew.ui.common.formatDateTime
+import com.github.saintleva.sourcechew.ui.common.getErrorMessage
+import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.company
@@ -64,9 +76,121 @@ import sourcechew.composeapp.generated.resources.user
 import sourcechew.composeapp.generated.resources.website
 
 @Composable
+inline fun <reified Details : OwnerDetailsBase> OwnerDetailsScreenContainer(
+    viewModel: OwnerDetailsViewModel,
+    modifier: Modifier = Modifier,
+    crossinline content: @Composable (details: Details) -> Unit,
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Box(modifier = modifier.fillMaxSize()) {
+        when (val currentState = state) {
+            is DetailsUiState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+            is DetailsUiState.Error -> {
+                ErrorContent(
+                    modifier = Modifier.align(Alignment.Center),
+                    message = getErrorMessage(currentState.error),
+                    onRetry = viewModel::refresh,
+                )
+            }
+            is DetailsUiState.InfrastructureError -> {
+                ErrorContent(
+                    modifier = Modifier.align(Alignment.Center),
+                    message = getErrorMessage(currentState.cause),
+                    onRetry = viewModel::refresh,
+                )
+            }
+            is DetailsUiState.Success -> {
+                (currentState.details as? Details)?.let { details ->
+                    content(details)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun OwnerDetailsContentLayout(
+    details: OwnerDetailsBase,
+    ownerType: OwnerType,
+    modifier: Modifier = Modifier,
+    sectionTitle: String? = null,
+    sectionText: String? = null,
+    onReposClick: () -> Unit,
+    secondaryActionButton: @Composable () -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        OwnerHeader(details = details, ownerType = ownerType)
+
+        if (!sectionTitle.isNullOrBlank() && !sectionText.isNullOrBlank()) {
+            TextSectionCard(title = sectionTitle, text = sectionText)
+        }
+
+        OwnerStatsRow(details = details)
+
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            RepositoriesButton(
+                publicReposCount = details.publicRepos,
+                onClick = onReposClick,
+            )
+            secondaryActionButton()
+        }
+
+        OwnerInfoCard(details = details)
+
+        OpenInBrowserButton(htmlUrl = details.htmlUrl)
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+fun TextSectionCard(
+    title: String,
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedCard(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = text, style = MaterialTheme.typography.bodyLarge)
+        }
+    }
+}
+
+@Composable
+fun RepositoriesButton(
+    publicReposCount: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Icon(Icons.Default.Source, contentDescription = null)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text("${stringResource(Res.string.public_repos)} ($publicReposCount)")
+    }
+}
+
+@Composable
 fun OwnerHeader(
     details: OwnerDetailsBase,
-    isOrg: Boolean,
+    ownerType: OwnerType,
     modifier: Modifier = Modifier,
     extraChip: (@Composable () -> Unit)? = null,
 ) {
@@ -83,7 +207,10 @@ fun OwnerHeader(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                imageVector = if (isOrg) Icons.Default.CorporateFare else Icons.Default.Person,
+                imageVector = when (ownerType) {
+                    OwnerType.USER -> Icons.Default.Person
+                    OwnerType.ORGANIZATION -> Icons.Default.CorporateFare
+                },
                 contentDescription = null,
                 modifier = Modifier.size(36.dp),
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -113,16 +240,23 @@ fun OwnerHeader(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AssistChip(
-                    onClick = {},
-                    label = {
-                        Text(
-                            stringResource(
-                                if (isOrg) Res.string.organization else Res.string.user
-                            )
-                        )
-                    },
-                )
+                // Non-clickable surface badge for owner type
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    shape = MaterialTheme.shapes.small,
+                ) {
+                    Text(
+                        text = stringResource(
+                            when (ownerType) {
+                                OwnerType.USER -> Res.string.user
+                                OwnerType.ORGANIZATION -> Res.string.organization
+                            }
+                        ),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
                 extraChip?.invoke()
             }
         }
@@ -227,52 +361,7 @@ fun OwnerInfoCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun StatCard(
-    modifier: Modifier = Modifier,
-    icon: ImageVector,
-    label: String,
-    value: String,
-) {
-    OutlinedCard(modifier = modifier) {
-        BoxWithConstraints(
-            modifier = Modifier.padding(8.dp).fillMaxWidth()
-        ) {
-            val showLabel = maxWidth >= 75.dp
-            val content = @Composable {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Icon(icon, contentDescription = label, tint = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    if (showLabel) {
-                        Text(text = label, style = MaterialTheme.typography.labelSmall, maxLines = 1)
-                    }
-                }
-            }
 
-            if (!showLabel) {
-                val tooltipState = rememberTooltipState()
-                TooltipBox(
-                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
-                    tooltip = {
-                        PlainTooltip {
-                            Text(label)
-                        }
-                    },
-                    state = tooltipState,
-                ) {
-                    content()
-                }
-            } else {
-                content()
-            }
-        }
-    }
-}
 
 @Composable
 fun DetailRow(
@@ -306,22 +395,5 @@ fun DetailRow(
             fontWeight = FontWeight.Medium,
             color = if (onClick != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
         )
-    }
-}
-
-@Composable
-fun OpenInBrowserButton(
-    htmlUrl: String,
-    modifier: Modifier = Modifier,
-) {
-    val uriHandler = LocalUriHandler.current
-
-    Button(
-        onClick = { uriHandler.openUri(htmlUrl) },
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Icon(Icons.Default.OpenInBrowser, contentDescription = null)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(stringResource(Res.string.open_in_browser))
     }
 }

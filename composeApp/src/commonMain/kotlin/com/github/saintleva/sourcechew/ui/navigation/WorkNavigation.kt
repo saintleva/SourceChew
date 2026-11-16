@@ -19,8 +19,6 @@ import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesScreen
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
@@ -31,8 +29,9 @@ import com.github.saintleva.sourcechew.ui.screens.ownerrepos.OwnerReposViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsScreen
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundOwnerScreen
+import com.github.saintleva.sourcechew.ui.screens.found.FoundOwnerViewModel
 import com.github.saintleva.sourcechew.ui.screens.found.FoundRepoScreen
-import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
+import com.github.saintleva.sourcechew.ui.screens.found.FoundRepoViewModel
 import com.github.saintleva.sourcechew.ui.screens.members.MembersScreen
 import com.github.saintleva.sourcechew.ui.screens.members.MembersViewModel
 import com.github.saintleva.sourcechew.ui.screens.userorgs.UserOrgsScreen
@@ -110,7 +109,7 @@ fun WorkNavigation(
                 }
             }
             entry<Route.Work.Found.Repo> {
-                val foundViewModel = koinViewModel<FoundViewModel<RepoSearchConditions, FoundRepo>>(
+                val foundViewModel = koinViewModel<FoundRepoViewModel>(
                     qualifier<FoundRepo>()
                 )
                 val maxDescriptionLength by foundViewModel.maxDescriptionLength.collectAsStateWithLifecycle(
@@ -146,7 +145,7 @@ fun WorkNavigation(
                 }
             }
             entry<Route.Work.Found.Owner> {
-                val foundViewModel = koinViewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>>(
+                val foundViewModel = koinViewModel<FoundOwnerViewModel>(
                     qualifier<FoundOwner>()
                 )
                 WorkEntryContainer(

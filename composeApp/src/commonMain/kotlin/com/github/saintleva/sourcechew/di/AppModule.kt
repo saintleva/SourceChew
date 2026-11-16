@@ -28,7 +28,8 @@ import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OwnerDetailsViewModel
 import com.github.saintleva.sourcechew.ui.screens.ownerrepos.OwnerReposViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.repo.RepoDetailsViewModel
-import com.github.saintleva.sourcechew.ui.screens.found.FoundViewModel
+import com.github.saintleva.sourcechew.ui.screens.found.FoundOwnerViewModel
+import com.github.saintleva.sourcechew.ui.screens.found.FoundRepoViewModel
 import com.github.saintleva.sourcechew.ui.screens.members.MembersViewModel
 import com.github.saintleva.sourcechew.ui.screens.userorgs.UserOrgsViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.OwnerSearchViewModel
@@ -74,17 +75,16 @@ val appModule = module {
         )
     }
 
-    viewModel<FoundViewModel<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
-        FoundViewModel(
+    viewModel<FoundRepoViewModel>(qualifier<FoundRepo>()) {
+        FoundRepoViewModel(
             searchInteractor = get(qualifier<FoundRepo>()),
             appSettingsStore = get(qualifier<AppSettings>())
         )
     }
 
-    viewModel<FoundViewModel<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
-        FoundViewModel(
-            searchInteractor = get(qualifier<FoundOwner>()),
-            appSettingsStore = get(qualifier<AppSettings>())
+    viewModel<FoundOwnerViewModel>(qualifier<FoundOwner>()) {
+        FoundOwnerViewModel(
+            searchInteractor = get(qualifier<FoundOwner>())
         )
     }
 

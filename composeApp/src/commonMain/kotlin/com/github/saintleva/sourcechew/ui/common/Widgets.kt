@@ -19,19 +19,47 @@ package com.github.saintleva.sourcechew.ui.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.open_in_browser
 
+
+@Composable
+fun OpenInBrowserButton(
+    htmlUrl: String,
+    modifier: Modifier = Modifier,
+) {
+    val uriHandler = LocalUriHandler.current
+
+    OutlinedButton(
+        onClick = { uriHandler.openUri(htmlUrl) },
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Icon(Icons.Default.OpenInBrowser, contentDescription = null)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(stringResource(Res.string.open_in_browser))
+    }
+}
 
 @Composable
 fun BaseInteractiveRow(
