@@ -1,13 +1,11 @@
 package com.github.saintleva.sourcechew.ui.screens.branches
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.usecase.BranchData
 import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
-import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import com.jamal_aliev.paginator.offset.Paginator
@@ -52,8 +50,6 @@ class BranchesViewModel(
 
     private var loadJob: Job? = null
 
-    private var scrollPosition: ScrollPosition? = null
-
     init {
         loadBranches()
     }
@@ -64,16 +60,6 @@ class BranchesViewModel(
             _branches.value = fetchBranchesUseCase(repoRef)
             paginator?.jump(BookmarkInt(1))
         }
-    }
-
-    override fun consumeInitialScroll(): ScrollPosition? {
-        val current = scrollPosition
-        scrollPosition = null
-        return current
-    }
-
-    override fun saveScroll(index: Int, offset: Int) {
-        scrollPosition = ScrollPosition(index, offset)
     }
 
     fun refresh() {

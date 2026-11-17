@@ -10,8 +10,10 @@ import com.jamal_aliev.paginator.offset.load.LoadResult
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -49,12 +51,14 @@ class OwnerReposViewModelTest : FunSpec({
             appSettingsStore = configStore,
         )
 
+        val collector = CoroutineScope(testDispatcher).launch { viewModel.maxDescriptionLength.collect {} }
         testDispatcher.scheduler.advanceUntilIdle()
 
         viewModel.owner shouldBe "test-owner"
         requestedOwner shouldBe "test-owner"
         viewModel.paginator shouldBe dummyPaginator
         viewModel.maxDescriptionLength.value shouldBe 120
+        collector.cancel()
     }
 
     test("saveScroll and consumeInitialScroll maintain scroll position") {

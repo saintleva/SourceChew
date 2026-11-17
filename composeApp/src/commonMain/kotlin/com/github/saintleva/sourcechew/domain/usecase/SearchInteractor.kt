@@ -23,6 +23,7 @@ import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
+import com.github.saintleva.sourcechew.domain.pagination.FIRST_PAGE
 import com.jamal_aliev.paginator.offset.Paginator
 import com.jamal_aliev.paginator.offset.bookmark.BookmarkInt
 import io.github.aakira.napier.Napier
@@ -45,15 +46,11 @@ sealed interface SearchState<out FoundItem: FoundBase> {
 
 }
 
-data class ScrollPosition(val index: Int, val offset: Int)
-
 interface SearchInteractor<ItemSearchConditions, out FoundItem: FoundBase> {
 
     val searchState: StateFlow<SearchState<FoundItem>>
 
     val everSearched: Boolean
-
-    var lastScrollPosition: ScrollPosition?
 
     suspend fun search(conditions: ItemSearchConditions, usePreviousSearch: Boolean)
 
@@ -75,8 +72,6 @@ class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
 
     private var previousConditions: ItemSearchConditions? = null
     private var lastFound: Paginator<@UnsafeVariance FoundItem>? = null
-
-    override var lastScrollPosition: ScrollPosition? = null
 
     override val everSearched: Boolean
         get() = lastFound != null
@@ -109,7 +104,6 @@ class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
         lastFound?.release()
         lastFound = null
         previousConditions = null
-        lastScrollPosition = null
         scope.cancel()
     }
 
@@ -123,14 +117,9 @@ class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
         val paginator = fetchFoundItemsUseCase(conditions)
         previousConditions = conditions
         lastFound = paginator
-        lastScrollPosition = null
         _searchState.update { SearchState.Found(paginator) }
         Napier.d(tag = "search") { "Published Found(paginator=${paginator.hashCode()})" }
 
         paginator.jump(BookmarkInt(FIRST_PAGE))
-    }
-
-    companion object {
-        private const val FIRST_PAGE = 1
     }
 }

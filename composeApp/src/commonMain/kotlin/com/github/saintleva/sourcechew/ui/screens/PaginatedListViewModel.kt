@@ -1,7 +1,7 @@
 package com.github.saintleva.sourcechew.ui.screens
 
 import androidx.lifecycle.viewModelScope
-import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
+import com.github.saintleva.sourcechew.domain.pagination.FIRST_PAGE
 import com.jamal_aliev.paginator.offset.Paginator
 import com.jamal_aliev.paginator.offset.bookmark.BookmarkInt
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,23 +19,11 @@ open class PaginatedListViewModel<Param, Item : Any>(
     override val paginator: Paginator<Item>?
         get() = paginatorStateFlow.value
 
-    private var scrollPosition: ScrollPosition? = null
-
     init {
         viewModelScope.launch {
             val p = fetchPaginator(key)
             _paginatorStateFlow.value = p
-            p.jump(BookmarkInt(1))
+            p.jump(BookmarkInt(FIRST_PAGE))
         }
-    }
-
-    override fun consumeInitialScroll(): ScrollPosition? {
-        val current = scrollPosition
-        scrollPosition = null
-        return current
-    }
-
-    override fun saveScroll(index: Int, offset: Int) {
-        scrollPosition = ScrollPosition(index, offset)
     }
 }

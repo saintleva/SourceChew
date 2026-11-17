@@ -18,7 +18,6 @@
 package com.github.saintleva.sourcechew.ui.screens.found
 
 import com.github.saintleva.sourcechew.domain.models.FoundBase
-import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
@@ -38,12 +37,6 @@ open class BaseFoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
 
     override val paginator: Paginator<FoundItem>?
         get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator
-
-    override fun consumeInitialScroll(): ScrollPosition? = searchInteractor.lastScrollPosition
-
-    override fun saveScroll(index: Int, offset: Int) {
-        searchInteractor.lastScrollPosition = ScrollPosition(index, offset)
-    }
 
     fun onNavigationBack() {
         searchInteractor.switchToSelecting()

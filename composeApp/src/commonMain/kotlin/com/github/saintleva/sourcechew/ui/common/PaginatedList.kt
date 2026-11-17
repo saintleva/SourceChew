@@ -22,7 +22,9 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import com.jamal_aliev.paginator.compose.core.PaginatedSlots
@@ -44,12 +46,26 @@ fun <Item : Any> PaginatedList(
         return
     }
 
+    val initialScroll = remember(paginator) {
+        viewModel.consumeInitialScroll()
+    }
+
     val listState = remember(paginator) {
-        val initial = viewModel.consumeInitialScroll()
         LazyListState(
-            firstVisibleItemIndex = initial?.index ?: 0,
-            firstVisibleItemScrollOffset = initial?.offset ?: 0,
+            firstVisibleItemIndex = initialScroll?.index ?: 0,
+            firstVisibleItemScrollOffset = initialScroll?.offset ?: 0,
         )
+    }
+
+    if (initialScroll != null && (initialScroll.index > 0 || initialScroll.offset > 0)) {
+        LaunchedEffect(paginator, initialScroll) {
+            snapshotFlow { listState.layoutInfo.totalItemsCount }
+                .collect { totalItems ->
+                    if (totalItems > initialScroll.index) {
+                        listState.scrollToItem(initialScroll.index, initialScroll.offset)
+                    }
+                }
+        }
     }
 
     DisposableEffect(paginator) {

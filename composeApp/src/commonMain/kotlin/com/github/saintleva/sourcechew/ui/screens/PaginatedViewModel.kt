@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.saintleva.sourcechew.domain.usecase.ScrollPosition
+import com.github.saintleva.sourcechew.ui.models.ScrollPosition
 import com.jamal_aliev.paginator.offset.Paginator
 import kotlinx.coroutines.launch
 
@@ -10,9 +10,29 @@ abstract class PaginatedViewModel<Item> : ViewModel() {
 
     abstract val paginator: Paginator<Item>?
 
-    abstract fun consumeInitialScroll(): ScrollPosition?
+    private var savedScrollPaginator: Paginator<*>? = null
+    private var scrollPosition: ScrollPosition? = null
 
-    abstract fun saveScroll(index: Int, offset: Int)
+    open fun consumeInitialScroll(): ScrollPosition? {
+        val currentPaginator = paginator
+        val savedPaginator = savedScrollPaginator
+        val matches = (savedPaginator == null || currentPaginator == null || savedPaginator === currentPaginator)
+        if (matches) {
+            val current = scrollPosition
+            scrollPosition = null
+            savedScrollPaginator = null
+            return current
+        } else {
+            scrollPosition = null
+            savedScrollPaginator = null
+            return null
+        }
+    }
+
+    open fun saveScroll(index: Int, offset: Int) {
+        savedScrollPaginator = paginator
+        scrollPosition = ScrollPosition(index, offset)
+    }
 
     fun restart() {
         viewModelScope.launch { paginator?.restart() }
