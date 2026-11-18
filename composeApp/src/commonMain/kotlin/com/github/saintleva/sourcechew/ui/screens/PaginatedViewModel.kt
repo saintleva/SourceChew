@@ -29,9 +29,9 @@ abstract class PaginatedViewModel<Item> : ViewModel() {
         }
     }
 
-    open fun saveScroll(index: Int, offset: Int) {
+    open fun saveScroll(position: ScrollPosition) {
         savedScrollPaginator = paginator
-        scrollPosition = ScrollPosition(index, offset)
+        scrollPosition = position
     }
 
     fun restart() {

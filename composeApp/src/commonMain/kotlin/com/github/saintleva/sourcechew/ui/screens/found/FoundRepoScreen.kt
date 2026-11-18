@@ -6,6 +6,7 @@ import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res

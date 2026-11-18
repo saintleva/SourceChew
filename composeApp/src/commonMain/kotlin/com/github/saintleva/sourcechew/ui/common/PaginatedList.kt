@@ -26,11 +26,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import com.github.saintleva.sourcechew.ui.models.ScrollPosition
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import com.jamal_aliev.paginator.compose.core.PaginatedSlots
 import com.jamal_aliev.paginator.compose.offset.PaginatedLazyColumn
 import com.jamal_aliev.paginator.core.page.PageState
 import com.jamal_aliev.paginator.offset.Paginator
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun <Item : Any> PaginatedList(
@@ -49,33 +51,11 @@ fun <Item : Any> PaginatedList(
     val initialScroll = remember(paginator) {
         viewModel.consumeInitialScroll()
     }
-
-    val listState = remember(paginator) {
-        LazyListState(
-            firstVisibleItemIndex = initialScroll?.index ?: 0,
-            firstVisibleItemScrollOffset = initialScroll?.offset ?: 0,
-        )
-    }
-
-    if (initialScroll != null && (initialScroll.index > 0 || initialScroll.offset > 0)) {
-        LaunchedEffect(paginator, initialScroll) {
-            snapshotFlow { listState.layoutInfo.totalItemsCount }
-                .collect { totalItems ->
-                    if (totalItems > initialScroll.index) {
-                        listState.scrollToItem(initialScroll.index, initialScroll.offset)
-                    }
-                }
-        }
-    }
-
-    DisposableEffect(paginator) {
-        onDispose {
-            viewModel.saveScroll(
-                listState.firstVisibleItemIndex,
-                listState.firstVisibleItemScrollOffset,
-            )
-        }
-    }
+    val listState = rememberPaginatedListState(
+        paginator = paginator,
+        initialScroll = ScrollPosition(initialScroll?.index ?: 0, initialScroll?.offset ?: 0),
+        onSaveScroll = viewModel::saveScroll
+    )
 
     PaginatedLazyColumn(
         paginator = paginator,
@@ -85,6 +65,57 @@ fun <Item : Any> PaginatedList(
         slots = slots,
         itemContent = itemContent
     )
+}
+
+/**
+ * Creates and remembers a [LazyListState] bound to a [Paginator], handling scroll restoration
+ * and recording scroll positions when the user scrolls or when the composable leaves composition.
+ */
+@Composable
+fun rememberPaginatedListState(
+    paginator: Paginator<*>,
+    initialScroll: ScrollPosition = ScrollPosition.Zero,
+    onSaveScroll: (position: ScrollPosition) -> Unit
+): LazyListState {
+    val listState = remember(paginator) {
+        LazyListState(
+            firstVisibleItemIndex = initialScroll.index,
+            firstVisibleItemScrollOffset = initialScroll.offset,
+        )
+    }
+
+    // Continuously record scroll position while user scrolls
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            ScrollPosition(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset)
+        }.collect { position ->
+            if (!position.isAtStart()) {
+                onSaveScroll(position)
+            }
+        }
+    }
+
+    // Wait until items are populated, then perform scroll restoration
+    if (!initialScroll.isAtStart()) {
+        LaunchedEffect(paginator, initialScroll) {
+            snapshotFlow { listState.layoutInfo.totalItemsCount }
+                .first { totalItems -> totalItems > initialScroll.index }
+            listState.scrollToItem(initialScroll.index, initialScroll.offset)
+        }
+    }
+
+    DisposableEffect(paginator) {
+        onDispose {
+            onSaveScroll(
+                ScrollPosition(
+                    listState.firstVisibleItemIndex,
+                    listState.firstVisibleItemScrollOffset
+                )
+            )
+        }
+    }
+
+    return listState
 }
 
 @Composable
