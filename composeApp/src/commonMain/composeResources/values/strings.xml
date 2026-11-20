@@ -162,4 +162,7 @@ Try changing your search terms.</string>
     <string name="sponsor_button">Sponsor</string>
     <string name="organizations">Organizations</string>
     <string name="members">Members</string>
+    <string name="no_branches_found">This repository has no branches</string>
+    <string name="no_members_found">No members found</string>
+    <string name="no_organizations_found">No organizations found</string>
 </resources>

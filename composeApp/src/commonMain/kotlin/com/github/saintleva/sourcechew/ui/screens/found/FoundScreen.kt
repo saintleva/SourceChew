@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.pagination.SearchMetadata
 import com.github.saintleva.sourcechew.ui.common.PaginatedList
+import com.github.saintleva.sourcechew.ui.common.standardSearchPaginatedSlots
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.found_items
@@ -45,6 +46,7 @@ fun <FoundItem: FoundBase> FoundScreen(
     PaginatedList(
         viewModel = viewModel,
         modifier = modifier,
+        slots = standardSearchPaginatedSlots(viewModel),
         key = { it.id }
     ) { item, globalIndex, _, _, page ->
         if (globalIndex == 0 && showMetadata && itemsTitle != null) {

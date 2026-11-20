@@ -8,6 +8,7 @@ import com.github.saintleva.sourcechew.domain.models.Owner
 import com.github.saintleva.sourcechew.ui.common.OwnerListScreen
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
+import sourcechew.composeapp.generated.resources.no_organizations_found
 import sourcechew.composeapp.generated.resources.organizations
 
 @Composable
@@ -23,6 +24,7 @@ fun UserOrgsScreen(
         title = stringResource(Res.string.organizations),
         paginator = paginator,
         viewModel = viewModel,
+        emptyMessage = stringResource(Res.string.no_organizations_found),
         onItemClick = onOrgClick
     )
 }

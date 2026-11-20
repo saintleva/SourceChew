@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jamal_aliev.paginator.core.page.PageState
 import org.jetbrains.compose.resources.stringResource
@@ -63,7 +64,7 @@ fun FullscreenLoading(
 }
 
 @Composable
-fun EmptyContent(
+fun SearchEmptyContent(
     modifier: Modifier = Modifier,
     title: String = stringResource(Res.string.no_items_found_title),
     description: String = stringResource(Res.string.no_items_found_description)
@@ -83,6 +84,25 @@ fun EmptyContent(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 8.dp)
+        )
+    }
+}
+
+@Composable
+fun EmptyListContent(
+    modifier: Modifier = Modifier,
+    message: String,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
         )
     }
 }

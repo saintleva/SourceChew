@@ -51,12 +51,16 @@ import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.ui.common.PaginatedList
 import com.github.saintleva.sourcechew.ui.common.formatRelativeTime
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
+import com.github.saintleva.sourcechew.ui.common.standardEmptyablePaginatedSlots
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.branches
 import sourcechew.composeapp.generated.resources.commit_sha
 import sourcechew.composeapp.generated.resources.default_branch_badge
 import sourcechew.composeapp.generated.resources.loading_error
+import sourcechew.composeapp.generated.resources.no_branches_found
+import sourcechew.composeapp.generated.resources.no_items_found_description
+import sourcechew.composeapp.generated.resources.no_items_found_title
 import sourcechew.composeapp.generated.resources.refresh_button
 
 @Composable
@@ -78,14 +82,14 @@ fun BranchesScreen(
 
         when (val result = defaultBranchResult) {
             is BranchDetailsResult.Success -> {
-                val branch = result.value
-                if (branch != null) {
-                    BranchCard(
-                        branchName = branch.name,
-                        commit = branch.commit,
-                        isDefault = true
-                    )
-                }
+                BranchCard(
+                    branchName = result.value.name,
+                    commit = result.value.commit,
+                    isDefault = true
+                )
+            }
+            is BranchDetailsResult.NonExistent -> {
+                // Repository has no default branch (e.g. empty repository)
             }
             is BranchDetailsResult.Error -> BranchErrorCard(
                 message = getErrorMessage(result.error),
@@ -104,6 +108,10 @@ fun BranchesScreen(
             viewModel = viewModel,
             paginator = branchesState?.paginator,
             modifier = Modifier.fillMaxSize(),
+            slots = standardEmptyablePaginatedSlots(
+                viewModel = viewModel,
+                emptyMessage = stringResource(Res.string.no_branches_found)
+            ),
             key = { it.name }
         ) { item, _, _, _, _ ->
             if (item.name != defaultBranch?.name) {

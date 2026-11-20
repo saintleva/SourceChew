@@ -6,6 +6,7 @@ import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.usecase.BranchData
 import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
+import com.github.saintleva.sourcechew.ui.models.ScrollPosition
 import com.jamal_aliev.paginator.offset.Paginator
 import com.jamal_aliev.paginator.offset.dsl.paginator
 import com.jamal_aliev.paginator.offset.load.LoadResult
@@ -66,6 +67,7 @@ class BranchesViewModelTest : FunSpec({
         requestedRepoRef shouldBe repoRef
         viewModel.branches.value shouldBe dummyData
         viewModel.defaultBranch?.name shouldBe "main"
+        viewModel.paginator shouldBe dummyData.paginator
     }
 
     test("saveScroll and consumeInitialScroll maintain scroll position") {
@@ -82,7 +84,7 @@ class BranchesViewModelTest : FunSpec({
 
         viewModel.consumeInitialScroll() shouldBe null
 
-        viewModel.saveScroll(index = 3, offset = 50)
+        viewModel.saveScroll(ScrollPosition(index = 3, offset = 50))
 
         val position = viewModel.consumeInitialScroll()
         position shouldNotBe null

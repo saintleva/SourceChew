@@ -161,4 +161,7 @@
     <string name="sponsor_button">Sponsor</string>
     <string name="organizations">Организации</string>
     <string name="members">Участники</string>
+    <string name="no_branches_found">У этого репозитория нет веток</string>
+    <string name="no_members_found">У организации нет участников</string>
+    <string name="no_organizations_found">У пользователя нет организаций</string>
 </resources>

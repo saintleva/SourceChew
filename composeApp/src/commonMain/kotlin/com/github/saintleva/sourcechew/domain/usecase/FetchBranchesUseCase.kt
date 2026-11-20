@@ -21,7 +21,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 
 sealed interface BranchDetailsResult {
-    data class Success(val value: Branch?) : BranchDetailsResult
+    data class Success(val value: Branch) : BranchDetailsResult
+    data object NonExistent : BranchDetailsResult
     data class Error(val error: DetailsError) : BranchDetailsResult
     data class InfrastructureError(val cause: AppException) : BranchDetailsResult
 }
@@ -49,11 +50,17 @@ class FetchBranchesUseCaseImpl(
                     is Result.Success -> {
                         val defaultBranchName = repoDetailsResult.value.defaultBranch
                         if (defaultBranchName == null) {
-                            BranchDetailsResult.Success(null)
+                            BranchDetailsResult.NonExistent
                         } else {
                             when (val branchResult = branchesRepository.getSingleBranch(repoRef, defaultBranchName)) {
                                 is Result.Success -> BranchDetailsResult.Success(branchResult.value)
-                                is Result.Failure -> BranchDetailsResult.Error(branchResult.error)
+                                is Result.Failure -> {
+                                    if (branchResult.error is DetailsError.ResourceNotFound) {
+                                        BranchDetailsResult.NonExistent
+                                    } else {
+                                        BranchDetailsResult.Error(branchResult.error)
+                                    }
+                                }
                             }
                         }
                     }

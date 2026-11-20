@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.ui.screens.branches
 import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.pagination.FIRST_PAGE
 import com.github.saintleva.sourcechew.domain.usecase.BranchData
 import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
@@ -26,16 +27,8 @@ class BranchesViewModel(
     private val _branches = MutableStateFlow<BranchData?>(null)
     val branches = _branches.asStateFlow()
 
-    private val paginatorStateFlow = branches
-        .map { it?.paginator }
-        .stateIn(
-            scope = viewModelScope,
-            started = WhileUiSubscribed,
-            initialValue = null
-        )
-
     override val paginator: Paginator<Branch>?
-        get() = paginatorStateFlow.value
+        get() = _branches.value?.paginator
 
     val defaultBranchResult: StateFlow<BranchDetailsResult?> = branches
         .map { it?.default }
@@ -57,8 +50,9 @@ class BranchesViewModel(
     private fun loadBranches() {
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
-            _branches.value = fetchBranchesUseCase(repoRef)
-            paginator?.jump(BookmarkInt(1))
+            val branchData = fetchBranchesUseCase(repoRef)
+            _branches.value = branchData
+            branchData.paginator.jump(BookmarkInt(FIRST_PAGE))
         }
     }
 

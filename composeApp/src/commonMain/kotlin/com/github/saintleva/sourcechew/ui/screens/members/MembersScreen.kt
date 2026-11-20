@@ -9,6 +9,7 @@ import com.github.saintleva.sourcechew.ui.common.OwnerListScreen
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.members
+import sourcechew.composeapp.generated.resources.no_members_found
 
 @Composable
 fun MembersScreen(
@@ -23,6 +24,7 @@ fun MembersScreen(
         title = stringResource(Res.string.members),
         paginator = paginator,
         viewModel = viewModel,
+        emptyMessage = stringResource(Res.string.no_members_found),
         onItemClick = onMemberClick
     )
 }

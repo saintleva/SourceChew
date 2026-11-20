@@ -130,6 +130,44 @@ class FetchBranchesUseCaseTest : FunSpec({
         error.error shouldBe DetailsError.ResourceNotFound
     }
 
+    test("returns NonExistent when repository defaultBranch is null") {
+        val configStore = FakeConfigStore(AppSettings.default)
+        val branchesRepository = FakeBranchesRepository()
+        val repoDetailsRepository = FakeRepoDetailsRepository {
+            Result.Success(dummyRepoDetails.copy(defaultBranch = null))
+        }
+
+        val useCase = FetchBranchesUseCaseImpl(
+            appSettingsStore = configStore,
+            branchesRepository = branchesRepository,
+            repoDetailsRepository = repoDetailsRepository,
+        )
+
+        val branchData = useCase(RepoRef("octocat", "Hello-World"))
+        branchData.default shouldBe BranchDetailsResult.NonExistent
+    }
+
+    test("returns NonExistent when single branch request returns ResourceNotFound") {
+        val configStore = FakeConfigStore(AppSettings.default)
+        val branchesRepository = FakeBranchesRepository(
+            singleBranchResultProvider = { _, _ ->
+                Result.Failure(DetailsError.ResourceNotFound)
+            }
+        )
+        val repoDetailsRepository = FakeRepoDetailsRepository {
+            Result.Success(dummyRepoDetails.copy(defaultBranch = "main"))
+        }
+
+        val useCase = FetchBranchesUseCaseImpl(
+            appSettingsStore = configStore,
+            branchesRepository = branchesRepository,
+            repoDetailsRepository = repoDetailsRepository,
+        )
+
+        val branchData = useCase(RepoRef("octocat", "Hello-World"))
+        branchData.default shouldBe BranchDetailsResult.NonExistent
+    }
+
     test("handles thrown exception gracefully when fetching default branch") {
         val configStore = FakeConfigStore(AppSettings.default)
         val branchesRepository = FakeBranchesRepository()

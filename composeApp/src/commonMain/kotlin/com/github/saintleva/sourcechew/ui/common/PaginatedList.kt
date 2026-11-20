@@ -40,7 +40,7 @@ fun <Item : Any> PaginatedList(
     key: (Item) -> Any,
     modifier: Modifier = Modifier,
     paginator: Paginator<Item>? = viewModel.paginator,
-    slots: PaginatedSlots<Item> = defaultPaginatedSlots(viewModel),
+    slots: PaginatedSlots<Item>,
     itemContent: @Composable LazyItemScope.(item: Item, globalIndex: Int, pageIndex: Int, items: List<Item>, page: PageState<Item>) -> Unit
 ) {
     if (paginator == null) {
@@ -119,8 +119,9 @@ fun rememberPaginatedListState(
 }
 
 @Composable
-fun <Item : Any> defaultPaginatedSlots(
-    viewModel: PaginatedViewModel<Item>
+fun <Item : Any> standardPaginatedSlots(
+    viewModel: PaginatedViewModel<Item>,
+    emptyContent: @Composable () -> Unit
 ): PaginatedSlots<Item> {
     return PaginatedSlots(
         prependErrorIndicator = { state ->
@@ -136,7 +137,7 @@ fun <Item : Any> defaultPaginatedSlots(
             )
         },
         loadingContent = { FullscreenLoading() },
-        emptyContent = { EmptyContent() },
+        emptyContent = emptyContent,
         errorContent = { state ->
             ErrorContent(
                 cause = state.exception,
@@ -145,3 +146,16 @@ fun <Item : Any> defaultPaginatedSlots(
         }
     )
 }
+
+@Composable
+fun <Item : Any> standardSearchPaginatedSlots(
+    viewModel: PaginatedViewModel<Item>
+): PaginatedSlots<Item> =
+    standardPaginatedSlots(viewModel, ::SearchEmptyContent)
+
+@Composable
+fun <Item : Any> standardEmptyablePaginatedSlots(
+    viewModel: PaginatedViewModel<Item>,
+    emptyMessage: String
+): PaginatedSlots<Item> =
+    standardPaginatedSlots(viewModel, { EmptyListContent(message = emptyMessage) })

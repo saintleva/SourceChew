@@ -4,6 +4,7 @@ import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
 import com.github.saintleva.sourcechew.domain.usecase.FetchOwnerReposUseCase
 import com.github.saintleva.sourcechew.test.FakeConfigStore
+import com.github.saintleva.sourcechew.ui.models.ScrollPosition
 import com.jamal_aliev.paginator.offset.Paginator
 import com.jamal_aliev.paginator.offset.dsl.paginator
 import com.jamal_aliev.paginator.offset.load.LoadResult
@@ -81,7 +82,7 @@ class OwnerReposViewModelTest : FunSpec({
 
         viewModel.consumeInitialScroll() shouldBe null
 
-        viewModel.saveScroll(index = 5, offset = 100)
+        viewModel.saveScroll(ScrollPosition(index = 5, offset = 100))
 
         val position = viewModel.consumeInitialScroll()
         position shouldNotBe null

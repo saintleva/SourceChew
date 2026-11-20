@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
 import com.github.saintleva.sourcechew.domain.models.Owner
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import com.jamal_aliev.paginator.offset.Paginator
+import org.jetbrains.compose.resources.StringResource
+import sourcechew.composeapp.generated.resources.Res
 
 @Composable
 fun OwnerListScreen(
@@ -19,6 +21,7 @@ fun OwnerListScreen(
     title: String,
     paginator: Paginator<Owner>?,
     viewModel: PaginatedViewModel<Owner>,
+    emptyMessage: String,
     onItemClick: (Owner) -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -33,6 +36,10 @@ fun OwnerListScreen(
             viewModel = viewModel,
             paginator = paginator,
             modifier = Modifier.fillMaxSize(),
+            slots = standardEmptyablePaginatedSlots(
+                viewModel = viewModel,
+                emptyMessage = emptyMessage
+            ),
             key = { it.id }
         ) { item, _, _, _, _ ->
             OwnerItemCard(
