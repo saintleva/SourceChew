@@ -164,4 +164,9 @@
     <string name="no_branches_found">У этого репозитория нет веток</string>
     <string name="no_members_found">У организации нет участников</string>
     <string name="no_organizations_found">У пользователя нет организаций</string>
+    <string name="download_branch">Скачать ветку</string>
+    <string name="download_branch_title">Скачивание ветки</string>
+    <string name="download_branch_downloading">Скачивание архива…</string>
+    <string name="download_branch_extracting">Распаковка архива…</string>
+    <string name="download_branch_success">Ветка успешно скачана и распакована!</string>
 </resources>

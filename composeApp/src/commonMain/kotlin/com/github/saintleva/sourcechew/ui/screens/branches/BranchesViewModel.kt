@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.pagination.FIRST_PAGE
+import com.github.saintleva.sourcechew.domain.result.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.BranchData
-import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed

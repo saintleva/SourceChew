@@ -56,6 +56,20 @@ actual val platformModule = module {
             )
         )
     }
+
+    single<okio.FileSystem> { FileSystem.SYSTEM }
+
+    single<okio.Path>(org.koin.core.qualifier.qualifier("BranchStorageDirectory")) {
+        val directory = NSFileManager.defaultManager.URLForDirectory(
+            directory = NSDocumentDirectory,
+            inDomain = NSUserDomainMask,
+            appropriateForURL = null,
+            create = true,
+            error = null
+        )
+        val stringPath = requireNotNull(directory?.path) + "/repos"
+        stringPath.toPath()
+    }
 }
 
 actual val ioDispatcher = Dispatchers.Default

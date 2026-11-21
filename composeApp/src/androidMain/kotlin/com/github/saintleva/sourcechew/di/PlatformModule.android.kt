@@ -66,6 +66,12 @@ actual val platformModule = module {
     single<SecureKeyValueStorage> {
         KSafeKeyValueStorage(ksafe = get())
     }
+
+    single<okio.FileSystem> { FileSystem.SYSTEM }
+
+    single<okio.Path>(org.koin.core.qualifier.qualifier("BranchStorageDirectory")) {
+        get<Context>().filesDir.resolve("repos").toOkioPath()
+    }
 }
 
 // Module factory used in tests to inject a custom Context

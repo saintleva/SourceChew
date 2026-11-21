@@ -47,7 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.Commit
-import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
+import com.github.saintleva.sourcechew.domain.result.BranchDetailsResult
 import com.github.saintleva.sourcechew.ui.common.PaginatedList
 import com.github.saintleva.sourcechew.ui.common.formatRelativeTime
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
@@ -57,6 +57,14 @@ import sourcechew.composeapp.generated.resources.Res
 import sourcechew.composeapp.generated.resources.branches
 import sourcechew.composeapp.generated.resources.commit_sha
 import sourcechew.composeapp.generated.resources.default_branch_badge
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.github.saintleva.sourcechew.ui.screens.download.DownloadBranchBottomSheet
+import com.github.saintleva.sourcechew.ui.screens.download.DownloadBranchViewModel
+import org.koin.compose.viewmodel.koinViewModel
+import sourcechew.composeapp.generated.resources.download_branch
 import sourcechew.composeapp.generated.resources.loading_error
 import sourcechew.composeapp.generated.resources.no_branches_found
 import sourcechew.composeapp.generated.resources.no_items_found_description
@@ -72,6 +80,21 @@ fun BranchesScreen(
     val defaultBranchResult by viewModel.defaultBranchResult.collectAsStateWithLifecycle()
     val defaultBranch = viewModel.defaultBranch
 
+    var branchToDownload by remember { mutableStateOf<String?>(null) }
+    val downloadViewModel = koinViewModel<DownloadBranchViewModel>()
+
+    if (branchToDownload != null) {
+        DownloadBranchBottomSheet(
+            repoRef = viewModel.repoRef,
+            branch = branchToDownload!!,
+            viewModel = downloadViewModel,
+            onDismissRequest = {
+                branchToDownload = null
+                downloadViewModel.reset()
+            }
+        )
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         Text(
             text = stringResource(Res.string.branches),
@@ -85,7 +108,8 @@ fun BranchesScreen(
                 BranchCard(
                     branchName = result.value.name,
                     commit = result.value.commit,
-                    isDefault = true
+                    isDefault = true,
+                    onDownload = { branchToDownload = result.value.name }
                 )
             }
             is BranchDetailsResult.NonExistent -> {
@@ -118,7 +142,8 @@ fun BranchesScreen(
                 BranchCard(
                     branchName = item.name,
                     commit = item.commit,
-                    isDefault = false
+                    isDefault = false,
+                    onDownload = { branchToDownload = item.name }
                 )
             }
         }
@@ -176,7 +201,8 @@ private fun BranchErrorCard(
 private fun BranchCard(
     branchName: String,
     commit: Commit?,
-    isDefault: Boolean = false
+    isDefault: Boolean = false,
+    onDownload: (() -> Unit)? = null
 ) {
     val cardColors = if (isDefault) {
         CardDefaults.cardColors(
@@ -278,6 +304,16 @@ private fun BranchCard(
                             )
                         }
                     }
+                }
+            }
+            if (onDownload != null) {
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(onClick = onDownload) {
+                    Icon(
+                        imageVector = Icons.Default.Download,
+                        contentDescription = stringResource(Res.string.download_branch),
+                        tint = if (isDefault) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }

@@ -48,4 +48,15 @@ actual val platformModule = module {
     }
 
     single<SecureKeyValueStorage> { DesktopSecureKeyValueStorage() }
+
+    single<okio.FileSystem> { FileSystem.SYSTEM }
+
+    single<okio.Path>(org.koin.core.qualifier.qualifier("BranchStorageDirectory")) {
+        val userDataDir = get<AppDirs>().getUserDataDir()
+        val reposDir = File(userDataDir, "repos")
+        if (!reposDir.exists()) {
+            reposDir.mkdirs()
+        }
+        reposDir.toOkioPath()
+    }
 }

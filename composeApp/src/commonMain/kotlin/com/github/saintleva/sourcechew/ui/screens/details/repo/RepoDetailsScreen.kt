@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CorporateFare
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.ForkRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -31,7 +32,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SuggestionChip
@@ -54,6 +57,11 @@ import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.models.RepoLanguage
+import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.ui.screens.download.DownloadBranchBottomSheet
+import com.github.saintleva.sourcechew.ui.screens.download.DownloadBranchViewModel
+import org.koin.compose.viewmodel.koinViewModel
+import sourcechew.composeapp.generated.resources.download_branch
 import com.github.saintleva.sourcechew.ui.common.ErrorContent
 import com.github.saintleva.sourcechew.ui.common.ExpandableSection
 import com.github.saintleva.sourcechew.ui.common.OpenInBrowserButton
@@ -137,6 +145,21 @@ private fun RepoDetailsContent(
 ) {
     val uriHandler = LocalUriHandler.current
     var isDescriptionExpanded by remember { mutableStateOf(false) }
+
+    var branchToDownload by remember { mutableStateOf<String?>(null) }
+    val downloadViewModel = koinViewModel<DownloadBranchViewModel>()
+
+    if (branchToDownload != null) {
+        DownloadBranchBottomSheet(
+            repoRef = RepoRef(details.owner.login, details.name),
+            branch = branchToDownload!!,
+            viewModel = downloadViewModel,
+            onDismissRequest = {
+                branchToDownload = null
+                downloadViewModel.reset()
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -280,19 +303,36 @@ private fun RepoDetailsContent(
             )
         }
 
-        // Primary Action: Navigate to Branches
-        Button(
-            onClick = {
-                onBranchesClick(details.owner.login, details.name)
-            },
-            modifier = Modifier.fillMaxWidth()
+        // Primary Action: Navigate to Branches & Download Default Branch
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.ForkRight, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            val branchesLabel = details.defaultBranch?.let { defaultBranch ->
-                "${stringResource(Res.string.branches)} ($defaultBranch)"
-            } ?: stringResource(Res.string.branches)
-            Text(branchesLabel)
+            Button(
+                onClick = {
+                    onBranchesClick(details.owner.login, details.name)
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(Icons.Default.ForkRight, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                val branchesLabel = details.defaultBranch?.let { defaultBranch ->
+                    "${stringResource(Res.string.branches)} ($defaultBranch)"
+                } ?: stringResource(Res.string.branches)
+                Text(branchesLabel)
+            }
+
+            if (details.defaultBranch != null) {
+                FilledTonalIconButton(
+                    onClick = { branchToDownload = details.defaultBranch }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Download,
+                        contentDescription = stringResource(Res.string.download_branch)
+                    )
+                }
+            }
         }
 
         // Topics (Expandable)

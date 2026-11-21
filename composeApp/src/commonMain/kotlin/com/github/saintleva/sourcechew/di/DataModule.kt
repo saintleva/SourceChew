@@ -11,6 +11,7 @@ import com.github.saintleva.sourcechew.data.network.KtorSearchInOwnersApiService
 import com.github.saintleva.sourcechew.data.network.KtorSearchInReposApiService
 import com.github.saintleva.sourcechew.data.network.OwnerDetailsApiService
 import com.github.saintleva.sourcechew.domain.repository.BranchesRepository
+import com.github.saintleva.sourcechew.domain.repository.DownloadBranchRepository
 import com.github.saintleva.sourcechew.domain.repository.OwnerReposRepository
 import com.github.saintleva.sourcechew.data.network.RepoDetailsApiService
 import com.github.saintleva.sourcechew.data.network.createHttpClient
@@ -104,5 +105,24 @@ val dataModule = module {
 
     single<OwnerDetailsRepository> {
         OwnerDetailsRepositoryImpl(apiService = get())
+    }
+
+    single<com.github.saintleva.sourcechew.data.storage.BranchStorage> {
+        com.github.saintleva.sourcechew.data.storage.OkioBranchStorage(
+            baseDir = get(qualifier = qualifier("BranchStorageDirectory")),
+            fileSystem = get()
+        )
+    }
+
+    single<com.github.saintleva.sourcechew.data.network.DownloadBranchApiService> {
+        com.github.saintleva.sourcechew.data.network.KtorDownloadBranchApiService(httpClient = get())
+    }
+
+    single<DownloadBranchRepository> {
+        com.github.saintleva.sourcechew.data.repository.DownloadBranchRepositoryImpl(
+            apiService = get(),
+            branchStorage = get(),
+            fileSystem = get()
+        )
     }
 }

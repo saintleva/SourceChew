@@ -165,4 +165,9 @@ Try changing your search terms.</string>
     <string name="no_branches_found">This repository has no branches</string>
     <string name="no_members_found">No members found</string>
     <string name="no_organizations_found">No organizations found</string>
+    <string name="download_branch">Download branch</string>
+    <string name="download_branch_title">Download Branch</string>
+    <string name="download_branch_downloading">Downloading archive…</string>
+    <string name="download_branch_extracting">Extracting archive…</string>
+    <string name="download_branch_success">Branch downloaded and extracted successfully!</string>
 </resources>

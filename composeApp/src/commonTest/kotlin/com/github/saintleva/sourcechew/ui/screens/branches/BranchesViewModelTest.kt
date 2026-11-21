@@ -3,8 +3,8 @@ package com.github.saintleva.sourcechew.ui.screens.branches
 import com.github.saintleva.sourcechew.domain.models.Branch
 import com.github.saintleva.sourcechew.domain.models.Commit
 import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.result.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.BranchData
-import com.github.saintleva.sourcechew.domain.usecase.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.usecase.FetchBranchesUseCase
 import com.github.saintleva.sourcechew.ui.models.ScrollPosition
 import com.jamal_aliev.paginator.offset.Paginator

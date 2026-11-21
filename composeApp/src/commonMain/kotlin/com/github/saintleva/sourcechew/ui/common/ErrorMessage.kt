@@ -51,6 +51,15 @@ fun getErrorMessage(detailsError: DetailsError): String {
 }
 
 @Composable
+fun getErrorMessage(downloadBranchError: com.github.saintleva.sourcechew.domain.result.DownloadBranchError): String {
+    return when (downloadBranchError) {
+        is com.github.saintleva.sourcechew.domain.result.DownloadBranchError.Details -> renderDetailsError(downloadBranchError.detailsError)
+        is com.github.saintleva.sourcechew.domain.result.DownloadBranchError.Infrastructure -> getErrorMessage(downloadBranchError.cause)
+        is com.github.saintleva.sourcechew.domain.result.DownloadBranchError.Unknown -> getErrorMessage(downloadBranchError.throwable)
+    }
+}
+
+@Composable
 fun getErrorMessage(searchError: SearchError): String {
     return renderSearchError(searchError)
 }

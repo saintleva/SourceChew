@@ -122,4 +122,10 @@ val domainModule = module {
     single<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         SearchInteractorImpl(fetchFoundItemsUseCase = get(qualifier<FoundOwner>()))
     }
+
+    factory<com.github.saintleva.sourcechew.domain.usecase.DownloadBranchUseCase> {
+        com.github.saintleva.sourcechew.domain.usecase.DownloadBranchUseCaseImpl(
+            downloadBranchRepository = get()
+        )
+    }
 }

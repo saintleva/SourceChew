@@ -7,6 +7,7 @@ import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.result.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.NetworkException
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException

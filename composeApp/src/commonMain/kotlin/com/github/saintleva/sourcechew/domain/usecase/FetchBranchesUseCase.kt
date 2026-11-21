@@ -8,6 +8,7 @@ import com.github.saintleva.sourcechew.domain.repository.BranchesRepository
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.repository.RepoDetailsRepository
 import com.github.saintleva.sourcechew.domain.result.AppException
+import com.github.saintleva.sourcechew.domain.result.BranchDetailsResult
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
 import com.github.saintleva.sourcechew.domain.result.Result
@@ -19,13 +20,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
-
-sealed interface BranchDetailsResult {
-    data class Success(val value: Branch) : BranchDetailsResult
-    data object NonExistent : BranchDetailsResult
-    data class Error(val error: DetailsError) : BranchDetailsResult
-    data class InfrastructureError(val cause: AppException) : BranchDetailsResult
-}
 
 class BranchData(
     val default: BranchDetailsResult,

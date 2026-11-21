@@ -131,4 +131,10 @@ val appModule = module {
             appSettingsStore = get(qualifier<AppSettings>())
         )
     }
+
+    viewModel<com.github.saintleva.sourcechew.ui.screens.download.DownloadBranchViewModel> {
+        com.github.saintleva.sourcechew.ui.screens.download.DownloadBranchViewModel(
+            downloadBranchUseCase = get()
+        )
+    }
 }
