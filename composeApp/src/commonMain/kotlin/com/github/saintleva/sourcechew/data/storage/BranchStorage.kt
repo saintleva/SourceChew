@@ -1,6 +1,6 @@
 package com.github.saintleva.sourcechew.data.storage
 
-import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.models.BranchRef
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -11,12 +11,12 @@ interface BranchStorage {
     /**
      * Returns a temporary ZIP file path for downloading a branch archive.
      */
-    fun getTempZipPath(repoRef: RepoRef, branch: String): Path
+    fun getTempZipPath(branchRef: BranchRef): Path
 
     /**
      * Returns the target directory path where extracted branch source files are stored.
      */
-    fun getTargetDirectoryPath(repoRef: RepoRef, branch: String): Path
+    fun getTargetDirectoryPath(branchRef: BranchRef): Path
 
     /**
      * Extracts the specified ZIP archive into the target directory, stripping top-level archive prefix.
@@ -35,14 +35,14 @@ class OkioBranchStorage(
     private val fileSystem: FileSystem
 ) : BranchStorage {
 
-    override fun getTempZipPath(repoRef: RepoRef, branch: String): Path {
-        val sanitizedBranch = sanitizeName(branch)
-        return baseDir / repoRef.owner / repoRef.name / "$sanitizedBranch.zip.tmp"
+    override fun getTempZipPath(branchRef: BranchRef): Path {
+        val sanitizedBranch = sanitizeName(branchRef.branch)
+        return baseDir / branchRef.repoRef.owner / branchRef.repoRef.name / "$sanitizedBranch.zip.tmp"
     }
 
-    override fun getTargetDirectoryPath(repoRef: RepoRef, branch: String): Path {
-        val sanitizedBranch = sanitizeName(branch)
-        return baseDir / repoRef.owner / repoRef.name / sanitizedBranch
+    override fun getTargetDirectoryPath(branchRef: BranchRef): Path {
+        val sanitizedBranch = sanitizeName(branchRef.branch)
+        return baseDir / branchRef.repoRef.owner / branchRef.repoRef.name / sanitizedBranch
     }
 
     override suspend fun deleteIfExists(path: Path) {

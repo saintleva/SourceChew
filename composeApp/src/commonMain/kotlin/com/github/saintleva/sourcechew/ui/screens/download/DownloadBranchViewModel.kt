@@ -2,6 +2,7 @@ package com.github.saintleva.sourcechew.ui.screens.download
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.domain.models.DownloadBranchStatus
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.usecase.DownloadBranchUseCase
@@ -19,26 +20,30 @@ class DownloadBranchViewModel(
     private val _downloadStatus = MutableStateFlow<DownloadBranchStatus>(DownloadBranchStatus.Idle)
     val downloadStatus: StateFlow<DownloadBranchStatus> = _downloadStatus.asStateFlow()
 
-    private val _activeTarget = MutableStateFlow<Pair<RepoRef, String>?>(null)
-    val activeTarget: StateFlow<Pair<RepoRef, String>?> = _activeTarget.asStateFlow()
+    private val _activeTarget = MutableStateFlow<BranchRef?>(null)
+    val activeTarget: StateFlow<BranchRef?> = _activeTarget.asStateFlow()
 
     private var downloadJob: Job? = null
 
-    fun startDownload(repoRef: RepoRef, branch: String) {
-        if (_activeTarget.value == Pair(repoRef, branch) &&
+    fun startDownload(branchRef: BranchRef) {
+        if (_activeTarget.value == branchRef &&
             (_downloadStatus.value is DownloadBranchStatus.Downloading || _downloadStatus.value is DownloadBranchStatus.Extracting)
         ) {
             return
         }
 
         downloadJob?.cancel()
-        _activeTarget.value = Pair(repoRef, branch)
+        _activeTarget.value = branchRef
 
         downloadJob = viewModelScope.launch {
-            downloadBranchUseCase(repoRef, branch).collectLatest { status ->
+            downloadBranchUseCase(branchRef).collectLatest { status ->
                 _downloadStatus.value = status
             }
         }
+    }
+
+    fun startDownload(repoRef: RepoRef, branch: String) {
+        startDownload(BranchRef(repoRef, branch))
     }
 
     fun cancelDownload() {
@@ -50,7 +55,7 @@ class DownloadBranchViewModel(
 
     fun retry() {
         val target = _activeTarget.value ?: return
-        startDownload(target.first, target.second)
+        startDownload(target)
     }
 
     fun reset() {

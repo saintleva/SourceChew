@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.ui.screens.download
 
+import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.domain.models.DownloadBranchStatus
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.usecase.DownloadBranchUseCase
@@ -27,10 +28,11 @@ class DownloadBranchViewModelTest : FunSpec({
 
     val dummyRepoRef = RepoRef("octocat", "Hello-World")
     val branch = "main"
+    val branchRef = BranchRef(dummyRepoRef, branch)
 
     test("startDownload invokes usecase and updates status") {
         val fakeUseCase = object : DownloadBranchUseCase {
-            override fun invoke(repoRef: RepoRef, branch: String): Flow<DownloadBranchStatus> = flow {
+            override fun invoke(branchRef: BranchRef): Flow<DownloadBranchStatus> = flow {
                 emit(DownloadBranchStatus.Downloading(0L, null))
                 emit(DownloadBranchStatus.Success("/path/to/repo"))
             }
@@ -40,7 +42,7 @@ class DownloadBranchViewModelTest : FunSpec({
         viewModel.downloadStatus.value shouldBe DownloadBranchStatus.Idle
 
         viewModel.startDownload(dummyRepoRef, branch)
-        viewModel.activeTarget.value shouldBe Pair(dummyRepoRef, branch)
+        viewModel.activeTarget.value shouldBe branchRef
 
         testDispatcher.scheduler.advanceUntilIdle()
 
@@ -49,7 +51,7 @@ class DownloadBranchViewModelTest : FunSpec({
 
     test("cancelDownload and reset restore Idle state") {
         val fakeUseCase = object : DownloadBranchUseCase {
-            override fun invoke(repoRef: RepoRef, branch: String): Flow<DownloadBranchStatus> = flow {
+            override fun invoke(branchRef: BranchRef): Flow<DownloadBranchStatus> = flow {
                 emit(DownloadBranchStatus.Downloading(100L, 500L))
             }
         }
@@ -68,7 +70,7 @@ class DownloadBranchViewModelTest : FunSpec({
     test("retry restarts download for active target") {
         var invocations = 0
         val fakeUseCase = object : DownloadBranchUseCase {
-            override fun invoke(repoRef: RepoRef, branch: String): Flow<DownloadBranchStatus> = flow {
+            override fun invoke(branchRef: BranchRef): Flow<DownloadBranchStatus> = flow {
                 invocations++
                 emit(DownloadBranchStatus.Success("/target/$invocations"))
             }

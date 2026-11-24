@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.data.repository
 
 import com.github.saintleva.sourcechew.data.network.DownloadBranchApiService
 import com.github.saintleva.sourcechew.data.storage.BranchStorage
-import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.domain.repository.DownloadBranchRepository
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
@@ -15,23 +15,21 @@ class DownloadBranchRepositoryImpl(
 ) : DownloadBranchRepository {
 
     override suspend fun downloadBranchArchive(
-        repoRef: RepoRef,
-        branch: String,
+        branchRef: BranchRef,
         onProgress: (bytesDownloaded: Long, totalBytes: Long?) -> Unit
     ): Result<Unit, DetailsError> {
-        val tempZipPath = branchStorage.getTempZipPath(repoRef, branch)
+        val tempZipPath = branchStorage.getTempZipPath(branchRef)
         return apiService.downloadBranchZip(
-            repoRef = repoRef,
-            branch = branch,
+            branchRef = branchRef,
             tempZipPath = tempZipPath,
             fileSystem = fileSystem,
             onProgress = onProgress
         )
     }
 
-    override suspend fun extractBranchArchive(repoRef: RepoRef, branch: String): String {
-        val tempZipPath = branchStorage.getTempZipPath(repoRef, branch)
-        val targetDirPath = branchStorage.getTargetDirectoryPath(repoRef, branch)
+    override suspend fun extractBranchArchive(branchRef: BranchRef): String {
+        val tempZipPath = branchStorage.getTempZipPath(branchRef)
+        val targetDirPath = branchStorage.getTargetDirectoryPath(branchRef)
 
         try {
             return branchStorage.extractZipArchive(tempZipPath, targetDirPath)
@@ -40,8 +38,8 @@ class DownloadBranchRepositoryImpl(
         }
     }
 
-    override suspend fun cleanupTempFile(repoRef: RepoRef, branch: String) {
-        val tempZipPath = branchStorage.getTempZipPath(repoRef, branch)
+    override suspend fun cleanupTempFile(branchRef: BranchRef) {
+        val tempZipPath = branchStorage.getTempZipPath(branchRef)
         branchStorage.deleteIfExists(tempZipPath)
     }
 }

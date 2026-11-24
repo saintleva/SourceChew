@@ -1,5 +1,6 @@
 package com.github.saintleva.sourcechew.domain.usecase
 
+import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.domain.models.DownloadBranchStatus
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.repository.DownloadBranchRepository
@@ -15,12 +16,12 @@ class DownloadBranchUseCaseTest : FunSpec({
 
     val dummyRepoRef = RepoRef("octocat", "Hello-World")
     val branch = "main"
+    val branchRef = BranchRef(dummyRepoRef, branch)
 
     test("emits Downloading, Extracting, and Success on happy path") {
         val fakeRepo = object : DownloadBranchRepository {
             override suspend fun downloadBranchArchive(
-                repoRef: RepoRef,
-                branch: String,
+                branchRef: BranchRef,
                 onProgress: (bytesDownloaded: Long, totalBytes: Long?) -> Unit
             ): Result<Unit, DetailsError> {
                 onProgress(500L, 1000L)
@@ -28,15 +29,15 @@ class DownloadBranchUseCaseTest : FunSpec({
                 return Result.Success(Unit)
             }
 
-            override suspend fun extractBranchArchive(repoRef: RepoRef, branch: String): String {
+            override suspend fun extractBranchArchive(branchRef: BranchRef): String {
                 return "/path/to/extracted/main"
             }
 
-            override suspend fun cleanupTempFile(repoRef: RepoRef, branch: String) = Unit
+            override suspend fun cleanupTempFile(branchRef: BranchRef) = Unit
         }
 
         val useCase = DownloadBranchUseCaseImpl(fakeRepo)
-        val statuses = useCase(dummyRepoRef, branch).toList()
+        val statuses = useCase(branchRef).toList()
 
         statuses.first() shouldBe DownloadBranchStatus.Downloading(0L, null)
         statuses.any { it is DownloadBranchStatus.Downloading && it.bytesDownloaded == 500L } shouldBe true
@@ -49,24 +50,23 @@ class DownloadBranchUseCaseTest : FunSpec({
         var cleanedUp = false
         val fakeRepo = object : DownloadBranchRepository {
             override suspend fun downloadBranchArchive(
-                repoRef: RepoRef,
-                branch: String,
+                branchRef: BranchRef,
                 onProgress: (bytesDownloaded: Long, totalBytes: Long?) -> Unit
             ): Result<Unit, DetailsError> {
                 return Result.Failure(DetailsError.ResourceNotFound)
             }
 
-            override suspend fun extractBranchArchive(repoRef: RepoRef, branch: String): String {
+            override suspend fun extractBranchArchive(branchRef: BranchRef): String {
                 error("Should not be called")
             }
 
-            override suspend fun cleanupTempFile(repoRef: RepoRef, branch: String) {
+            override suspend fun cleanupTempFile(branchRef: BranchRef) {
                 cleanedUp = true
             }
         }
 
         val useCase = DownloadBranchUseCaseImpl(fakeRepo)
-        val statuses = useCase(dummyRepoRef, branch).toList()
+        val statuses = useCase(branchRef).toList()
 
         cleanedUp shouldBe true
         val lastStatus = statuses.last()

@@ -58,6 +58,7 @@ import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoDetails
 import com.github.saintleva.sourcechew.domain.models.RepoLanguage
 import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.ui.screens.download.DownloadBranchBottomSheet
 import com.github.saintleva.sourcechew.ui.screens.download.DownloadBranchViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -151,8 +152,7 @@ private fun RepoDetailsContent(
 
     if (branchToDownload != null) {
         DownloadBranchBottomSheet(
-            repoRef = RepoRef(details.owner.login, details.name),
-            branch = branchToDownload!!,
+            branchRef = BranchRef(RepoRef(details.owner.login, details.name), branchToDownload!!),
             viewModel = downloadViewModel,
             onDismissRequest = {
                 branchToDownload = null

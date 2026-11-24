@@ -43,6 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.github.saintleva.sourcechew.domain.models.BranchRef
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -85,8 +86,7 @@ fun BranchesScreen(
 
     if (branchToDownload != null) {
         DownloadBranchBottomSheet(
-            repoRef = viewModel.repoRef,
-            branch = branchToDownload!!,
+            branchRef = BranchRef(viewModel.repoRef, branchToDownload!!),
             viewModel = downloadViewModel,
             onDismissRequest = {
                 branchToDownload = null

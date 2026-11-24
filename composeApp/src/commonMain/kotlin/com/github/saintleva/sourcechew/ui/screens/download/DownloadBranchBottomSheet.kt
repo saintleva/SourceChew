@@ -1,6 +1,7 @@
 package com.github.saintleva.sourcechew.ui.screens.download
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
@@ -27,11 +29,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.domain.models.DownloadBranchStatus
-import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -46,16 +49,15 @@ import sourcechew.composeapp.generated.resources.retry_button
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadBranchBottomSheet(
-    repoRef: RepoRef,
-    branch: String,
+    branchRef: BranchRef,
     viewModel: DownloadBranchViewModel,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val status by viewModel.downloadStatus.collectAsStateWithLifecycle()
 
-    LaunchedEffect(repoRef, branch) {
-        viewModel.startDownload(repoRef, branch)
+    LaunchedEffect(branchRef) {
+        viewModel.startDownload(branchRef)
     }
 
     ModalBottomSheet(
@@ -84,7 +86,7 @@ fun DownloadBranchBottomSheet(
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${repoRef.owner}/${repoRef.name}",
+                        text = "${branchRef.repoRef.owner}/${branchRef.repoRef.name}",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -94,7 +96,7 @@ fun DownloadBranchBottomSheet(
                         color = MaterialTheme.colorScheme.secondaryContainer
                     ) {
                         Text(
-                            text = branch,
+                            text = branchRef.branch,
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -103,125 +105,162 @@ fun DownloadBranchBottomSheet(
                 }
             }
 
+            // Status Body Content
             when (val currentStatus = status) {
-                is DownloadBranchStatus.Idle, is DownloadBranchStatus.Downloading -> {
-                    val downloadingState = currentStatus as? DownloadBranchStatus.Downloading
-                    val progress = downloadingState?.progress
+                is DownloadBranchStatus.Idle,
+                is DownloadBranchStatus.Downloading -> {
+                    val progress = currentStatus as? DownloadBranchStatus.Downloading
+                    val downloaded = progress?.bytesDownloaded ?: 0L
+                    val total = progress?.totalBytes
 
-                    Text(
-                        text = stringResource(Res.string.download_branch_downloading),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    if (progress != null) {
-                        LinearProgressIndicator(
-                            progress = { progress },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    } else {
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                    }
-
-                    if (downloadingState != null) {
-                        val downloadedMb = downloadingState.bytesDownloaded / (1024f * 1024f)
-                        val sizeText = if (downloadingState.totalBytes != null && downloadingState.totalBytes > 0L) {
-                            val totalMb = downloadingState.totalBytes / (1024f * 1024f)
-                            val percentage = (progress!! * 100).toInt()
-                            "${formatMb(downloadedMb)} / ${formatMb(totalMb)} MB ($percentage%)"
-                        } else {
-                            "${formatMb(downloadedMb)} MB"
-                        }
-                        Text(
-                            text = sizeText,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.cancelDownload()
-                            onDismissRequest()
-                        },
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(stringResource(Res.string.dialog_cancel))
+                        if (total != null && total > 0L) {
+                            val fraction = (downloaded.toFloat() / total.toFloat()).coerceIn(0f, 1f)
+                            val percentage = (fraction * 100).toInt()
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                LinearProgressIndicator(
+                                    progress = { fraction },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(20.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                )
+                                Text(
+                                    text = "$percentage%",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                            Text(
+                                text = "${stringResource(Res.string.download_branch_downloading)} (${formatBytes(downloaded)} / ${formatBytes(total)})",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        } else {
+                            LinearProgressIndicator(
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Text(
+                                text = "${stringResource(Res.string.download_branch_downloading)} (${formatBytes(downloaded)})",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                viewModel.cancelDownload()
+                                onDismissRequest()
+                            }
+                        ) {
+                            Text(stringResource(Res.string.dialog_cancel))
+                        }
                     }
                 }
 
                 is DownloadBranchStatus.Extracting -> {
-                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
-                    Text(
-                        text = stringResource(Res.string.download_branch_extracting),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        CircularProgressIndicator()
+                        Text(
+                            text = stringResource(Res.string.download_branch_extracting),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
 
                 is DownloadBranchStatus.Success -> {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Text(
-                        text = stringResource(Res.string.download_branch_success),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = currentStatus.targetDirectory,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Button(
-                        onClick = onDismissRequest,
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(stringResource(Res.string.dialog_ok))
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Text(
+                            text = stringResource(Res.string.download_branch_success),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Button(
+                            onClick = {
+                                onDismissRequest()
+                            }
+                        ) {
+                            Text(stringResource(Res.string.dialog_ok))
+                        }
                     }
                 }
 
                 is DownloadBranchStatus.Failed -> {
-                    Icon(
-                        imageVector = Icons.Default.Error,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Text(
-                        text = getErrorMessage(currentStatus.error),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Row(
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        OutlinedButton(
-                            onClick = onDismissRequest,
-                            modifier = Modifier.weight(1f)
+                        Icon(
+                            imageVector = Icons.Default.Error,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Text(
+                            text = getErrorMessage(currentStatus.error),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(stringResource(Res.string.dialog_cancel))
-                        }
-                        Button(
-                            onClick = viewModel::retry,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(stringResource(Res.string.retry_button))
+                            OutlinedButton(
+                                onClick = {
+                                    onDismissRequest()
+                                }
+                            ) {
+                                Text(stringResource(Res.string.dialog_cancel))
+                            }
+                            Button(
+                                onClick = {
+                                    viewModel.retry()
+                                }
+                            ) {
+                                Text(stringResource(Res.string.retry_button))
+                            }
                         }
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
-private fun formatMb(value: Float): String {
-    val rounded = (value * 100).toInt() / 100f
-    return rounded.toString()
+private fun formatBytes(bytes: Long): String {
+    val kb = bytes / 1024.0
+    val mb = kb / 1024.0
+    return if (mb >= 1.0) {
+        val rounded = kotlin.math.round(mb * 10) / 10.0
+        "$rounded MB"
+    } else if (kb >= 1.0) {
+        val rounded = kotlin.math.round(kb * 10) / 10.0
+        "$rounded KB"
+    } else {
+        "$bytes B"
+    }
 }
