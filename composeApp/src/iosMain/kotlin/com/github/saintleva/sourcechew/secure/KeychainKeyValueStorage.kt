@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.secure
 
 import com.github.saintleva.sourcechew.data.secure.ClearableSecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
-import com.github.saintleva.sourcechew.di.ioDispatcher
+import com.github.saintleva.sourcechew.domain.coroutines.ioDispatcher
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.KeychainSettings
 import com.russhwolf.settings.Settings
@@ -11,7 +11,6 @@ import kotlinx.coroutines.withContext
 import platform.Foundation.NSBundle
 
 
-@OptIn(ExperimentalSettingsApi::class)
 class KeychainKeyValueStorage(
     private val dispatcher: CoroutineDispatcher = ioDispatcher
 ) : ClearableSecureKeyValueStorage {

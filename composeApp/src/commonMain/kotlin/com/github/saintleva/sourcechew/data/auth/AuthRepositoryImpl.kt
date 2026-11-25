@@ -1,8 +1,9 @@
 package com.github.saintleva.sourcechew.data.auth
 
 import com.github.saintleva.sourcechew.data.secure.SecureTokenStorage
-import com.github.saintleva.sourcechew.di.ioDispatcher
+import com.github.saintleva.sourcechew.domain.coroutines.ioDispatcher
 import com.github.saintleva.sourcechew.domain.repository.AuthRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -31,8 +32,15 @@ class AuthRepositoryImpl(
 
     init {
         scope.launch {
-            _authToken.value = storage.read()
-            isInitialized.complete(Unit)
+            try {
+                _authToken.value = storage.read()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Throwable) {
+                _authToken.value = null
+            } finally {
+                isInitialized.complete(Unit)
+            }
         }
     }
 

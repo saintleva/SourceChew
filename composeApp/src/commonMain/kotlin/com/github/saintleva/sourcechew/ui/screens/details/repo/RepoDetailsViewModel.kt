@@ -10,6 +10,7 @@ import com.github.saintleva.sourcechew.ui.screens.details.DetailsUiState
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
+import com.github.saintleva.sourcechew.domain.result.UnknownInfrastructureException
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,6 +59,8 @@ class RepoDetailsViewModel(
                 throw e
             } catch (e: AppException) {
                 _uiState.value = DetailsUiState.InfrastructureError(e)
+            } catch (e: Exception) {
+                _uiState.value = DetailsUiState.InfrastructureError(UnknownInfrastructureException(e))
             }
         }
     }

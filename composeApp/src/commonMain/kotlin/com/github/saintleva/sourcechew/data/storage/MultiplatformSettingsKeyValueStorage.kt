@@ -2,7 +2,7 @@ package com.github.saintleva.sourcechew.data.storage
 
 import com.github.saintleva.sourcechew.data.secure.ClearableSecureKeyValueStorage
 import com.github.saintleva.sourcechew.data.secure.SecureKeyValueStorage
-import com.github.saintleva.sourcechew.di.ioDispatcher
+import com.github.saintleva.sourcechew.domain.coroutines.ioDispatcher
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

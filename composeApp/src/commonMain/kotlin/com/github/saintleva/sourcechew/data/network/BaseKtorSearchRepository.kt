@@ -9,6 +9,7 @@ import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.CancellationException
 
 
 class PaginatedRequest<ItemSearchConditions>(
@@ -45,7 +46,9 @@ interface BaseKtorSearchRepository<ItemSearchConditions, out FoundItem: FoundBas
                 } else {
                     message ?: "Validation Error (422)"
                 }
-            } catch (e: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
                 rawBody.takeIf { it.isNotBlank() } ?: "Validation Error (422)"
             }
             SearchError.Validation(errorMessage)

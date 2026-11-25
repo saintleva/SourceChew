@@ -11,7 +11,6 @@ import com.russhwolf.settings.ExperimentalSettingsImplementation
 import com.russhwolf.settings.KeychainSettings
 import com.russhwolf.settings.Settings
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.coroutines.Dispatchers
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import org.koin.dsl.module
@@ -71,5 +70,3 @@ actual val platformModule = module {
         stringPath.toPath()
     }
 }
-
-actual val ioDispatcher = Dispatchers.Default

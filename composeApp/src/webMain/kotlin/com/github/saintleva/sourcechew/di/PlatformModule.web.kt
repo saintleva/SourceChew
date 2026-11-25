@@ -4,7 +4,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.okio.WebLocalStorage
 import com.github.saintleva.sourcechew.data.storage.AppPreferences
-import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module
 
 
@@ -21,5 +20,3 @@ val webCommonModule = module {
         )
     }
 }
-
-actual val ioDispatcher = Dispatchers.Default

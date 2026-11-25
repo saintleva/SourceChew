@@ -5,12 +5,14 @@ import com.github.saintleva.sourcechew.domain.models.RepoLanguage
 import com.github.saintleva.sourcechew.domain.models.RepoRef
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.Result
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -57,7 +59,12 @@ class KtorRepoDetailsApiService(
             } else {
                 emptyList()
             }
-        } catch (_: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Napier.w(throwable = e, tag = "KtorRepoDetailsApiService") {
+                "Failed to fetch languages for ${repoRef.owner}/${repoRef.name}"
+            }
             emptyList()
         }
     }
