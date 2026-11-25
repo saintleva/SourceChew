@@ -56,9 +56,11 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
 ) {
     val searchState = viewModel.searchState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(searchState.value) {
-        if (searchState.value is SearchState.Found) {
-            onFound()
+    LaunchedEffect(viewModel) {
+        viewModel.navEvents.collect { event ->
+            when (event) {
+                SearchNavEvent.NavigateToResults -> onFound()
+            }
         }
     }
 

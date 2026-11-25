@@ -11,11 +11,14 @@ import com.github.saintleva.sourcechew.domain.models.updateCommonFilters
 import kotlinx.datetime.LocalDate
 import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
+import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.domain.utils.Lens
 import com.github.saintleva.sourcechew.ui.utils.DEBOUNCE
 import com.github.saintleva.sourcechew.ui.utils.WhileUiSubscribed
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,8 +26,13 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+sealed interface SearchNavEvent {
+    data object NavigateToResults : SearchNavEvent
+}
 
 
 @OptIn(FlowPreview::class)
@@ -63,6 +71,9 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
 
     val searchState = searchInteractor.searchState
 
+    private val _navEvents = Channel<SearchNavEvent>(Channel.BUFFERED)
+    val navEvents: Flow<SearchNavEvent> = _navEvents.receiveAsFlow()
+
     private var _searchJob: Job? = null
 
     init {
@@ -79,6 +90,14 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
 
     fun onQueryChange(query: String) {
         _conditions.updateCommonFilters { it.copy(query = query) }
+        if (query.isBlank()) {
+            searchInteractor.clear()
+        }
+    }
+
+    fun clearSearch() {
+        _conditions.updateCommonFilters { it.copy(query = "") }
+        searchInteractor.clear()
     }
 
     fun onCreatedFilterChange(created: Range<LocalDate>?) {
@@ -96,6 +115,9 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
         _searchJob?.cancel()
         _searchJob = viewModelScope.launch {
             searchInteractor.search(conditions.value, usePreviousSearch.value)
+            if (searchInteractor.searchState.value is SearchState.Found) {
+                _navEvents.send(SearchNavEvent.NavigateToResults)
+            }
         }
     }
 

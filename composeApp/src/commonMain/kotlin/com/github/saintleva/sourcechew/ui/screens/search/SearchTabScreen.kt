@@ -42,8 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -73,18 +71,19 @@ fun SearchTabScreen(
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTab.ordinal) }
 
-    val repoSearchState by repoViewModel.searchState.collectAsStateWithLifecycle()
-    val ownerSearchState by ownerViewModel.searchState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(repoSearchState) {
-        if (repoSearchState is SearchState.Found) {
-            onFoundRepo()
+    LaunchedEffect(repoViewModel) {
+        repoViewModel.navEvents.collect { event ->
+            when (event) {
+                SearchNavEvent.NavigateToResults -> onFoundRepo()
+            }
         }
     }
 
-    LaunchedEffect(ownerSearchState) {
-        if (ownerSearchState is SearchState.Found) {
-            onFoundOwner()
+    LaunchedEffect(ownerViewModel) {
+        ownerViewModel.navEvents.collect { event ->
+            when (event) {
+                SearchNavEvent.NavigateToResults -> onFoundOwner()
+            }
         }
     }
 

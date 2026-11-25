@@ -19,7 +19,6 @@ package com.github.saintleva.sourcechew.ui.screens.found
 
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
-import com.github.saintleva.sourcechew.domain.usecase.SearchState
 import com.github.saintleva.sourcechew.ui.screens.PaginatedViewModel
 import com.jamal_aliev.paginator.offset.Paginator
 import io.github.aakira.napier.Napier
@@ -36,7 +35,7 @@ open class BaseFoundViewModel<ItemSearchConditions, FoundItem: FoundBase>(
     }
 
     override val paginator: Paginator<FoundItem>?
-        get() = (searchInteractor.searchState.value as? SearchState.Found)?.paginator
+        get() = searchInteractor.currentPaginator
 
     fun onNavigationBack() {
         searchInteractor.switchToSelecting()

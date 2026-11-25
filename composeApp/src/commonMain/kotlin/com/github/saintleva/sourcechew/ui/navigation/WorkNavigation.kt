@@ -18,11 +18,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundOwner
 import com.github.saintleva.sourcechew.domain.models.FoundRepo
-import com.github.saintleva.sourcechew.domain.models.OwnerSearchConditions
 import com.github.saintleva.sourcechew.domain.models.OwnerType
 import com.github.saintleva.sourcechew.domain.models.RepoRef
-import com.github.saintleva.sourcechew.domain.models.RepoSearchConditions
-import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesScreen
 import com.github.saintleva.sourcechew.ui.screens.branches.BranchesViewModel
 import com.github.saintleva.sourcechew.ui.screens.details.owner.OrganizationDetailsScreen
@@ -41,7 +38,6 @@ import com.github.saintleva.sourcechew.ui.screens.userorgs.UserOrgsScreen
 import com.github.saintleva.sourcechew.ui.screens.userorgs.UserOrgsViewModel
 import com.github.saintleva.sourcechew.ui.screens.search.SearchTabScreen
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.qualifier
@@ -78,13 +74,6 @@ fun WorkNavigation(
         Route.Work.Search()
     )
 
-    val repoSearchInteractor = koinInject<SearchInteractor<RepoSearchConditions, FoundRepo>>(
-        qualifier<FoundRepo>()
-    )
-    val ownerSearchInteractor = koinInject<SearchInteractor<OwnerSearchConditions, FoundOwner>>(
-        qualifier<FoundOwner>()
-    )
-
     fun navigateToSearch() {
         if (backStack.lastOrNull() !is Route.Work.Search) {
             backStack.add(Route.Work.Search())
@@ -94,13 +83,6 @@ fun WorkNavigation(
     NavDisplay(
         backStack = backStack,
         onBack = {
-            // Synchronously reset search state back to Selecting before popping backstack,
-            // preventing race conditions with SearchTabScreen's LaunchedEffect during exit transitions.
-            when (backStack.lastOrNull()) {
-                is Route.Work.Found.Repo -> repoSearchInteractor.switchToSelecting()
-                is Route.Work.Found.Owner -> ownerSearchInteractor.switchToSelecting()
-                else -> {}
-            }
             backStack.pop()
         },
         entryDecorators = listOf(

@@ -72,7 +72,15 @@ val domainModule = module {
 
     single<SecureTokenStorage> { DefaultTokenStorage(storage = get()) }
 
-    single<AuthRepository> { AuthRepositoryImpl(storage = get()) }
+    single<AuthRepository> {
+        AuthRepositoryImpl(
+            storage = get(),
+            onAuthCleared = {
+                getOrNull<SearchInteractor<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>())?.clear()
+                getOrNull<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>())?.clear()
+            }
+        )
+    }
 
     factory<FetchFoundItemsUseCase<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
         FetchFoundItemsUseCaseImpl(

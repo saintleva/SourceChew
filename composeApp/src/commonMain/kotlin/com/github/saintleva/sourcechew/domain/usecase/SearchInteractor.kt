@@ -41,6 +41,9 @@ interface SearchInteractor<ItemSearchConditions, out FoundItem: FoundBase> {
 
     val searchState: StateFlow<SearchState<FoundItem>>
 
+    val currentPaginator: Paginator<@UnsafeVariance FoundItem>?
+        get() = (searchState.value as? SearchState.Found)?.paginator
+
     val everSearched: Boolean
 
     suspend fun search(conditions: ItemSearchConditions, usePreviousSearch: Boolean)
@@ -61,6 +64,9 @@ class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
 
     private var previousConditions: ItemSearchConditions? = null
     private var lastFound: Paginator<@UnsafeVariance FoundItem>? = null
+
+    override val currentPaginator: Paginator<@UnsafeVariance FoundItem>?
+        get() = lastFound
 
     override val everSearched: Boolean
         get() = lastFound != null
@@ -90,9 +96,13 @@ class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
     }
 
     override fun clear() {
-        lastFound?.release()
+        lastFound?.let {
+            Napier.d(tag = "search") { "Releasing paginator on clear: ${it.hashCode()}" }
+            it.release(silently = true)
+        }
         lastFound = null
         previousConditions = null
+        _searchState.update { SearchState.Selecting }
     }
 
     private suspend fun obtainNewResult(conditions: ItemSearchConditions) {
