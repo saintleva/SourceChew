@@ -82,9 +82,6 @@ fun WorkNavigation(
 
     NavDisplay(
         backStack = backStack,
-        onBack = {
-            backStack.pop()
-        },
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()

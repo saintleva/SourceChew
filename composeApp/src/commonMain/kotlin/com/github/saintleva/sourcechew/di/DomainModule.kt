@@ -73,13 +73,7 @@ val domainModule = module {
     single<SecureTokenStorage> { DefaultTokenStorage(storage = get()) }
 
     single<AuthRepository> {
-        AuthRepositoryImpl(
-            storage = get(),
-            onAuthCleared = {
-                getOrNull<SearchInteractor<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>())?.clear()
-                getOrNull<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>())?.clear()
-            }
-        )
+        AuthRepositoryImpl(storage = get())
     }
 
     factory<FetchFoundItemsUseCase<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
@@ -126,11 +120,19 @@ val domainModule = module {
     }
 
     single<SearchInteractor<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
-        SearchInteractorImpl(fetchFoundItemsUseCase = get(qualifier<FoundRepo>()))
+        SearchInteractorImpl(
+            fetchFoundItemsUseCase = get(qualifier<FoundRepo>()),
+            authRepository = get(),
+            appSettingsStore = get(qualifier<AppSettings>())
+        )
     }
 
     single<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
-        SearchInteractorImpl(fetchFoundItemsUseCase = get(qualifier<FoundOwner>()))
+        SearchInteractorImpl(
+            fetchFoundItemsUseCase = get(qualifier<FoundOwner>()),
+            authRepository = get(),
+            appSettingsStore = get(qualifier<AppSettings>())
+        )
     }
 
     factory<DownloadBranchUseCase> {

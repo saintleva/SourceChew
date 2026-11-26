@@ -18,8 +18,7 @@ import kotlinx.coroutines.launch
 
 class AuthRepositoryImpl(
     private val storage: SecureTokenStorage,
-    coroutineDispatcher: CoroutineDispatcher = ioDispatcher,
-    private val onAuthCleared: (() -> Unit)? = null
+    coroutineDispatcher: CoroutineDispatcher = ioDispatcher
 ) : AuthRepository {
 
     private val scope = CoroutineScope(coroutineDispatcher + SupervisorJob())
@@ -53,12 +52,10 @@ class AuthRepositoryImpl(
     override suspend fun saveToken(token: String) {
         storage.write(token)
         _authToken.value = token
-        onAuthCleared?.invoke()
     }
 
     override suspend fun clearToken() {
         storage.clear()
         _authToken.value = null
-        onAuthCleared?.invoke()
     }
 }

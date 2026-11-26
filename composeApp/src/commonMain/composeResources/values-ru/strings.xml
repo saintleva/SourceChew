@@ -30,6 +30,7 @@
     <string name="collapse">Свернуть</string>
     <string name="expand">Развернуть</string>
     <string name="search">Найти</string>
+    <string name="reset_filters">Сбросить фильтры</string>
     <string name="use_previous_search_conditions">Использовать результаты предыдущего поиска по этим параметрам</string>
     <string name="stop_search">Остановить поиск</string>
     <string name="go_back">Нззад</string>

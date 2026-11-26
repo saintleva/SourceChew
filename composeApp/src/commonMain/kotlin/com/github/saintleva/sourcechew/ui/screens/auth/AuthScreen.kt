@@ -48,6 +48,8 @@ fun AuthScreen(
     viewModel: AuthViewModel
 ) {
     val isAuthorized = viewModel.isAuthorized.collectAsStateWithLifecycle()
+    val token = viewModel.token.collectAsStateWithLifecycle()
+    val canSaveState = viewModel.canSaveState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -88,7 +90,7 @@ fun AuthScreen(
             TextButton(
                 onClick = viewModel::onTokenCopy,
                 contentPadding = PaddingValues(horizontal = 8.dp),
-                enabled = viewModel.token.value.isNotEmpty()
+                enabled = token.value.isNotEmpty()
             ) {
                 Icon(Icons.Default.ContentCopy, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(4.dp))
@@ -96,13 +98,13 @@ fun AuthScreen(
             }
         }
         OutlinedTextField(
-            value = viewModel.token.value,
+            value = token.value,
             onValueChange = viewModel::onTokenChange,
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(Res.string.enter_api_token)) },
             singleLine = true,
             trailingIcon = {
-                if (viewModel.token.value.isNotEmpty()) {
+                if (token.value.isNotEmpty()) {
                     IconButton(onClick = { viewModel.onTokenChange("") }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
@@ -113,10 +115,10 @@ fun AuthScreen(
             }
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Napier.d(tag = "AuthScreen") { "Token: ${viewModel.token.value}" }
+        Napier.d(tag = "AuthScreen") { "Token: ${token.value}" }
         Button(
             onClick = viewModel::onTokenSave,
-            enabled = viewModel.canSaveState.value,
+            enabled = canSaveState.value,
             modifier = Modifier.padding(top = 16.dp)
         ) {
             Text(

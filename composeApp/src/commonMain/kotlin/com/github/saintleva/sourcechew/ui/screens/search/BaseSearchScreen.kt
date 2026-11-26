@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +43,7 @@ import sourcechew.composeapp.generated.resources.ascending
 import sourcechew.composeapp.generated.resources.descending
 import sourcechew.composeapp.generated.resources.enter_search_text
 import sourcechew.composeapp.generated.resources.order
+import sourcechew.composeapp.generated.resources.reset_filters
 import sourcechew.composeapp.generated.resources.search
 import sourcechew.composeapp.generated.resources.stop_search
 import sourcechew.composeapp.generated.resources.use_previous_search_conditions
@@ -164,6 +166,13 @@ fun <SearchConditions : BaseSearchConditions<SearchConditions>, FoundItem : Foun
             enabled = selectingEnabled && maySearch
         ) {
             Text(stringResource(Res.string.search))
+        }
+        OutlinedButton(
+            onClick = viewModel::resetFilters,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = selectingEnabled
+        ) {
+            Text(stringResource(Res.string.reset_filters))
         }
     }
 }

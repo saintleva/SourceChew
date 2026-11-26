@@ -137,6 +137,7 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.paginator.offset)
+                implementation(libs.cmp.clipboard)
             }
         }
 

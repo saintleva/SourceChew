@@ -40,7 +40,7 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
     private val conditionsStore: ConfigStore<SearchConditions>,
     private val appSettingsStore: ConfigStore<AppSettings>,
     private val searchInteractor: SearchInteractor<SearchConditions, FoundItem>,
-    initialConditions: SearchConditions,
+    protected val initialConditions: SearchConditions,
     private val usePreviousSearchLens: Lens<AppSettings, Boolean>
 ) : ViewModel() {
 
@@ -64,6 +64,9 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
         )
 
     fun usePreviousSearchChange(checked: Boolean) {
+        if (!checked) {
+            searchInteractor.clear()
+        }
         viewModelScope.launch {
             appSettingsStore.update { usePreviousSearchLens.set(it, checked) }
         }
@@ -97,6 +100,11 @@ abstract class BaseSearchViewModel<SearchConditions : BaseSearchConditions<Searc
 
     fun clearSearch() {
         _conditions.updateCommonFilters { it.copy(query = "") }
+        searchInteractor.clear()
+    }
+
+    open fun resetFilters() {
+        _conditions.value = initialConditions
         searchInteractor.clear()
     }
 
