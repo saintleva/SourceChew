@@ -21,8 +21,13 @@ interface BranchStorage {
     /**
      * Extracts the specified ZIP archive into the target directory, stripping top-level archive prefix.
      * Cleans up existing files in target directory prior to extraction.
+     * Invokes [onExtractProgress] periodically with the number of processed files and total entries.
      */
-    suspend fun extractZipArchive(zipPath: Path, targetDirPath: Path): String
+    suspend fun extractZipArchive(
+        zipPath: Path,
+        targetDirPath: Path,
+        onExtractProgress: ((filesExtracted: Int, totalFiles: Int?) -> Unit)? = null
+    ): String
 
     /**
      * Safely deletes a file or directory if it exists.
@@ -51,7 +56,11 @@ class OkioBranchStorage(
         }
     }
 
-    override suspend fun extractZipArchive(zipPath: Path, targetDirPath: Path): String {
+    override suspend fun extractZipArchive(
+        zipPath: Path,
+        targetDirPath: Path,
+        onExtractProgress: ((filesExtracted: Int, totalFiles: Int?) -> Unit)?
+    ): String {
         // Ensure parent repo directory exists
         val parentDir = targetDirPath.parent
         if (parentDir != null && !fileSystem.exists(parentDir)) {
@@ -75,9 +84,17 @@ class OkioBranchStorage(
             }
 
             val allPaths = zipFileSystem.listRecursively(rootPath).toList()
+            val totalFiles = allPaths.size
+            var extractedCount = 0
+
+            onExtractProgress?.invoke(0, totalFiles)
 
             for (entryPath in allPaths) {
-                if (entryPath == rootPath || (topPrefix != null && entryPath == topPrefix)) continue
+                extractedCount++
+                if (entryPath == rootPath || (topPrefix != null && entryPath == topPrefix)) {
+                    onExtractProgress?.invoke(extractedCount, totalFiles)
+                    continue
+                }
 
                 val relativePath = if (topPrefix != null && entryPath.toString().startsWith(topPrefix.toString())) {
                     entryPath.relativeTo(topPrefix)
@@ -85,7 +102,10 @@ class OkioBranchStorage(
                     entryPath.relativeTo(rootPath)
                 }
 
-                if (relativePath.toString().isEmpty() || relativePath.toString() == ".") continue
+                if (relativePath.toString().isEmpty() || relativePath.toString() == ".") {
+                    onExtractProgress?.invoke(extractedCount, totalFiles)
+                    continue
+                }
 
                 val destinationPath = targetDirPath / relativePath
                 val isDirectory = zipFileSystem.metadata(entryPath).isDirectory
@@ -104,6 +124,7 @@ class OkioBranchStorage(
                         }
                     }
                 }
+                onExtractProgress?.invoke(extractedCount, totalFiles)
             }
         } finally {
             zipFileSystem.close()

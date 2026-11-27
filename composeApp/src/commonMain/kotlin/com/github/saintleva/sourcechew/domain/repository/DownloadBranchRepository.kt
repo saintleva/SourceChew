@@ -6,21 +6,12 @@ import com.github.saintleva.sourcechew.domain.result.Result
 
 interface DownloadBranchRepository {
     /**
-     * Downloads the branch ZIP archive to a temporary file while invoking [onProgress].
+     * Downloads and extracts the branch ZIP archive while reporting progress via [listener].
+     * Guarantees atomic, serialized execution per [branchRef] and automatic cleanup of temporary files.
+     * Returns the target directory path on success or [DetailsError] on failure.
      */
-    suspend fun downloadBranchArchive(
+    suspend fun downloadAndExtractBranch(
         branchRef: BranchRef,
-        onProgress: (bytesDownloaded: Long, totalBytes: Long?) -> Unit
-    ): Result<Unit, DetailsError>
-
-    /**
-     * Extracts the downloaded ZIP archive to local storage and cleans up the temporary ZIP file.
-     * Returns the target directory path string.
-     */
-    suspend fun extractBranchArchive(branchRef: BranchRef): String
-
-    /**
-     * Cleans up temporary download artifacts if present.
-     */
-    suspend fun cleanupTempFile(branchRef: BranchRef)
+        listener: BranchDownloadListener
+    ): Result<String, DetailsError>
 }

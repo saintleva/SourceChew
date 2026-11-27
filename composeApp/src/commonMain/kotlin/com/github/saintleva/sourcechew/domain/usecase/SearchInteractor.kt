@@ -17,26 +17,15 @@
 
 package com.github.saintleva.sourcechew.domain.usecase
 
-import com.github.saintleva.sourcechew.domain.coroutines.ioDispatcher
-import com.github.saintleva.sourcechew.domain.models.AppSettings
 import com.github.saintleva.sourcechew.domain.models.FoundBase
 import com.github.saintleva.sourcechew.domain.pagination.FIRST_PAGE
-import com.github.saintleva.sourcechew.domain.repository.AuthRepository
-import com.github.saintleva.sourcechew.domain.repository.ConfigStore
 import com.jamal_aliev.paginator.offset.Paginator
 import com.jamal_aliev.paginator.offset.bookmark.BookmarkInt
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 
 sealed interface SearchState<out FoundItem: FoundBase> {
@@ -67,13 +56,8 @@ interface SearchInteractor<ItemSearchConditions, out FoundItem: FoundBase> {
 }
 
 class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
-    private val fetchFoundItemsUseCase: FetchFoundItemsUseCase<ItemSearchConditions, FoundItem>,
-    authRepository: AuthRepository,
-    appSettingsStore: ConfigStore<AppSettings>,
-    coroutineDispatcher: CoroutineDispatcher = ioDispatcher
+    private val fetchFoundItemsUseCase: FetchFoundItemsUseCase<ItemSearchConditions, FoundItem>
 ) : SearchInteractor<ItemSearchConditions, FoundItem> {
-
-    private val scope = CoroutineScope(coroutineDispatcher + SupervisorJob())
 
     private val _searchState = MutableStateFlow<SearchState<FoundItem>>(SearchState.Selecting)
     override val searchState = _searchState.asStateFlow()
@@ -89,24 +73,6 @@ class SearchInteractorImpl<ItemSearchConditions, out FoundItem: FoundBase>(
 
     init {
         Napier.d(tag = "init") { "SearchInteractor created: ${this.hashCode()}" }
-        scope.launch {
-            authRepository.authToken
-                .drop(1)
-                .collect {
-                    Napier.d(tag = "search") { "Auth token changed, clearing search interactor" }
-                    clear()
-                }
-        }
-        scope.launch {
-            appSettingsStore.config
-                .map { it.paginationPageSize }
-                .distinctUntilChanged()
-                .drop(1)
-                .collect {
-                    Napier.d(tag = "search") { "Page size changed, clearing search interactor" }
-                    clear()
-                }
-        }
     }
 
     override suspend fun search(conditions: ItemSearchConditions, usePreviousSearch: Boolean) {

@@ -43,6 +43,8 @@ import com.github.saintleva.sourcechew.domain.usecase.FetchOwnerReposUseCase
 import com.github.saintleva.sourcechew.domain.usecase.FetchOwnerReposUseCaseImpl
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractor
 import com.github.saintleva.sourcechew.domain.usecase.SearchInteractorImpl
+import com.github.saintleva.sourcechew.domain.usecase.SearchInvalidationObserver
+import com.github.saintleva.sourcechew.domain.usecase.SearchInvalidationObserverImpl
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 
@@ -121,17 +123,24 @@ val domainModule = module {
 
     single<SearchInteractor<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()) {
         SearchInteractorImpl(
-            fetchFoundItemsUseCase = get(qualifier<FoundRepo>()),
-            authRepository = get(),
-            appSettingsStore = get(qualifier<AppSettings>())
+            fetchFoundItemsUseCase = get(qualifier<FoundRepo>())
         )
     }
 
     single<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>()) {
         SearchInteractorImpl(
-            fetchFoundItemsUseCase = get(qualifier<FoundOwner>()),
+            fetchFoundItemsUseCase = get(qualifier<FoundOwner>())
+        )
+    }
+
+    single<SearchInvalidationObserver>(createdAtStart = true) {
+        SearchInvalidationObserverImpl(
             authRepository = get(),
-            appSettingsStore = get(qualifier<AppSettings>())
+            appSettingsStore = get(qualifier<AppSettings>()),
+            searchInteractors = listOf(
+                get<SearchInteractor<RepoSearchConditions, FoundRepo>>(qualifier<FoundRepo>()),
+                get<SearchInteractor<OwnerSearchConditions, FoundOwner>>(qualifier<FoundOwner>())
+            )
         )
     }
 

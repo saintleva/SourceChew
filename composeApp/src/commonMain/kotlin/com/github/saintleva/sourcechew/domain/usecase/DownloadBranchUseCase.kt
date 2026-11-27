@@ -2,6 +2,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 
 import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.domain.models.DownloadBranchStatus
+import com.github.saintleva.sourcechew.domain.repository.BranchDownloadListener
 import com.github.saintleva.sourcechew.domain.repository.DownloadBranchRepository
 import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.DownloadBranchError
@@ -22,31 +23,32 @@ class DownloadBranchUseCaseImpl(
         send(DownloadBranchStatus.Downloading(bytesDownloaded = 0L, totalBytes = null))
 
         try {
-            val downloadResult = downloadBranchRepository.downloadBranchArchive(
-                branchRef = branchRef
-            ) { bytesDownloaded, totalBytes ->
-                trySend(DownloadBranchStatus.Downloading(bytesDownloaded, totalBytes))
-            }
+            val result = downloadBranchRepository.downloadAndExtractBranch(
+                branchRef = branchRef,
+                listener = object : BranchDownloadListener {
+                    override fun onDownloadProgress(bytesDownloaded: Long, totalBytes: Long?) {
+                        trySend(DownloadBranchStatus.Downloading(bytesDownloaded, totalBytes))
+                    }
 
-            when (downloadResult) {
+                    override fun onExtractProgress(filesExtracted: Int, totalFiles: Int?) {
+                        trySend(DownloadBranchStatus.Extracting(filesExtracted, totalFiles))
+                    }
+                }
+            )
+
+            when (result) {
                 is Result.Success -> {
-                    send(DownloadBranchStatus.Extracting)
-                    val targetDir = downloadBranchRepository.extractBranchArchive(branchRef)
-                    send(DownloadBranchStatus.Success(targetDir))
+                    send(DownloadBranchStatus.Success(result.value))
                 }
                 is Result.Failure -> {
-                    downloadBranchRepository.cleanupTempFile(branchRef)
-                    send(DownloadBranchStatus.Failed(DownloadBranchError.Details(downloadResult.error)))
+                    send(DownloadBranchStatus.Failed(DownloadBranchError.Details(result.error)))
                 }
             }
         } catch (e: CancellationException) {
-            downloadBranchRepository.cleanupTempFile(branchRef)
             throw e
         } catch (e: AppException) {
-            downloadBranchRepository.cleanupTempFile(branchRef)
             send(DownloadBranchStatus.Failed(DownloadBranchError.Infrastructure(e)))
         } catch (e: Exception) {
-            downloadBranchRepository.cleanupTempFile(branchRef)
             send(DownloadBranchStatus.Failed(DownloadBranchError.Unknown(e)))
         }
     }

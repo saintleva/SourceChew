@@ -3,6 +3,7 @@ package com.github.saintleva.sourcechew.domain.usecase
 import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.domain.models.DownloadBranchStatus
 import com.github.saintleva.sourcechew.domain.models.RepoRef
+import com.github.saintleva.sourcechew.domain.repository.BranchDownloadListener
 import com.github.saintleva.sourcechew.domain.repository.DownloadBranchRepository
 import com.github.saintleva.sourcechew.domain.result.DetailsError
 import com.github.saintleva.sourcechew.domain.result.DownloadBranchError
@@ -18,22 +19,18 @@ class DownloadBranchUseCaseTest : FunSpec({
     val branch = "main"
     val branchRef = BranchRef(dummyRepoRef, branch)
 
-    test("emits Downloading, Extracting, and Success on happy path") {
+    test("emits Downloading, Extracting with progress, and Success on happy path") {
         val fakeRepo = object : DownloadBranchRepository {
-            override suspend fun downloadBranchArchive(
+            override suspend fun downloadAndExtractBranch(
                 branchRef: BranchRef,
-                onProgress: (bytesDownloaded: Long, totalBytes: Long?) -> Unit
-            ): Result<Unit, DetailsError> {
-                onProgress(500L, 1000L)
-                onProgress(1000L, 1000L)
-                return Result.Success(Unit)
+                listener: BranchDownloadListener
+            ): Result<String, DetailsError> {
+                listener.onDownloadProgress(500L, 1000L)
+                listener.onDownloadProgress(1000L, 1000L)
+                listener.onExtractProgress(5, 10)
+                listener.onExtractProgress(10, 10)
+                return Result.Success("/path/to/extracted/main")
             }
-
-            override suspend fun extractBranchArchive(branchRef: BranchRef): String {
-                return "/path/to/extracted/main"
-            }
-
-            override suspend fun cleanupTempFile(branchRef: BranchRef) = Unit
         }
 
         val useCase = DownloadBranchUseCaseImpl(fakeRepo)
@@ -42,33 +39,24 @@ class DownloadBranchUseCaseTest : FunSpec({
         statuses.first() shouldBe DownloadBranchStatus.Downloading(0L, null)
         statuses.any { it is DownloadBranchStatus.Downloading && it.bytesDownloaded == 500L } shouldBe true
         statuses.any { it is DownloadBranchStatus.Downloading && it.bytesDownloaded == 1000L } shouldBe true
-        statuses.any { it is DownloadBranchStatus.Extracting } shouldBe true
+        statuses.any { it is DownloadBranchStatus.Extracting && it.filesExtracted == 5 && it.totalFiles == 10 } shouldBe true
+        statuses.any { it is DownloadBranchStatus.Extracting && it.filesExtracted == 10 && it.totalFiles == 10 } shouldBe true
         statuses.last() shouldBe DownloadBranchStatus.Success("/path/to/extracted/main")
     }
 
     test("emits Failed on repository download error") {
-        var cleanedUp = false
         val fakeRepo = object : DownloadBranchRepository {
-            override suspend fun downloadBranchArchive(
+            override suspend fun downloadAndExtractBranch(
                 branchRef: BranchRef,
-                onProgress: (bytesDownloaded: Long, totalBytes: Long?) -> Unit
-            ): Result<Unit, DetailsError> {
+                listener: BranchDownloadListener
+            ): Result<String, DetailsError> {
                 return Result.Failure(DetailsError.ResourceNotFound)
-            }
-
-            override suspend fun extractBranchArchive(branchRef: BranchRef): String {
-                error("Should not be called")
-            }
-
-            override suspend fun cleanupTempFile(branchRef: BranchRef) {
-                cleanedUp = true
             }
         }
 
         val useCase = DownloadBranchUseCaseImpl(fakeRepo)
         val statuses = useCase(branchRef).toList()
 
-        cleanedUp shouldBe true
         val lastStatus = statuses.last()
         lastStatus.shouldBeInstanceOf<DownloadBranchStatus.Failed>()
         (lastStatus.error as DownloadBranchError.Details).detailsError shouldBe DetailsError.ResourceNotFound

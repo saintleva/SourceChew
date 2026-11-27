@@ -23,7 +23,22 @@ sealed interface DownloadBranchStatus {
             }
     }
 
-    data object Extracting : DownloadBranchStatus
+    /**
+     * Indicates active archive extraction.
+     * @param filesExtracted Number of files/directories extracted so far.
+     * @param totalFiles Total count of files/directories in the archive, or null if unknown.
+     */
+    data class Extracting(
+        val filesExtracted: Int = 0,
+        val totalFiles: Int? = null
+    ) : DownloadBranchStatus {
+        val progress: Float?
+            get() = if (totalFiles != null && totalFiles > 0) {
+                (filesExtracted.toFloat() / totalFiles.toFloat()).coerceIn(0f, 1f)
+            } else {
+                null
+            }
+    }
 
     data class Success(
         val targetDirectory: String

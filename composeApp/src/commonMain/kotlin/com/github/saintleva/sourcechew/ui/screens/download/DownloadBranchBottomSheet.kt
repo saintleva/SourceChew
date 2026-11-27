@@ -1,7 +1,6 @@
 package com.github.saintleva.sourcechew.ui.screens.download
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,15 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -29,12 +25,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.saintleva.sourcechew.domain.models.BranchRef
 import com.github.saintleva.sourcechew.domain.models.DownloadBranchStatus
+import com.github.saintleva.sourcechew.ui.common.LabeledLinearProgressBar
 import com.github.saintleva.sourcechew.ui.common.getErrorMessage
 import org.jetbrains.compose.resources.stringResource
 import sourcechew.composeapp.generated.resources.Res
@@ -113,47 +109,21 @@ fun DownloadBranchBottomSheet(
                     val downloaded = progress?.bytesDownloaded ?: 0L
                     val total = progress?.totalBytes
 
+                    val label = if (total != null && total > 0L) {
+                        "${stringResource(Res.string.download_branch_downloading)} (${formatBytes(downloaded)} / ${formatBytes(total)})"
+                    } else {
+                        "${stringResource(Res.string.download_branch_downloading)} (${formatBytes(downloaded)})"
+                    }
+
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        if (total != null && total > 0L) {
-                            val fraction = (downloaded.toFloat() / total.toFloat()).coerceIn(0f, 1f)
-                            val percentage = (fraction * 100).toInt()
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                LinearProgressIndicator(
-                                    progress = { fraction },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(20.dp)
-                                        .clip(RoundedCornerShape(10.dp))
-                                )
-                                Text(
-                                    text = "$percentage%",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
-                            }
-                            Text(
-                                text = "${stringResource(Res.string.download_branch_downloading)} (${formatBytes(downloaded)} / ${formatBytes(total)})",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        } else {
-                            LinearProgressIndicator(
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Text(
-                                text = "${stringResource(Res.string.download_branch_downloading)} (${formatBytes(downloaded)})",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        LabeledLinearProgressBar(
+                            progress = progress?.progress,
+                            label = label
+                        )
 
                         OutlinedButton(
                             onClick = {
@@ -167,16 +137,23 @@ fun DownloadBranchBottomSheet(
                 }
 
                 is DownloadBranchStatus.Extracting -> {
+                    val extracted = currentStatus.filesExtracted
+                    val total = currentStatus.totalFiles
+
+                    val label = if (total != null && total > 0) {
+                        "${stringResource(Res.string.download_branch_extracting)} ($extracted / $total)"
+                    } else {
+                        stringResource(Res.string.download_branch_extracting)
+                    }
+
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        CircularProgressIndicator()
-                        Text(
-                            text = stringResource(Res.string.download_branch_extracting),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        LabeledLinearProgressBar(
+                            progress = currentStatus.progress,
+                            label = label
                         )
                     }
                 }
