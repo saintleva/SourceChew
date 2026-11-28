@@ -8,7 +8,10 @@ import com.github.saintleva.sourcechew.domain.result.AppException
 import com.github.saintleva.sourcechew.domain.result.DownloadBranchError
 import com.github.saintleva.sourcechew.domain.result.Result
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.channelFlow
 
 interface DownloadBranchUseCase {
@@ -27,10 +30,12 @@ class DownloadBranchUseCaseImpl(
                 branchRef = branchRef,
                 listener = object : BranchDownloadListener {
                     override fun onDownloadProgress(bytesDownloaded: Long, totalBytes: Long?) {
+                        // trySend emits progress non-blockingly; if channel is closed or full, result is safely dropped
                         trySend(DownloadBranchStatus.Downloading(bytesDownloaded, totalBytes))
                     }
 
                     override fun onExtractProgress(filesExtracted: Int, totalFiles: Int?) {
+                        // trySend emits progress non-blockingly; if channel is closed or full, result is safely dropped
                         trySend(DownloadBranchStatus.Extracting(filesExtracted, totalFiles))
                     }
                 }
@@ -51,5 +56,5 @@ class DownloadBranchUseCaseImpl(
         } catch (e: Exception) {
             send(DownloadBranchStatus.Failed(DownloadBranchError.Unknown(e)))
         }
-    }
+    }.buffer(capacity = 64, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 }

@@ -1,6 +1,8 @@
 package com.github.saintleva.sourcechew.data.storage
 
 import com.github.saintleva.sourcechew.domain.models.BranchRef
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -89,42 +91,51 @@ class OkioBranchStorage(
 
             onExtractProgress?.invoke(0, totalFiles)
 
-            for (entryPath in allPaths) {
-                extractedCount++
-                if (entryPath == rootPath || (topPrefix != null && entryPath == topPrefix)) {
-                    onExtractProgress?.invoke(extractedCount, totalFiles)
-                    continue
-                }
+            try {
+                for (entryPath in allPaths) {
+                    // Check for cancellat  ion before processing each zip entry
+                    currentCoroutineContext().ensureActive()
 
-                val relativePath = if (topPrefix != null && entryPath.toString().startsWith(topPrefix.toString())) {
-                    entryPath.relativeTo(topPrefix)
-                } else {
-                    entryPath.relativeTo(rootPath)
-                }
-
-                if (relativePath.toString().isEmpty() || relativePath.toString() == ".") {
-                    onExtractProgress?.invoke(extractedCount, totalFiles)
-                    continue
-                }
-
-                val destinationPath = targetDirPath / relativePath
-                val isDirectory = zipFileSystem.metadata(entryPath).isDirectory
-
-                if (isDirectory) {
-                    fileSystem.createDirectories(destinationPath)
-                } else {
-                    val destParent = destinationPath.parent
-                    if (destParent != null && !fileSystem.exists(destParent)) {
-                        fileSystem.createDirectories(destParent)
+                    extractedCount++
+                    if (entryPath == rootPath || (topPrefix != null && entryPath == topPrefix)) {
+                        onExtractProgress?.invoke(extractedCount, totalFiles)
+                        continue
                     }
 
-                    zipFileSystem.source(entryPath).use { source ->
-                        fileSystem.sink(destinationPath).buffer().use { sink ->
-                            sink.writeAll(source)
+                    val relativePath = if (topPrefix != null && entryPath.toString().startsWith(topPrefix.toString())) {
+                        entryPath.relativeTo(topPrefix)
+                    } else {
+                        entryPath.relativeTo(rootPath)
+                    }
+
+                    if (relativePath.toString().isEmpty() || relativePath.toString() == ".") {
+                        onExtractProgress?.invoke(extractedCount, totalFiles)
+                        continue
+                    }
+
+                    val destinationPath = targetDirPath / relativePath
+                    val isDirectory = zipFileSystem.metadata(entryPath).isDirectory
+
+                    if (isDirectory) {
+                        fileSystem.createDirectories(destinationPath)
+                    } else {
+                        val destParent = destinationPath.parent
+                        if (destParent != null && !fileSystem.exists(destParent)) {
+                            fileSystem.createDirectories(destParent)
+                        }
+
+                        zipFileSystem.source(entryPath).use { source ->
+                            fileSystem.sink(destinationPath).buffer().use { sink ->
+                                sink.writeAll(source)
+                            }
                         }
                     }
+                    onExtractProgress?.invoke(extractedCount, totalFiles)
                 }
-                onExtractProgress?.invoke(extractedCount, totalFiles)
+            } catch (e: Throwable) {
+                // Clean up target directory if extraction was cancelled or failed midway
+                deleteIfExists(targetDirPath)
+                throw e
             }
         } finally {
             zipFileSystem.close()

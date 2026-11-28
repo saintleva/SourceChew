@@ -135,9 +135,11 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.kotest.extensions.koin)
                 implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.mock)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.paginator.offset)
                 implementation(libs.cmp.clipboard)
+                implementation(libs.okio)
             }
         }
 
@@ -181,6 +183,7 @@ kotlin {
         }
 
         getByName("jvmDesktopTest") {
+            dependsOn(getByName("commonTest"))
             dependencies {
                 implementation(libs.kotest.runner.junit5)
                 implementation(libs.junit.platform.launcher)

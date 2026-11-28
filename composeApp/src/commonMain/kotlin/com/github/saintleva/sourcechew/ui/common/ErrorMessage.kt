@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.github.saintleva.sourcechew.domain.result.CommonApiError
 import com.github.saintleva.sourcechew.domain.result.DeserializationException
 import com.github.saintleva.sourcechew.domain.result.DetailsError
+import com.github.saintleva.sourcechew.domain.result.DownloadBranchError
 import com.github.saintleva.sourcechew.domain.result.InvalidTokenException
 import com.github.saintleva.sourcechew.domain.result.NetworkException
 import com.github.saintleva.sourcechew.domain.result.PagingBranchesException
@@ -51,11 +52,11 @@ fun getErrorMessage(detailsError: DetailsError): String {
 }
 
 @Composable
-fun getErrorMessage(downloadBranchError: com.github.saintleva.sourcechew.domain.result.DownloadBranchError): String {
+fun getErrorMessage(downloadBranchError: DownloadBranchError): String {
     return when (downloadBranchError) {
-        is com.github.saintleva.sourcechew.domain.result.DownloadBranchError.Details -> renderDetailsError(downloadBranchError.detailsError)
-        is com.github.saintleva.sourcechew.domain.result.DownloadBranchError.Infrastructure -> getErrorMessage(downloadBranchError.cause)
-        is com.github.saintleva.sourcechew.domain.result.DownloadBranchError.Unknown -> getErrorMessage(downloadBranchError.throwable)
+        is DownloadBranchError.Details -> renderDetailsError(downloadBranchError.detailsError)
+        is DownloadBranchError.Infrastructure -> getErrorMessage(downloadBranchError.cause)
+        is DownloadBranchError.Unknown -> getErrorMessage(downloadBranchError.throwable)
     }
 }
 
@@ -70,12 +71,27 @@ fun renderCommonApiError(commonApiError: CommonApiError): String = when (commonA
     is CommonApiError.Unauthorized -> stringResource(Res.string.error_unauthorized)
     is CommonApiError.RateLimitExceeded -> stringResource(Res.string.error_rate_limit_exceeded)
     is CommonApiError.ServerError -> stringResource(Res.string.error_server)
-    is CommonApiError.UnknownApiError -> stringResource(Res.string.error_unknown_api, commonApiError.statusCode)
+    is DetailsError.ResourceNotFound -> stringResource(Res.string.error_not_found)
+    is CommonApiError.BadRequest -> {
+        commonApiError.message ?: stringResource(Res.string.error_validation, "Bad Request (400)")
+    }
+    is CommonApiError.Conflict -> {
+        commonApiError.message ?: stringResource(Res.string.error_validation, "Conflict (409)")
+    }
+    is CommonApiError.UnprocessableEntity -> {
+        commonApiError.message ?: stringResource(Res.string.error_validation, "Unprocessable Entity (422)")
+    }
+    is CommonApiError.UnknownApiError -> {
+        commonApiError.message ?: stringResource(
+            Res.string.error_unknown_api, commonApiError.statusCode
+        )
+    }
 }
 
 @Composable
 fun renderSearchError(searchError: SearchError): String = when (searchError) {
     is SearchError.Validation -> stringResource(Res.string.error_validation, searchError.reason)
+    is SearchError.SearchNotFound -> stringResource(Res.string.error_not_found)
     is CommonApiError -> renderCommonApiError(searchError)
 }
 
